@@ -3,7 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { AppShell } from "./components/AppShell";
+import Home from "./pages/Home";
+import Meetings from "./pages/Meetings";
+import MeetingDetail from "./pages/MeetingDetail";
+import Tasks from "./pages/Tasks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,7 +19,20 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<AppShell><Home /></AppShell>} />
+          <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
+          <Route path="/meetings/:id" element={<AppShell><MeetingDetail /></AppShell>} />
+          <Route path="/tasks" element={<AppShell><Tasks /></AppShell>} />
+          <Route path="/templates" element={<AppShell><div className="p-8 text-center text-muted-foreground">Templates page coming soon</div></AppShell>} />
+          <Route path="/search" element={<AppShell><div className="p-8 text-center text-muted-foreground">Search page coming soon</div></AppShell>} />
+          <Route path="/automations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Automations page coming soon</div></AppShell>} />
+          <Route path="/integrations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Integrations page coming soon</div></AppShell>} />
+          <Route path="/insights" element={<AppShell><div className="p-8 text-center text-muted-foreground">Insights page coming soon</div></AppShell>} />
+          <Route path="/accounts" element={<AppShell><div className="p-8 text-center text-muted-foreground">Accounts page coming soon</div></AppShell>} />
+          <Route path="/notifications" element={<AppShell><div className="p-8 text-center text-muted-foreground">Notifications page coming soon</div></AppShell>} />
+          <Route path="/admin" element={<AppShell><div className="p-8 text-center text-muted-foreground">Admin page coming soon</div></AppShell>} />
+          <Route path="/billing" element={<AppShell><div className="p-8 text-center text-muted-foreground">Billing page coming soon</div></AppShell>} />
+          <Route path="/compliance" element={<AppShell><div className="p-8 text-center text-muted-foreground">Compliance page coming soon</div></AppShell>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
