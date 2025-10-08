@@ -8,6 +8,11 @@ import Home from "./pages/Home";
 import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
 import Tasks from "./pages/Tasks";
+import Accounts from "./pages/Accounts";
+import Notifications from "./pages/Notifications";
+import Admin from "./pages/Admin";
+import Billing from "./pages/Billing";
+import Compliance from "./pages/Compliance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,11 +33,11 @@ const App = () => (
           <Route path="/automations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Automations page coming soon</div></AppShell>} />
           <Route path="/integrations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Integrations page coming soon</div></AppShell>} />
           <Route path="/insights" element={<AppShell><div className="p-8 text-center text-muted-foreground">Insights page coming soon</div></AppShell>} />
-          <Route path="/accounts" element={<AppShell><div className="p-8 text-center text-muted-foreground">Accounts page coming soon</div></AppShell>} />
-          <Route path="/notifications" element={<AppShell><div className="p-8 text-center text-muted-foreground">Notifications page coming soon</div></AppShell>} />
-          <Route path="/admin" element={<AppShell><div className="p-8 text-center text-muted-foreground">Admin page coming soon</div></AppShell>} />
-          <Route path="/billing" element={<AppShell><div className="p-8 text-center text-muted-foreground">Billing page coming soon</div></AppShell>} />
-          <Route path="/compliance" element={<AppShell><div className="p-8 text-center text-muted-foreground">Compliance page coming soon</div></AppShell>} />
+          <Route path="/accounts" element={<AppShell><Accounts /></AppShell>} />
+          <Route path="/notifications" element={<AppShell><Notifications /></AppShell>} />
+          <Route path="/admin" element={<AppShell><Admin /></AppShell>} />
+          <Route path="/billing" element={<AppShell><Billing /></AppShell>} />
+          <Route path="/compliance" element={<AppShell><Compliance /></AppShell>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
