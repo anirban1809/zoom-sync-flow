@@ -7,6 +7,7 @@ import { AppShell } from "./components/AppShell";
 import Home from "./pages/Home";
 import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
+import Calendars from "./pages/Calendars";
 import Tasks from "./pages/Tasks";
 import Accounts from "./pages/Accounts";
 import Notifications from "./pages/Notifications";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<AppShell><Home /></AppShell>} />
           <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
           <Route path="/meetings/:id" element={<AppShell><MeetingDetail /></AppShell>} />
+          <Route path="/calendars" element={<AppShell><Calendars /></AppShell>} />
           <Route path="/tasks" element={<AppShell><Tasks /></AppShell>} />
           <Route path="/templates" element={<AppShell><div className="p-8 text-center text-muted-foreground">Templates page coming soon</div></AppShell>} />
           <Route path="/search" element={<AppShell><div className="p-8 text-center text-muted-foreground">Search page coming soon</div></AppShell>} />

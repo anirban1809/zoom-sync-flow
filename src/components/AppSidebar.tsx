@@ -15,6 +15,7 @@ import {
 const mainNav = [
   { title: 'Home', url: '/', icon: Home },
   { title: 'Meetings', url: '/meetings', icon: Calendar },
+  { title: 'Calendars', url: '/calendars', icon: Calendar },
   { title: 'Tasks', url: '/tasks', icon: CheckSquare },
   { title: 'Templates', url: '/templates', icon: FileText },
 ];
