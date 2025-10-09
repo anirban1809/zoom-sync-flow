@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Clock, MapPin, Users, Video, X } from 'lucide-react';
+import { Clock, MapPin, Users, Video, ArrowLeft } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, startOfMonth, endOfMonth, addDays } from 'date-fns';
 
 interface CalendarEvent {
@@ -22,8 +21,7 @@ interface CalendarEvent {
 interface CalendarViewProps {
   calendarName: string;
   calendarEmail: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onBack: () => void;
 }
 
 // Mock events for demonstration
@@ -77,7 +75,7 @@ const mockEvents: CalendarEvent[] = [
   },
 ];
 
-export default function CalendarView({ calendarName, calendarEmail, open, onOpenChange }: CalendarViewProps) {
+export default function CalendarView({ calendarName, calendarEmail, onBack }: CalendarViewProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
 
@@ -242,71 +240,72 @@ export default function CalendarView({ calendarName, calendarEmail, open, onOpen
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <div>
-              <div className="text-xl">{calendarName}</div>
-              <div className="text-sm text-muted-foreground font-normal">{calendarEmail}</div>
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="grid grid-cols-[280px_1fr] gap-4 flex-1 overflow-hidden">
-          <div className="space-y-4">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border pointer-events-auto"
-            />
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Legend</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-primary/20 border-2 border-primary" />
-                  <span className="text-xs">Sales Calls</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-accent/20 border-2 border-accent" />
-                  <span className="text-xs">Meetings</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-highlight/20 border-2 border-highlight" />
-                  <span className="text-xs">Internal</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Calendars
+        </Button>
+      </div>
 
-          <div className="flex flex-col overflow-hidden">
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="flex-1 flex flex-col">
-              <TabsList className="mb-4">
-                <TabsTrigger value="day">Day</TabsTrigger>
-                <TabsTrigger value="week">Week</TabsTrigger>
-                <TabsTrigger value="month">Month</TabsTrigger>
-              </TabsList>
+      <div>
+        <h2 className="text-2xl font-bold">{calendarName}</h2>
+        <p className="text-muted-foreground">{calendarEmail}</p>
+      </div>
 
-              <div className="flex-1 overflow-auto">
-                <TabsContent value="day" className="mt-0">
-                  {renderDayView()}
-                </TabsContent>
-
-                <TabsContent value="week" className="mt-0">
-                  {renderWeekView()}
-                </TabsContent>
-
-                <TabsContent value="month" className="mt-0">
-                  {renderMonthView()}
-                </TabsContent>
+      <div className="grid grid-cols-[280px_1fr] gap-6">
+        <div className="space-y-4">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => date && setSelectedDate(date)}
+            className="rounded-md border pointer-events-auto"
+          />
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Legend</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-primary/20 border-2 border-primary" />
+                <span className="text-xs">Sales Calls</span>
               </div>
-            </Tabs>
-          </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-accent/20 border-2 border-accent" />
+                <span className="text-xs">Meetings</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded bg-highlight/20 border-2 border-highlight" />
+                <span className="text-xs">Internal</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <div className="flex flex-col">
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="flex-1 flex flex-col">
+            <TabsList className="mb-4">
+              <TabsTrigger value="day">Day</TabsTrigger>
+              <TabsTrigger value="week">Week</TabsTrigger>
+              <TabsTrigger value="month">Month</TabsTrigger>
+            </TabsList>
+
+            <div className="flex-1">
+              <TabsContent value="day" className="mt-0">
+                {renderDayView()}
+              </TabsContent>
+
+              <TabsContent value="week" className="mt-0">
+                {renderWeekView()}
+              </TabsContent>
+
+              <TabsContent value="month" className="mt-0">
+                {renderMonthView()}
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -66,6 +66,16 @@ const autoJoinRules = [
 export default function Calendars() {
   const [selectedCalendar, setSelectedCalendar] = useState<typeof connectedCalendars[0] | null>(null);
 
+  if (selectedCalendar) {
+    return (
+      <CalendarView
+        calendarName={selectedCalendar.provider}
+        calendarEmail={selectedCalendar.email}
+        onBack={() => setSelectedCalendar(null)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -248,15 +258,6 @@ export default function Calendars() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {selectedCalendar && (
-        <CalendarView
-          calendarName={selectedCalendar.provider}
-          calendarEmail={selectedCalendar.email}
-          open={!!selectedCalendar}
-          onOpenChange={(open) => !open && setSelectedCalendar(null)}
-        />
-      )}
     </div>
   );
 }
