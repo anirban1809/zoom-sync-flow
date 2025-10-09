@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Calendar as CalendarIcon, Plus, RefreshCw, Check, X, Settings, Clock, Users, Zap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CalendarView from '@/components/CalendarView';
 
 const connectedCalendars = [
   {
@@ -62,6 +64,8 @@ const autoJoinRules = [
 ];
 
 export default function Calendars() {
+  const [selectedCalendar, setSelectedCalendar] = useState<typeof connectedCalendars[0] | null>(null);
+
   return (
     <div className="space-y-6">
       <div>
@@ -96,7 +100,11 @@ export default function Calendars() {
             </CardHeader>
             <CardContent className="space-y-4">
               {connectedCalendars.map((calendar) => (
-                <div key={calendar.id} className="border rounded-xl p-4 space-y-3">
+                <div 
+                  key={calendar.id} 
+                  className="border rounded-xl p-4 space-y-3 cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => setSelectedCalendar(calendar)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -240,6 +248,15 @@ export default function Calendars() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {selectedCalendar && (
+        <CalendarView
+          calendarName={selectedCalendar.provider}
+          calendarEmail={selectedCalendar.email}
+          open={!!selectedCalendar}
+          onOpenChange={(open) => !open && setSelectedCalendar(null)}
+        />
+      )}
     </div>
   );
 }
