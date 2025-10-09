@@ -9,6 +9,10 @@ import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
 import Calendars from "./pages/Calendars";
 import Tasks from "./pages/Tasks";
+import Search from "./pages/Search";
+import Automations from "./pages/Automations";
+import Integrations from "./pages/Integrations";
+import Insights from "./pages/Insights";
 import Accounts from "./pages/Accounts";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
@@ -31,10 +35,10 @@ const App = () => (
           <Route path="/calendars" element={<AppShell><Calendars /></AppShell>} />
           <Route path="/tasks" element={<AppShell><Tasks /></AppShell>} />
           <Route path="/templates" element={<AppShell><div className="p-8 text-center text-muted-foreground">Templates page coming soon</div></AppShell>} />
-          <Route path="/search" element={<AppShell><div className="p-8 text-center text-muted-foreground">Search page coming soon</div></AppShell>} />
-          <Route path="/automations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Automations page coming soon</div></AppShell>} />
-          <Route path="/integrations" element={<AppShell><div className="p-8 text-center text-muted-foreground">Integrations page coming soon</div></AppShell>} />
-          <Route path="/insights" element={<AppShell><div className="p-8 text-center text-muted-foreground">Insights page coming soon</div></AppShell>} />
+          <Route path="/search" element={<AppShell><Search /></AppShell>} />
+          <Route path="/automations" element={<AppShell><Automations /></AppShell>} />
+          <Route path="/integrations" element={<AppShell><Integrations /></AppShell>} />
+          <Route path="/insights" element={<AppShell><Insights /></AppShell>} />
           <Route path="/accounts" element={<AppShell><Accounts /></AppShell>} />
           <Route path="/notifications" element={<AppShell><Notifications /></AppShell>} />
           <Route path="/admin" element={<AppShell><Admin /></AppShell>} />
