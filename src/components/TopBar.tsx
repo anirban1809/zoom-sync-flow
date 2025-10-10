@@ -1,4 +1,5 @@
-import { Search, Plus, Bell, ChevronDown } from 'lucide-react';
+import { Search, Plus, Bell, ChevronDown, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,6 +15,8 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 
 export function TopBar() {
+  const { theme, setTheme } = useTheme();
+  
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-6">
       <SidebarTrigger />
@@ -47,6 +50,15 @@ export function TopBar() {
             <DropdownMenuItem>Automation</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+        </Button>
 
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
