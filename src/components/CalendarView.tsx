@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -78,6 +79,7 @@ const mockEvents: CalendarEvent[] = [
 export default function CalendarView({ calendarName, calendarEmail, onBack }: CalendarViewProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
+  const navigate = useNavigate();
 
   const getEventsForDate = (date: Date) => {
     return mockEvents.filter(event => isSameDay(event.start, date));
@@ -120,7 +122,11 @@ export default function CalendarView({ calendarName, calendarEmail, onBack }: Ca
                   {events
                     .filter(event => event.start.getHours() === hour)
                     .map(event => (
-                      <div key={event.id} className={`border-l-4 ${event.color} p-2 rounded mb-1`}>
+                      <div 
+                        key={event.id} 
+                        className={`border-l-4 ${event.color} p-2 rounded mb-1 cursor-pointer hover:opacity-80 transition-opacity`}
+                        onClick={() => navigate(`/meetings/${event.id}`)}
+                      >
                         <div className="font-medium text-sm">{event.title}</div>
                         <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
                           <Clock className="h-3 w-3" />
@@ -168,7 +174,11 @@ export default function CalendarView({ calendarName, calendarEmail, onBack }: Ca
                 </div>
                 <div className="p-2 min-h-[300px] space-y-1">
                   {getEventsForDate(day).map(event => (
-                    <div key={event.id} className={`border-l-4 ${event.color} p-1.5 rounded text-xs`}>
+                    <div 
+                      key={event.id} 
+                      className={`border-l-4 ${event.color} p-1.5 rounded text-xs cursor-pointer hover:opacity-80 transition-opacity`}
+                      onClick={() => navigate(`/meetings/${event.id}`)}
+                    >
                       <div className="font-medium truncate">{event.title}</div>
                       <div className="text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
@@ -220,7 +230,11 @@ export default function CalendarView({ calendarName, calendarEmail, onBack }: Ca
                   </div>
                   <div className="space-y-0.5">
                     {dayEvents.slice(0, 2).map(event => (
-                      <div key={event.id} className={`border-l-2 ${event.color} px-1 py-0.5 text-xs truncate`}>
+                      <div 
+                        key={event.id} 
+                        className={`border-l-2 ${event.color} px-1 py-0.5 text-xs truncate cursor-pointer hover:opacity-80 transition-opacity`}
+                        onClick={() => navigate(`/meetings/${event.id}`)}
+                      >
                         {event.title}
                       </div>
                     ))}
