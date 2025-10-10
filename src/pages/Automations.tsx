@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Plus, Zap, Play, Pause, Edit, Trash2, Clock, Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import CreateAutomationModal from '@/components/CreateAutomationModal';
 
 const automations = [
   {
@@ -70,6 +72,8 @@ const templates = [
 ];
 
 export default function Automations() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -79,11 +83,16 @@ export default function Automations() {
             Automate workflows and tasks based on meeting insights
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Create Automation
         </Button>
       </div>
+
+      <CreateAutomationModal 
+        open={isCreateModalOpen} 
+        onOpenChange={setIsCreateModalOpen}
+      />
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
