@@ -34,7 +34,7 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 9% 70%;
+    --border: 220 9% 85%;
     --input: 220 14% 90%;
     --ring: 158 48% 53%;
 
@@ -46,7 +46,7 @@ All colors MUST be HSL.
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 14% 90%;
     --sidebar-accent-foreground: 220 8% 25%;
-    --sidebar-border: 220 9% 70%;
+    --sidebar-border: 220 9% 85%;
     --sidebar-ring: 158 48% 53%;
 
     --success: 158 48% 53%;
@@ -98,7 +98,7 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 6% 25%;
+    --border: 220 6% 35%;
     --input: 220 6% 25%;
     --ring: 158 48% 53%;
 
@@ -108,7 +108,7 @@ All colors MUST be HSL.
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 6% 20%;
     --sidebar-accent-foreground: 220 14% 90%;
-    --sidebar-border: 220 6% 25%;
+    --sidebar-border: 220 6% 35%;
     --sidebar-ring: 158 48% 53%;
 
     --success: 158 48% 53%;
