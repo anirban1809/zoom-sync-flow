@@ -124,52 +124,50 @@ export default function AIChat() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-0">
-        {/* Header */}
-        <div className="flex-shrink-0 p-6 pb-0">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
-            <p className="text-muted-foreground mt-2">
-              Ask about your meetings, transcripts, and action items.
-            </p>
-          </div>
-
-          {/* Context Bar */}
-          <div className="px-6 pb-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              {scopeChips.map((chip) => (
-                <Badge key={chip} variant="secondary" className="gap-1">
-                  {chip}
-                  <button
-                    className="ml-1"
-                    onClick={() => removeScope(chip)}
-                  >
-                    ×
-                  </button>
-                </Badge>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addScope("Last 7 days")}
-              >
-                <Plus className="mr-1 h-3 w-3" />
-                Add scope
-              </Button>
-              <Button variant="outline" size="sm">
-                <Calendar className="mr-1 h-3 w-3" />
-                Attach meetings
-              </Button>
-            </div>
-          </div>
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <div className="flex-shrink-0 p-6 pb-0">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
+          <p className="text-muted-foreground mt-2">
+            Ask about your meetings, transcripts, and action items.
+          </p>
         </div>
+      </div>
 
-        {/* Conversation Area */}
-        <div className="flex-1 overflow-y-auto p-6">
+      {/* Context Bar */}
+      <div className="flex-shrink-0 px-6 pb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          {scopeChips.map((chip) => (
+            <Badge key={chip} variant="secondary" className="gap-1">
+              {chip}
+              <button
+                className="ml-1"
+                onClick={() => removeScope(chip)}
+              >
+                ×
+              </button>
+            </Badge>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addScope("Last 7 days")}
+          >
+            <Plus className="mr-1 h-3 w-3" />
+            Add scope
+          </Button>
+          <Button variant="outline" size="sm">
+            <Calendar className="mr-1 h-3 w-3" />
+            Attach meetings
+          </Button>
+        </div>
+      </div>
+
+      {/* Conversation Area */}
+      <div className="flex-1 overflow-y-auto px-6">
           {messages.length === 0 ? (
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div className="max-w-3xl mx-auto space-y-6 py-6">
               <div className="text-center space-y-2 mb-8">
                 <h2 className="text-lg font-medium">Get started with AI Chat</h2>
                 <p className="text-sm text-muted-foreground">
@@ -191,7 +189,7 @@ export default function AIChat() {
               </div>
             </div>
           ) : (
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div className="max-w-3xl mx-auto space-y-6 py-6">
               {messages.map((message) => (
                 <div key={message.id} className="space-y-3">
                   <div
@@ -321,8 +319,8 @@ export default function AIChat() {
           )}
         </div>
 
-        {/* Composer */}
-        <div className="border-t bg-background p-4 flex-shrink-0">
+        {/* Composer - Fixed at bottom */}
+        <div className="flex-shrink-0 border-t bg-background p-4">
           <div className="max-w-3xl mx-auto space-y-3">
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -358,7 +356,6 @@ export default function AIChat() {
               <Button variant="link" size="sm" className="text-xs">
                 Prompt tips
               </Button>
-            </div>
           </div>
         </div>
       </div>
