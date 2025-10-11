@@ -20,8 +20,6 @@ import {
   UserPlus,
   Building2,
   Clock,
-  Star,
-  History,
   ArrowUpDown,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -184,16 +182,6 @@ const mockFiles = [
   },
 ];
 
-const recentSearches = [
-  'owner:me has:recording',
-  'account:"Acme Corp" before:2025-10-01',
-  'speaker:"Sarah Chen" has:decision',
-];
-
-const savedSearches = [
-  { id: '1', name: 'My meetings with recordings', query: 'owner:me has:recording' },
-  { id: '2', name: 'Acme Corp meetings', query: 'account:"Acme Corp"' },
-];
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -529,10 +517,23 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Results area */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      {/* Empty State or Results area */}
+      {!searchQuery ? (
+        <div className="flex flex-col items-center justify-center py-24 px-4">
+          <SearchIcon className="h-16 w-16 text-muted-foreground/40 mb-6" />
+          <h2 className="text-2xl font-semibold mb-3">Search your meetings and content</h2>
+          <p className="text-muted-foreground text-center max-w-md mb-6">
+            Search across meetings, action items, transcripts, accounts, and files. Use operators like "owner:me" or "has:recording" for advanced searches.
+          </p>
+          <Button variant="outline" onClick={() => setShowSearchTips(true)}>
+            <HelpCircle className="h-4 w-4 mr-2" />
+            View search tips
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex items-center justify-between mb-4">
               <TabsList>
                 <TabsTrigger value="meetings">
@@ -869,65 +870,7 @@ export default function Search() {
           </Tabs>
         </div>
       </div>
-
-      {/* Secondary panels */}
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <History className="h-4 w-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Recent Searches</h3>
-            </div>
-            <div className="space-y-2">
-              {recentSearches.map((search, idx) => (
-                <button
-                  key={idx}
-                  className="w-full text-left text-sm p-2 rounded hover:bg-accent transition-colors"
-                  onClick={() => setSearchQuery(search)}
-                >
-                  <code className="text-xs">{search}</code>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Star className="h-4 w-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Saved Searches</h3>
-            </div>
-            <div className="space-y-2">
-              {savedSearches.map((search) => (
-                <div
-                  key={search.id}
-                  className="flex items-center justify-between p-2 rounded hover:bg-accent transition-colors"
-                >
-                  <button
-                    className="flex-1 text-left text-sm"
-                    onClick={() => setSearchQuery(search.query)}
-                  >
-                    <p className="font-medium">{search.name}</p>
-                    <code className="text-xs text-muted-foreground">{search.query}</code>
-                  </button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <MoreHorizontal className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Rename</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   );
 }
