@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AppShell } from "./components/AppShell";
 import Home from "./pages/Home";
+import AIChat from "./pages/AIChat";
 import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
 import Calendars from "./pages/Calendars";
@@ -34,6 +35,7 @@ const App = () => (
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppShell><Home /></AppShell>} />
+          <Route path="/ai-chat" element={<AppShell><AIChat /></AppShell>} />
           <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
           <Route path="/meetings/:id" element={<AppShell><MeetingDetail /></AppShell>} />
           <Route path="/calendars" element={<AppShell><Calendars /></AppShell>} />

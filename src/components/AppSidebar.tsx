@@ -1,4 +1,4 @@
-import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Bell, Settings, CreditCard, Shield, StickyNote, Database, HelpCircle } from 'lucide-react';
+import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Bell, Settings, CreditCard, Shield, StickyNote, Database, HelpCircle, MessageSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 
 const mainNav = [
   { title: 'Home', url: '/', icon: Home },
+  { title: 'AI Chat', url: '/ai-chat', icon: MessageSquare },
   { title: 'Meetings', url: '/meetings', icon: Calendar },
   { title: 'Calendars', url: '/calendars', icon: Calendar },
   { title: 'Tasks', url: '/tasks', icon: CheckSquare },
