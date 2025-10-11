@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import CalendarView from '@/components/CalendarView';
 
 const connectedCalendars = [
@@ -108,66 +109,114 @@ export default function Calendars() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {connectedCalendars.map((calendar) => (
-                <div 
-                  key={calendar.id} 
-                  className="border rounded-xl p-4 space-y-3 cursor-pointer hover:border-primary/50 transition-colors"
-                  onClick={() => setSelectedCalendar(calendar)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-primary" />
-                        <h3 className="font-semibold">{calendar.provider}</h3>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Calendar</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Last Sync</TableHead>
+                    <TableHead>Meetings</TableHead>
+                    <TableHead>Auto-join</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {connectedCalendars.map((calendar) => (
+                    <TableRow 
+                      key={calendar.id}
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        // Don't navigate if clicking on interactive elements
+                        if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[role="switch"]')) {
+                          return;
+                        }
+                        setSelectedCalendar(calendar);
+                      }}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="font-medium">{calendar.provider}</p>
+                            <p className="text-sm text-muted-foreground">{calendar.email}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                           <Check className="h-3 w-3 mr-1" />
                           {calendar.status}
                         </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{calendar.email}</p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Last sync: {calendar.lastSync}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {calendar.meetings} meetings this month
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor={`auto-join-${calendar.id}`} className="text-sm font-medium">
-                        Auto-join enabled meetings
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Automatically join and record meetings based on rules
-                      </p>
-                    </div>
-                    <Switch id={`auto-join-${calendar.id}`} checked={calendar.autoJoin} />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      <RefreshCw className="h-3 w-3 mr-2" />
-                      Sync Now
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-destructive">
-                      Disconnect
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {calendar.lastSync}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Users className="h-3 w-3 text-muted-foreground" />
+                          {calendar.meetings}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            id={`auto-join-${calendar.id}`} 
+                            checked={calendar.autoJoin}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <Label 
+                            htmlFor={`auto-join-${calendar.id}`}
+                            className="text-sm cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Enabled
+                          </Label>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle settings
+                            }}
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle sync
+                            }}
+                          >
+                            <RefreshCw className="h-3 w-3 mr-2" />
+                            Sync
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle disconnect
+                            }}
+                          >
+                            Disconnect
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </TabsContent>
