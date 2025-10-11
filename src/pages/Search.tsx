@@ -56,6 +56,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock data
 const mockMeetings = [
@@ -551,14 +552,132 @@ export default function Search() {
           </Button>
         </div>
       ) : isSearching ? (
-        <div className="flex flex-col items-center justify-center py-24 px-4">
-          <div className="relative mb-6">
-            <SearchIcon className="h-16 w-16 text-primary animate-pulse" />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <TabsList>
+                  <TabsTrigger value="meetings">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Meetings
+                  </TabsTrigger>
+                  <TabsTrigger value="actions">
+                    <Check className="h-4 w-4 mr-2" />
+                    Action items
+                  </TabsTrigger>
+                  <TabsTrigger value="transcripts">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Transcript & notes
+                  </TabsTrigger>
+                  <TabsTrigger value="accounts">
+                    <Users className="h-4 w-4 mr-2" />
+                    Accounts/People
+                  </TabsTrigger>
+                  <TabsTrigger value="files">
+                    <Paperclip className="h-4 w-4 mr-2" />
+                    Files & attachments
+                  </TabsTrigger>
+                </TabsList>
+
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-9 w-[160px]" />
+                </div>
+              </div>
+
+              {/* Skeleton for Meetings/Transcripts */}
+              {(activeTab === 'meetings' || activeTab === 'transcripts') && (
+                <TabsContent value={activeTab} className="space-y-6 mt-0">
+                  {[1, 2].map((i) => (
+                    <Card key={i}>
+                      <CardContent className="p-6">
+                        <div className="space-y-5">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-3 flex-1">
+                              <Skeleton className="h-6 w-3/4" />
+                              <div className="flex items-center gap-6">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-4 w-20" />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Skeleton className="h-6 w-16" />
+                              <Skeleton className="h-6 w-20" />
+                            </div>
+                          </div>
+                          <div className="pl-5 border-l-2 border-muted space-y-2">
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6" />
+                          </div>
+                          <div className="flex gap-3">
+                            <Skeleton className="h-8 w-16" />
+                            <Skeleton className="h-8 w-28" />
+                            <Skeleton className="h-8 w-32" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </TabsContent>
+              )}
+
+              {/* Skeleton for Action Items */}
+              {activeTab === 'actions' && (
+                <TabsContent value="actions" className="space-y-3 mt-0">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <Skeleton className="h-5 w-5" />
+                          <div className="flex-1 grid grid-cols-5 gap-4">
+                            <div className="col-span-2 space-y-2">
+                              <Skeleton className="h-4 w-3/4" />
+                              <Skeleton className="h-3 w-1/2" />
+                            </div>
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-6 w-24" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                          <div className="flex gap-2">
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-8 w-24" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </TabsContent>
+              )}
+
+              {/* Skeleton for Accounts/Files */}
+              {(activeTab === 'accounts' || activeTab === 'files') && (
+                <TabsContent value={activeTab} className="space-y-3 mt-0">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-6 flex-1">
+                            <div className="flex items-center gap-3">
+                              <Skeleton className="h-5 w-5" />
+                              <div className="space-y-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-3 w-16" />
+                              </div>
+                            </div>
+                            <Skeleton className="h-4 w-28" />
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-4 w-24" />
+                          </div>
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </TabsContent>
+              )}
+            </Tabs>
           </div>
-          <h2 className="text-2xl font-semibold mb-3">Searching...</h2>
-          <p className="text-muted-foreground text-center max-w-md">
-            Finding results for "{searchQuery}"
-          </p>
         </div>
       ) : showResults ? (
         <div className="space-y-4">
