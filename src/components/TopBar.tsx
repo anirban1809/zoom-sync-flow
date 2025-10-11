@@ -1,5 +1,6 @@
-import { Search, Plus, Bell, ChevronDown, Moon, Sun, CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { Search, Plus, Bell, ChevronDown, Moon, Sun, CheckCircle2, AlertCircle, Info, Building2, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -10,6 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
@@ -60,8 +68,30 @@ const mockNotifications = [
   },
 ];
 
+const mockWorkspaces = [
+  {
+    id: '1',
+    name: 'Acme Corp',
+    role: 'Owner',
+    current: true,
+  },
+  {
+    id: '2',
+    name: 'TechStart Inc',
+    role: 'Admin',
+    current: false,
+  },
+  {
+    id: '3',
+    name: 'Design Studio',
+    role: 'Member',
+    current: false,
+  },
+];
+
 export function TopBar() {
   const { theme, setTheme } = useTheme();
+  const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
   const unreadCount = mockNotifications.filter(n => !n.read).length;
 
   const getNotificationIcon = (type: string) => {
@@ -210,12 +240,50 @@ export function TopBar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile Settings</DropdownMenuItem>
             <DropdownMenuItem>Workspace Settings</DropdownMenuItem>
-            <DropdownMenuItem>Switch Workspace</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowWorkspaceSwitcher(true)}>
+              Switch Workspace
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Sign Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <Dialog open={showWorkspaceSwitcher} onOpenChange={setShowWorkspaceSwitcher}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Switch Workspace</DialogTitle>
+            <DialogDescription>
+              Select a workspace to switch to
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {mockWorkspaces.map((workspace) => (
+              <button
+                key={workspace.id}
+                className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors text-left"
+                onClick={() => {
+                  // Handle workspace switch
+                  setShowWorkspaceSwitcher(false);
+                }}
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback>
+                    <Building2 className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium">{workspace.name}</p>
+                  <p className="text-sm text-muted-foreground">{workspace.role}</p>
+                </div>
+                {workspace.current && (
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                )}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
