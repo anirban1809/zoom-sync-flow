@@ -20,6 +20,7 @@ import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
 import Billing from "./pages/Billing";
 import Compliance from "./pages/Compliance";
+import DataManagement from "./pages/DataManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/admin" element={<AppShell><Admin /></AppShell>} />
           <Route path="/billing" element={<AppShell><Billing /></AppShell>} />
           <Route path="/compliance" element={<AppShell><Compliance /></AppShell>} />
+          <Route path="/data-management" element={<AppShell><DataManagement /></AppShell>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

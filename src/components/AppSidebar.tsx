@@ -1,4 +1,4 @@
-import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Building2, Bell, Settings, CreditCard, Shield, StickyNote } from 'lucide-react';
+import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Building2, Bell, Settings, CreditCard, Shield, StickyNote, Database } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -33,6 +33,7 @@ const settingsNav = [
   { title: 'Admin', url: '/admin', icon: Settings },
   { title: 'Billing', url: '/billing', icon: CreditCard },
   { title: 'Compliance', url: '/compliance', icon: Shield },
+  { title: 'Data Management', url: '/data-management', icon: Database },
 ];
 
 export function AppSidebar() {
