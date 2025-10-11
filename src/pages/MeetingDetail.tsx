@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare } from 'lucide-react';
+import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -113,6 +113,30 @@ export default function MeetingDetail() {
           </div>
         </CardContent>
       </Card>
+
+      {meeting.status === 'completed' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Volume2 className="h-5 w-5" />
+              Meeting Recording
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <audio 
+              controls 
+              className="w-full"
+              style={{
+                height: '40px',
+                accentColor: 'hsl(var(--primary))'
+              }}
+            >
+              <source src="/audio/meeting-recording.mp3" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </CardContent>
+        </Card>
+      )}
 
       {summary && (
         <Tabs defaultValue="summary" className="space-y-4">
