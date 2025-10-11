@@ -55,7 +55,7 @@ export function TimePicker({ value, onChange, placeholder = "Pick a time" }: Tim
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <div className="flex pointer-events-auto">
-          <ScrollArea className="h-[240px]">
+          <ScrollArea className="h-[240px] w-[80px]">
             <div className="p-2">
               {hours.map((hour) => (
                 <button
@@ -72,7 +72,7 @@ export function TimePicker({ value, onChange, placeholder = "Pick a time" }: Tim
             </div>
           </ScrollArea>
           <div className="border-l" />
-          <ScrollArea className="h-[240px]">
+          <ScrollArea className="h-[240px] w-[80px]">
             <div className="p-2">
               {minutes.map((minute) => (
                 <button
