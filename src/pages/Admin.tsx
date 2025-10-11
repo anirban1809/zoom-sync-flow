@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Settings, Users, Shield, Database, Key, FileText, Clock, CheckCircle2, XCircle, MoreVertical, Plus, Mail } from 'lucide-react';
+import { InviteUserModal } from '@/components/InviteUserModal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -71,6 +72,7 @@ const users = [
 
 export default function Admin() {
   const [selectedTab, setSelectedTab] = useState('users');
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
     <div className="p-8">
@@ -112,7 +114,7 @@ export default function Admin() {
                     <CardTitle>Team Members</CardTitle>
                     <CardDescription>Manage user access and permissions</CardDescription>
                   </div>
-                  <Button>
+                  <Button onClick={() => setInviteModalOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Invite User
                   </Button>
@@ -429,6 +431,8 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <InviteUserModal open={inviteModalOpen} onOpenChange={setInviteModalOpen} />
     </div>
   );
 }
