@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Calendar, Plus, X, ChevronDown, Upload } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, X, ChevronDown, Upload } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +28,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { TimePicker } from "@/components/TimePicker";
+import { cn } from "@/lib/utils";
 
 interface CreateMeetingModalProps {
   open: boolean;
@@ -36,7 +45,7 @@ interface CreateMeetingModalProps {
 export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalProps) {
   const [title, setTitle] = useState("");
   const [allDay, setAllDay] = useState(false);
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<Date>();
   const [startTime, setStartTime] = useState("");
   const [duration, setDuration] = useState("60");
   const [timezone, setTimezone] = useState("America/New_York");
@@ -75,7 +84,7 @@ export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalPro
     onOpenChange(false);
   };
 
-  const isValid = title.trim().length > 0 && (!allDay ? date && startTime : date);
+  const isValid = title.trim().length > 0 && (allDay ? !!date : !!(date && startTime));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,21 +123,38 @@ export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalPro
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="date">Date *</Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            id="date"
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="start-time">Start time *</Label>
-                      <Input
-                        id="start-time"
-                        type="time"
+                      <TimePicker
                         value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
+                        onChange={setStartTime}
+                        placeholder="Pick start time"
                       />
                     </div>
                   </div>
@@ -136,13 +162,31 @@ export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalPro
 
                 {allDay && (
                   <div className="space-y-2">
-                    <Label htmlFor="date">Date *</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
+                    <Label htmlFor="date-allday">Date *</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="date-allday"
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={setDate}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 )}
 
@@ -463,7 +507,7 @@ export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalPro
                   {date && (
                     <p>
                       <span className="font-medium">Date:</span>{" "}
-                      {new Date(date).toLocaleDateString()} {!allDay && startTime && `at ${startTime}`}{" "}
+                      {format(date, "PPP")} {!allDay && startTime && `at ${startTime}`}{" "}
                       {!allDay && `(${duration} min, ${timezone})`}
                     </p>
                   )}
