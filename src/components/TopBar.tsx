@@ -196,7 +196,7 @@ export function TopBar() {
                 <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" />
                 <AvatarFallback>AK</AvatarFallback>
               </Avatar>
-              <span className="hidden sm:inline">Acme Corp</span>
+              <span className="hidden sm:inline">Alex Kim | Acme Corp</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
