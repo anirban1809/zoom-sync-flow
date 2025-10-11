@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +11,10 @@ import {
 import { MeetingCard } from "@/components/MeetingCard";
 import { TaskRow } from "@/components/TaskRow";
 import { mockMeetings, mockTasks } from "@/lib/mockData";
+import { CreateMeetingModal } from "@/components/CreateMeetingModal";
 
 export default function Home() {
+  const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
@@ -29,11 +32,22 @@ export default function Home() {
             Here's what's happening today
           </p>
         </div>
-        <Button size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          New Note
-        </Button>
+        <div className="flex gap-2">
+          <Button size="lg" variant="outline" className="gap-2" onClick={() => setCreateMeetingOpen(true)}>
+            <Calendar className="h-5 w-5" />
+            Create Meeting
+          </Button>
+          <Button size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            New Note
+          </Button>
+        </div>
       </div>
+
+      <CreateMeetingModal 
+        open={createMeetingOpen} 
+        onOpenChange={setCreateMeetingOpen}
+      />
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
