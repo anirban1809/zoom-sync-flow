@@ -86,13 +86,14 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] p-0">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
+      <DialogContent className="max-w-3xl max-h-[90vh] p-0 flex flex-col">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b flex-shrink-0">
           <DialogTitle>Invite users</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 py-6">
-          <div className="space-y-6">
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="px-6 py-6">
+            <div className="space-y-6">
             {/* 1) Add people */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">Add people</Label>
@@ -350,10 +351,11 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
               </div>
             </div>
           </div>
+          </div>
         </ScrollArea>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t flex items-center justify-between">
+        <div className="px-6 py-4 border-t flex items-center justify-between flex-shrink-0">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
