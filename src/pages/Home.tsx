@@ -9,8 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MeetingCard } from "@/components/MeetingCard";
-import { TaskRow } from "@/components/TaskRow";
-import { mockMeetings, mockTasks } from "@/lib/mockData";
+import { mockMeetings } from "@/lib/mockData";
 import { CreateMeetingModal } from "@/components/CreateMeetingModal";
 
 export default function Home() {
@@ -19,9 +18,6 @@ export default function Home() {
     (m) => m.start.toDateString() === new Date().toDateString()
   );
 
-  const upcomingTasks = mockTasks
-    .filter((t) => t.status !== "done")
-    .slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -49,46 +45,26 @@ export default function Home() {
         onOpenChange={setCreateMeetingOpen}
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Today's Meetings</CardTitle>
-            <CardDescription>Scheduled for October 7, 2025</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {todaysMeetings.length > 0 ? (
-              todaysMeetings.map((meeting) => (
-                <MeetingCard key={meeting.id} meeting={meeting} />
-              ))
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="mb-2">No meetings scheduled for today</p>
-                <Button variant="outline" size="sm">
-                  Connect Calendar
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>My Action Items</CardTitle>
-            <CardDescription>
-              {upcomingTasks.length} tasks pending
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {upcomingTasks.length > 0 ? (
-              upcomingTasks.map((task) => <TaskRow key={task.id} task={task} />)
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>All caught up! No pending tasks.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Today's Meetings</CardTitle>
+          <CardDescription>Scheduled for October 7, 2025</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {todaysMeetings.length > 0 ? (
+            todaysMeetings.map((meeting) => (
+              <MeetingCard key={meeting.id} meeting={meeting} />
+            ))
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="mb-2">No meetings scheduled for today</p>
+              <Button variant="outline" size="sm">
+                Connect Calendar
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
