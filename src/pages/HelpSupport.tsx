@@ -1,15 +1,18 @@
 import { useState } from "react";
 import {
   Search,
-  ChevronDown,
   ChevronRight,
   ExternalLink,
-  Clock,
-  AlertCircle,
   CheckCircle,
   FileText,
   Upload,
   Send,
+  Calendar,
+  Shield,
+  CreditCard,
+  Zap,
+  MessageSquare,
+  Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,173 +33,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const categories = [
-  { id: "all", label: "All" },
-  { id: "articles", label: "Articles" },
-  { id: "faqs", label: "FAQs" },
-  { id: "getting-started", label: "Getting Started" },
-  { id: "billing", label: "Billing" },
-  { id: "security", label: "Security" },
-  { id: "integrations", label: "Integrations" },
-];
-
-const quickActions = [
-  { label: "Getting started guide", icon: FileText },
-  { label: "Troubleshoot recording issues", icon: AlertCircle },
-  { label: "Billing & subscriptions", icon: FileText },
-  { label: "Integrations setup", icon: FileText },
-];
-
-const featuredHelp = [
+const topics = [
   {
+    id: "recordings",
     title: "Recordings & Transcripts",
-    description: "Learn how to manage and share your meeting recordings",
-    category: "Recordings",
+    description: "Manage and share your meeting recordings",
+    icon: Video,
   },
   {
+    id: "calendar",
     title: "Meetings & Calendar",
-    description: "Sync calendars and schedule meetings efficiently",
-    category: "Calendar",
+    description: "Sync calendars and schedule meetings",
+    icon: Calendar,
   },
   {
+    id: "automations",
     title: "Tasks & Automations",
-    description: "Automate workflows and manage action items",
-    category: "Automation",
+    description: "Automate workflows and action items",
+    icon: Zap,
   },
   {
-    title: "Data Management & Security",
-    description: "Understand data retention and security policies",
-    category: "Security",
+    id: "security",
+    title: "Data & Security",
+    description: "Data retention and security policies",
+    icon: Shield,
   },
   {
-    title: "Billing & Accounts",
-    description: "Manage subscriptions and payment methods",
-    category: "Billing",
+    id: "billing",
+    title: "Billing",
+    description: "Manage subscriptions and payments",
+    icon: CreditCard,
   },
   {
-    title: "Integrations (Zoom/Meet/Teams/CRM)",
+    id: "integrations",
+    title: "Integrations",
     description: "Connect with your favorite tools",
-    category: "Integrations",
+    icon: FileText,
   },
 ];
 
-const faqs = [
-  {
-    question: "How do I record a meeting?",
-    answer:
-      "To record a meeting, simply add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins.",
-  },
-  {
-    question: "Where can I find my transcripts?",
-    answer:
-      "All transcripts are available in the Meetings section. Click on any past meeting to view its recording, transcript, and AI-generated summary.",
-  },
-  {
-    question: "Can I edit transcripts?",
-    answer:
-      "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section to make changes.",
-  },
-  {
-    question: "How do I share a recording?",
-    answer:
-      "Navigate to the meeting detail page and click the 'Share' button. You can generate a shareable link or invite specific people via email.",
-  },
-  {
-    question: "What integrations are supported?",
-    answer:
-      "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and many more. Check the Integrations page for the full list.",
-  },
-  {
-    question: "How do I cancel my subscription?",
-    answer:
-      "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan at any time.",
-  },
-  {
-    question: "Is my data secure?",
-    answer:
-      "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards. Learn more in our Security & Compliance page.",
-  },
-  {
-    question: "How long are recordings stored?",
-    answer:
-      "Recordings are stored based on your plan. Free plans retain data for 30 days, while paid plans offer unlimited storage.",
-  },
+const faqChips = [
+  { question: "How do I record a meeting?", answer: "Add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins." },
+  { question: "Where are my transcripts?", answer: "All transcripts are in the Meetings section. Click any past meeting to view its recording, transcript, and AI summary." },
+  { question: "Can I edit transcripts?", answer: "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section." },
+  { question: "How do I share recordings?", answer: "Go to the meeting detail page and click 'Share'. Generate a link or invite people via email." },
+  { question: "What integrations are supported?", answer: "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and more." },
+  { question: "How do I cancel my subscription?", answer: "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan anytime." },
+  { question: "Is my data secure?", answer: "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards." },
+  { question: "How long are recordings stored?", answer: "Free plans retain data for 30 days, paid plans offer unlimited storage." },
 ];
 
 const recentTickets = [
-  {
-    id: "#12345",
-    subject: "Recording not joining meeting",
-    status: "In Progress",
-    updated: "2 hours ago",
-  },
-  {
-    id: "#12344",
-    subject: "Transcript accuracy issue",
-    status: "Resolved",
-    updated: "1 day ago",
-  },
-  {
-    id: "#12343",
-    subject: "Integration connection failed",
-    status: "Waiting for response",
-    updated: "2 days ago",
-  },
-];
-
-const quickLinks = [
-  { label: "Community forum / Feature requests", url: "#" },
-  { label: "API & developer docs", url: "#" },
-  { label: "Privacy, security & compliance", url: "#" },
-  { label: "Training webinars & tutorials", url: "#" },
-];
-
-const articles = [
-  {
-    title: "Getting Started with Recordin.ai",
-    snippet:
-      "Learn the basics of setting up your account and recording your first meeting",
-    category: "Getting Started",
-    readTime: "5 min",
-    badge: "New",
-  },
-  {
-    title: "Advanced Search Tips",
-    snippet:
-      "Master search operators to find exactly what you need in your transcripts",
-    category: "Features",
-    readTime: "3 min",
-    badge: null,
-  },
-  {
-    title: "Setting Up Zoom Integration",
-    snippet: "Step-by-step guide to connect your Zoom account",
-    category: "Integrations",
-    readTime: "4 min",
-    badge: "Updated",
-  },
-  {
-    title: "Understanding Your Bill",
-    snippet: "Breakdown of pricing tiers and usage calculations",
-    category: "Billing",
-    readTime: "6 min",
-    badge: null,
-  },
+  { id: "#12345", subject: "Recording not joining meeting", status: "In Progress", updated: "2 hours ago" },
+  { id: "#12344", subject: "Transcript accuracy issue", status: "Resolved", updated: "1 day ago" },
+  { id: "#12343", subject: "Integration connection failed", status: "Waiting for response", updated: "2 days ago" },
 ];
 
 export default function HelpSupport() {
+  const [view, setView] = useState<"main" | "search" | "contact">("main");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketCategory, setTicketCategory] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
@@ -209,409 +110,287 @@ export default function HelpSupport() {
       setTicketSubject("");
       setTicketCategory("");
       setTicketDescription("");
+      setShowAdvanced(false);
     }, 3000);
   };
 
   return (
-    <div className="p-8 space-y-6">
-      {/* Header */}
-      <div>
+    <div className="p-8 max-w-4xl mx-auto">
+      {/* Header - Simple, decision-first */}
+      <div className="space-y-6 mb-8">
         <h1 className="text-3xl font-bold">Help & Support</h1>
-        <p className="text-muted-foreground mt-1">
-          Find answers, get help, or contact our support team
-        </p>
-      </div>
 
-      {/* System Status Banner */}
-      <Card className="border-green-500/50 bg-green-500/5">
-        <CardContent className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <div>
-              <p className="font-medium">All systems operational</p>
-              <p className="text-sm text-muted-foreground">
-                Last updated: 5 minutes ago
-              </p>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" className="gap-2">
-            View incident details
-            <ExternalLink className="h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Search Bar */}
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Search help articles, FAQs, and guides..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 text-base"
-          />
-        </div>
-
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <Button
-              key={cat.id}
-              variant={selectedCategory === cat.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(cat.id)}
-            >
-              {cat.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {quickActions.map((action, idx) => (
+        {/* Two primary choices side-by-side */}
+        <div className="grid grid-cols-2 gap-4">
           <Button
-            key={idx}
-            variant="outline"
-            className="h-auto py-4 justify-start gap-3"
+            size="lg"
+            variant={view === "search" ? "default" : "outline"}
+            onClick={() => setView(view === "search" ? "main" : "search")}
+            className="h-auto py-4"
           >
-            <action.icon className="h-5 w-5" />
-            <span>{action.label}</span>
+            <Search className="h-5 w-5 mr-2" />
+            Search help
           </Button>
-        ))}
-      </div>
-
-      {/* Two Column Layout */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Featured Help Blocks */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Featured Help Topics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {featuredHelp.map((item, idx) => (
-                  <Card
-                    key={idx}
-                    className="hover:border-primary transition-colors cursor-pointer"
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-base">
-                            {item.title}
-                          </CardTitle>
-                          <Badge variant="outline" className="mt-2">
-                            {item.category}
-                          </Badge>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <CardDescription className="mt-2">
-                        {item.description}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* FAQs */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
-              <CardDescription>
-                Quick answers to common questions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {faqs.map((faq, idx) => (
-                  <AccordionItem key={idx} value={`item-${idx}`}>
-                    <AccordionTrigger className="text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-              <Button variant="link" className="mt-4">
-                View all FAQs →
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Article List */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Help Articles</CardTitle>
-                <Select defaultValue="relevance">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="relevance">Relevance</SelectItem>
-                    <SelectItem value="views">Most viewed</SelectItem>
-                    <SelectItem value="updated">Recently updated</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {articles.map((article, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start justify-between p-4 border rounded-lg hover:border-primary transition-colors cursor-pointer"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{article.title}</h4>
-                      {article.badge && (
-                        <Badge
-                          variant={
-                            article.badge === "New" ? "default" : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {article.badge}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {article.snippet}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>{article.category}</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {article.readTime}
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground mt-1" />
-                </div>
-              ))}
-              <Button variant="outline" className="w-full">
-                Load more articles
-              </Button>
-            </CardContent>
-          </Card>
+          <Button
+            size="lg"
+            variant={view === "contact" ? "default" : "outline"}
+            onClick={() => setView(view === "contact" ? "main" : "contact")}
+            className="h-auto py-4"
+          >
+            <MessageSquare className="h-5 w-5 mr-2" />
+            Contact support
+          </Button>
         </div>
 
-        {/* Right Column - Assist Panel */}
-        <div className="space-y-6">
-          {/* Contact Support Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Support</CardTitle>
-              <CardDescription>We're here to help</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {ticketSubmitted ? (
-                <div className="text-center py-8 space-y-3">
-                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
-                  <div>
-                    <p className="font-medium">Ticket submitted!</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Ticket ID: #12346
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      We'll respond within 24 hours
-                    </p>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    View ticket
-                  </Button>
-                </div>
-              ) : (
-                <Tabs defaultValue="email">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="email">Email</TabsTrigger>
-                    <TabsTrigger value="chat">Chat</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="email" className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label>Subject</Label>
-                      <Input
-                        placeholder="Brief description of your issue"
-                        value={ticketSubject}
-                        onChange={(e) => setTicketSubject(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Category</Label>
-                      <Select
-                        value={ticketCategory}
-                        onValueChange={setTicketCategory}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="recordings">
-                            Recordings/Transcripts
-                          </SelectItem>
-                          <SelectItem value="meetings">
-                            Meetings/Calendar
-                          </SelectItem>
-                          <SelectItem value="tasks">
-                            Tasks/Automations
-                          </SelectItem>
-                          <SelectItem value="integrations">
-                            Integrations
-                          </SelectItem>
-                          <SelectItem value="security">
-                            Data/Security
-                          </SelectItem>
-                          <SelectItem value="billing">Billing</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Priority</Label>
-                      <Select defaultValue="normal">
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="normal">Normal</SelectItem>
-                          <SelectItem value="urgent">Urgent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Textarea
-                        placeholder="Describe your issue in detail..."
-                        rows={4}
-                        value={ticketDescription}
-                        onChange={(e) => setTicketDescription(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Attachments</Label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full gap-2"
-                      >
-                        <Upload className="h-4 w-4" />
-                        Upload files
-                      </Button>
-                    </div>
-                    <Separator />
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="diagnostics" className="text-sm">
-                          Include diagnostic info
-                        </Label>
-                        <Switch id="diagnostics" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="logs" className="text-sm">
-                          Include last meeting logs
-                        </Label>
-                        <Switch id="logs" />
-                      </div>
-                    </div>
-                    <Button
-                      className="w-full gap-2"
-                      onClick={handleSubmitTicket}
-                    >
-                      <Send className="h-4 w-4" />
-                      Submit ticket
-                    </Button>
-                  </TabsContent>
-                  <TabsContent value="chat" className="mt-4">
-                    <div className="text-center py-8 space-y-3">
-                      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-                        <AlertCircle className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          Chat currently unavailable
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Please use email support or schedule a call
-                        </p>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Schedule a call
-                      </Button>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              )}
-            </CardContent>
-          </Card>
+        {/* Status line (compact) */}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span className="text-muted-foreground">All systems operational</span>
+          </div>
+          <Button variant="link" size="sm" className="gap-1 h-auto p-0">
+            View status
+            <ExternalLink className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
 
-          {/* Recent Tickets */}
+      {/* Search inline (when activated) */}
+      {view === "search" && (
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search help articles, FAQs, and guides..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12"
+                />
+              </div>
+              <Button variant="link" size="sm" className="h-auto p-0">
+                Search tips
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Contact support form (when activated) */}
+      {view === "contact" && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Contact Support</CardTitle>
+            <CardDescription>We'll respond within 24 hours</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {ticketSubmitted ? (
+              <div className="text-center py-8 space-y-3">
+                <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
+                <div>
+                  <p className="font-medium">Ticket submitted!</p>
+                  <p className="text-sm text-muted-foreground mt-1">Ticket ID: #12346</p>
+                </div>
+                <div className="flex gap-2 justify-center">
+                  <Button size="sm" variant="outline">View ticket</Button>
+                  <Button size="sm" variant="outline">Add more info</Button>
+                </div>
+              </div>
+            ) : (
+              <Tabs defaultValue="email">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="chat">Chat</TabsTrigger>
+                </TabsList>
+                <TabsContent value="email" className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Subject</Label>
+                    <Input
+                      placeholder="Brief description"
+                      value={ticketSubject}
+                      onChange={(e) => setTicketSubject(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <Select value={ticketCategory} onValueChange={setTicketCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="recordings">Recordings/Transcripts</SelectItem>
+                        <SelectItem value="meetings">Meetings/Calendar</SelectItem>
+                        <SelectItem value="automations">Tasks/Automations</SelectItem>
+                        <SelectItem value="security">Data/Security</SelectItem>
+                        <SelectItem value="billing">Billing</SelectItem>
+                        <SelectItem value="integrations">Integrations</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      placeholder="Describe your issue..."
+                      rows={4}
+                      value={ticketDescription}
+                      onChange={(e) => setTicketDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Attachments</Label>
+                    <Button variant="outline" size="sm" className="w-full gap-2">
+                      <Upload className="h-4 w-4" />
+                      Attach files
+                    </Button>
+                  </div>
+
+                  {/* Progressive disclosure */}
+                  <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="link" size="sm" className="h-auto p-0">
+                        {showAdvanced ? "Hide" : "Add details"}
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label>Priority</Label>
+                        <Select defaultValue="normal">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="urgent">Urgent</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Meeting ID (optional)</Label>
+                        <Input placeholder="meeting-123" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Affected Integration (optional)</Label>
+                        <Input placeholder="e.g., Zoom, Slack" />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  <Separator />
+                  <Button className="w-full gap-2" onClick={handleSubmitTicket}>
+                    <Send className="h-4 w-4" />
+                    Submit ticket
+                  </Button>
+                </TabsContent>
+                <TabsContent value="chat">
+                  <div className="text-center py-8 space-y-3">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
+                      <MessageSquare className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Chat currently unavailable</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Please use email support
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Self-serve section */}
+      <div className="space-y-8">
+        {/* Quick answers - FAQ chips */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Quick Answers</h2>
+          <div className="space-y-2">
+            {faqChips.map((faq, idx) => (
+              <Card key={idx} className="border">
+                <Collapsible open={expandedFaq === idx} onOpenChange={(open) => setExpandedFaq(open ? idx : null)}>
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
+                      <p className="text-sm font-medium text-left">{faq.question}</p>
+                      <ChevronRight className={`h-4 w-4 transition-transform ${expandedFaq === idx ? 'rotate-90' : ''}`} />
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Collapsible>
+              </Card>
+            ))}
+          </div>
+          <Button variant="link" className="mt-4 h-auto p-0">
+            View all FAQs →
+          </Button>
+        </div>
+
+        {/* Browse by topic */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Browse by Topic</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {topics.map((topic) => (
+              <Card
+                key={topic.id}
+                className="hover:border-primary transition-colors cursor-pointer"
+              >
+                <CardHeader>
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <topic.icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base">{topic.title}</CardTitle>
+                      <CardDescription className="mt-1">{topic.description}</CardDescription>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Your tickets */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Your Tickets</h2>
           <Card>
-            <CardHeader>
-              <CardTitle>Recent Tickets</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="pt-6 space-y-3">
               {recentTickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className="p-3 border rounded-lg hover:border-primary transition-colors cursor-pointer"
+                  className="flex items-start justify-between p-3 border rounded-lg hover:border-primary transition-colors cursor-pointer"
                 >
-                  <div className="flex items-start justify-between mb-1">
-                    <p className="font-medium text-sm">{ticket.id}</p>
-                    <Badge
-                      variant={
-                        ticket.status === "Resolved"
-                          ? "default"
-                          : ticket.status === "In Progress"
-                          ? "secondary"
-                          : "outline"
-                      }
-                      className="text-xs"
-                    >
-                      {ticket.status}
-                    </Badge>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-medium text-sm">{ticket.id}</p>
+                      <Badge
+                        variant={
+                          ticket.status === "Resolved"
+                            ? "default"
+                            : ticket.status === "In Progress"
+                            ? "secondary"
+                            : "outline"
+                        }
+                        className="text-xs"
+                      >
+                        {ticket.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">{ticket.subject}</p>
+                    <p className="text-xs text-muted-foreground">{ticket.updated}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {ticket.subject}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {ticket.updated}
-                  </p>
                 </div>
               ))}
-              <Button variant="link" className="w-full">
+              <Button variant="link" className="w-full h-auto p-0 mt-2">
                 View all tickets →
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Quick Links */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {quickLinks.map((link, idx) => (
-                <Button
-                  key={idx}
-                  variant="ghost"
-                  className="w-full justify-between"
-                  asChild
-                >
-                  <a href={link.url}>
-                    {link.label}
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              ))}
             </CardContent>
           </Card>
         </div>
