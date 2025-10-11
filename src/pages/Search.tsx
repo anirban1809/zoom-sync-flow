@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search as SearchIcon,
   Filter,
@@ -191,6 +191,26 @@ export default function Search() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showSearchTips, setShowSearchTips] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  // Handle search with 2 second delay
+  useEffect(() => {
+    if (searchQuery) {
+      setIsSearching(true);
+      setShowResults(false);
+      
+      const timer = setTimeout(() => {
+        setIsSearching(false);
+        setShowResults(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsSearching(false);
+      setShowResults(false);
+    }
+  }, [searchQuery]);
 
   const getTotalResults = () => {
     switch (activeTab) {
@@ -517,7 +537,7 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Empty State or Results area */}
+      {/* Empty State, Searching State, or Results area */}
       {!searchQuery ? (
         <div className="flex flex-col items-center justify-center py-24 px-4">
           <SearchIcon className="h-16 w-16 text-muted-foreground/40 mb-6" />
@@ -530,7 +550,17 @@ export default function Search() {
             View search tips
           </Button>
         </div>
-      ) : (
+      ) : isSearching ? (
+        <div className="flex flex-col items-center justify-center py-24 px-4">
+          <div className="relative mb-6">
+            <SearchIcon className="h-16 w-16 text-primary animate-pulse" />
+          </div>
+          <h2 className="text-2xl font-semibold mb-3">Searching...</h2>
+          <p className="text-muted-foreground text-center max-w-md">
+            Finding results for "{searchQuery}"
+          </p>
+        </div>
+      ) : showResults ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -870,7 +900,7 @@ export default function Search() {
           </Tabs>
         </div>
       </div>
-      )}
+      ) : null}
     </div>
   );
 }
