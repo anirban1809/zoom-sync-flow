@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import CreateAutomationModal from '@/components/CreateAutomationModal';
 
 const automations = [
@@ -137,68 +138,76 @@ export default function Automations() {
           <CardTitle>Your Automations</CardTitle>
           <CardDescription>Manage and monitor your automation workflows</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {automations.map((automation) => (
-            <div key={automation.id} className="border rounded-xl p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-primary" />
-                    <h3 className="font-semibold">{automation.name}</h3>
-                    <Badge variant={automation.enabled ? 'default' : 'secondary'}>
-                      {automation.enabled ? 'Active' : 'Disabled'}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{automation.description}</p>
-                </div>
-                <Switch checked={automation.enabled} />
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Play className="h-3 w-3 text-muted-foreground" />
-                  <span className="font-medium">Trigger:</span>
-                  <span className="text-muted-foreground">{automation.trigger}</span>
-                </div>
-                <div className="flex items-start gap-2 text-sm">
-                  <Check className="h-3 w-3 text-muted-foreground mt-0.5" />
-                  <div className="flex-1">
-                    <span className="font-medium">Actions:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Trigger</TableHead>
+                <TableHead>Actions</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Runs</TableHead>
+                <TableHead className="text-right">Last Run</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {automations.map((automation) => (
+                <TableRow key={automation.id}>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-primary" />
+                        <span className="font-medium">{automation.name}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{automation.description}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Play className="h-3 w-3 text-muted-foreground" />
+                      <span>{automation.trigger}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
                       {automation.actions.map((action, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {action}
                         </Badge>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>{automation.runs} runs</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Last run: {automation.lastRun}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Edit className="h-3 w-3 mr-2" />
-                    Edit
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-destructive">
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Switch checked={automation.enabled} />
+                      <Badge variant={automation.enabled ? 'default' : 'secondary'}>
+                        {automation.enabled ? 'Active' : 'Disabled'}
+                      </Badge>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">{automation.runs}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1 text-sm">
+                      <Clock className="h-3 w-3" />
+                      {automation.lastRun}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-3 w-3 mr-2" />
+                        Edit
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-destructive">
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
@@ -207,21 +216,33 @@ export default function Automations() {
           <CardTitle>Automation Templates</CardTitle>
           <CardDescription>Get started quickly with pre-built workflows</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {templates.map((template) => (
-            <div key={template.id} className="flex items-center justify-between border rounded-xl p-4">
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-semibold">{template.name}</h4>
-                  <Badge variant="secondary">{template.category}</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">{template.description}</p>
-              </div>
-              <Button variant="outline" size="sm">
-                Use Template
-              </Button>
-            </div>
-          ))}
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="text-right">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {templates.map((template) => (
+                <TableRow key={template.id}>
+                  <TableCell className="font-medium">{template.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{template.category}</Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">{template.description}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm">
+                      Use Template
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
