@@ -1,6 +1,6 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
-import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2, SkipBack, SkipForward, Link2, Mail, FileText, FileJson, Copy, Check } from 'lucide-react';
+import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2, SkipBack, SkipForward, Link2, Mail, FileText, FileJson, Copy, Check, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import { TaskRow } from '@/components/TaskRow';
 
 export default function MeetingDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -64,6 +65,16 @@ export default function MeetingDetail() {
 
   return (
     <div className="space-y-6">
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={() => navigate('/meetings')}
+        className="gap-2 -ml-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Meetings
+      </Button>
+      
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-2">
