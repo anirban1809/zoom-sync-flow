@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from './AppSidebar';
-import { TopBar } from './TopBar';
+import { ReactNode } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
+import { TopBar } from "./TopBar";
 
 interface AppShellProps {
   children: ReactNode;
@@ -14,9 +14,7 @@ export function AppShell({ children }: AppShellProps) {
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <TopBar />
-          <main className="flex-1 bg-muted/30 p-6">
-            {children}
-          </main>
+          <main className="flex-1 bg-muted/30 pl-6 pt-6 pr-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>

@@ -323,7 +323,7 @@ export default function AIChat() {
       </div>
 
       {/* Composer - Sticky at bottom */}
-      <div className="sticky bottom-0 border-t bg-background p-4 mt-auto">
+      <div className="sticky bottom-0  pt-4 pl-4 pr-4 mt-auto">
         <div className="max-w-3xl mx-auto w-full space-y-3">
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
