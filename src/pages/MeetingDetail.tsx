@@ -30,24 +30,12 @@ export default function MeetingDetail() {
   const [copied, setCopied] = useState(false);
   
   // Share modal state
-  const [accessLevel, setAccessLevel] = useState<'invited' | 'link' | 'organization'>('invited');
-  const [requirePassword, setRequirePassword] = useState(false);
-  const [linkPassword, setLinkPassword] = useState('');
-  const [linkExpiry, setLinkExpiry] = useState('never');
+  const [linkExists, setLinkExists] = useState(true);
+  const [accessLevel, setAccessLevel] = useState<'invited' | 'link'>('invited');
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [inviteInput, setInviteInput] = useState('');
-  const [linkPermission, setLinkPermission] = useState<'view' | 'download'>('view');
-  const [allowTranscriptDownload, setAllowTranscriptDownload] = useState(true);
-  const [allowRecordingDownload, setAllowRecordingDownload] = useState(true);
-  const [allowComments, setAllowComments] = useState(true);
-  const [allowResharing, setAllowResharing] = useState(false);
   const [inviteMessage, setInviteMessage] = useState('');
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [watermark, setWatermark] = useState(false);
-  const [domainRestriction, setDomainRestriction] = useState('');
-  const [defaultView, setDefaultView] = useState<'summary' | 'transcript' | 'recording'>('summary');
-  const [notifyOnView, setNotifyOnView] = useState(false);
-  const [utmTag, setUtmTag] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const meeting = mockMeetings.find(m => m.id === id);
   const summary = meeting?.summaryId ? mockSummaries[meeting.summaryId] : null;
   const transcript = meeting?.transcriptId ? mockTranscripts[meeting.transcriptId] : null;
@@ -65,6 +53,11 @@ export default function MeetingDetail() {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCreateLink = () => {
+    setLinkExists(true);
+    handleCopyLink();
   };
 
   const handleAddInvite = () => {
@@ -85,8 +78,9 @@ export default function MeetingDetail() {
   };
 
   const handleShare = () => {
-    handleCopyLink();
-    // Apply settings
+    if (accessLevel === 'link') {
+      handleCopyLink();
+    }
     console.log('Share settings applied');
   };
 
@@ -464,16 +458,16 @@ export default function MeetingDetail() {
 
       {/* Share Modal */}
       <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Share meeting</DialogTitle>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[calc(90vh-180px)] pr-4">
-            <div className="space-y-6">
-              {/* Share Link */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Share link</Label>
+          <div className="space-y-5 py-4">
+            {/* Share Link */}
+            {linkExists ? (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Share link</Label>
                 <div className="flex gap-2">
                   <Input 
                     value={shareUrl} 
@@ -481,367 +475,222 @@ export default function MeetingDetail() {
                     className="flex-1"
                   />
                   <Button 
-                    variant="outline" 
-                    size="icon"
+                    variant="outline"
                     onClick={handleCopyLink}
                   >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <QrCode className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Create new link
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-destructive">
-                    Reset link
-                  </Button>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Access Level */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Access level</Label>
-                <RadioGroup value={accessLevel} onValueChange={(v: any) => setAccessLevel(v)}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="invited" id="invited" />
-                    <Label htmlFor="invited" className="font-normal cursor-pointer">
-                      Only invited people
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="link" id="link" />
-                    <Label htmlFor="link" className="font-normal cursor-pointer">
-                      Anyone with the link
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="organization" id="organization" />
-                    <Label htmlFor="organization" className="font-normal cursor-pointer">
-                      People in my organization (SSO)
-                    </Label>
-                  </div>
-                </RadioGroup>
-
-                {accessLevel !== 'invited' && (
-                  <div className="space-y-3 ml-6 mt-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="password" 
-                        checked={requirePassword}
-                        onCheckedChange={(checked) => setRequirePassword(checked as boolean)}
-                      />
-                      <Label htmlFor="password" className="font-normal cursor-pointer">
-                        Require password
-                      </Label>
-                    </div>
-                    
-                    {requirePassword && (
-                      <Input 
-                        type="password"
-                        placeholder="Enter password"
-                        value={linkPassword}
-                        onChange={(e) => setLinkPassword(e.target.value)}
-                        className="ml-6"
-                      />
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4 mr-2" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy link
+                      </>
                     )}
-
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm">Link expires:</Label>
-                      <Select value={linkExpiry} onValueChange={setLinkExpiry}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="never">Never</SelectItem>
-                          <SelectItem value="24h">24 hours</SelectItem>
-                          <SelectItem value="7d">7 days</SelectItem>
-                          <SelectItem value="30d">30 days</SelectItem>
-                          <SelectItem value="custom">Custom date</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <Separator />
-
-              {/* Invite People */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Invite people</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    placeholder="Enter email addresses"
-                    value={inviteInput}
-                    onChange={(e) => setInviteInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddInvite()}
-                  />
-                  <Button onClick={handleAddInvite}>Add</Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Mail className="h-4 w-4" />
-                    Add from Google Workspace
                   </Button>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Mail className="h-4 w-4" />
-                    Add from Microsoft 365
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Share link</Label>
+                <Button 
+                  variant="outline" 
+                  onClick={handleCreateLink}
+                  className="w-full"
+                >
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Create link
+                </Button>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Access */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Access</Label>
+              <Select value={accessLevel} onValueChange={(v: any) => setAccessLevel(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="invited">Only invited people</SelectItem>
+                  <SelectItem value="link">Anyone with the link</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            {/* Invite People */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Invite people</Label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Enter email addresses"
+                  value={inviteInput}
+                  onChange={(e) => setInviteInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddInvite()}
+                />
+                <Button onClick={handleAddInvite}>Add</Button>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Mail className="h-4 w-4" />
+                  Add from Google Workspace
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Mail className="h-4 w-4" />
+                  Add from Microsoft 365
+                </Button>
+              </div>
+              
+              {inviteEmails.length > 0 && (
+                <div className="space-y-2 mt-3">
+                  {inviteEmails.map((email) => (
+                    <div key={email} className="flex items-center justify-between p-2 rounded-md border bg-muted/50">
+                      <span className="text-sm">{email}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleRemoveInvite(email)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Optional Message */}
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-sm font-medium">
+                Message (optional)
+              </Label>
+              <Input 
+                id="message"
+                placeholder="Add a message to your invite"
+                value={inviteMessage}
+                onChange={(e) => setInviteMessage(e.target.value)}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Quick Summary */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="gap-1">
+                {accessLevel === 'invited' ? 'Only invited people' : 'Anyone with the link'}
+              </Badge>
+              {inviteEmails.length > 0 && (
+                <Badge variant="secondary" className="gap-1">
+                  <Users className="h-3 w-3" />
+                  {inviteEmails.length} {inviteEmails.length === 1 ? 'invitee' : 'invitees'}
+                </Badge>
+              )}
+            </div>
+
+            {/* Advanced Link */}
+            {!showAdvanced && (
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-sm"
+                onClick={() => setShowAdvanced(true)}
+              >
+                More options
+              </Button>
+            )}
+
+            {/* Advanced Options (when expanded) */}
+            {showAdvanced && (
+              <div className="space-y-4 pt-2 border-t">
+                <div className="flex items-center justify-between text-sm font-medium mb-3">
+                  <span>Advanced options</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowAdvanced(false)}
+                  >
+                    Hide
                   </Button>
                 </div>
                 
-                {inviteEmails.length > 0 && (
-                  <div className="space-y-2 mt-3">
-                    {inviteEmails.map((email) => (
-                      <div key={email} className="flex items-center justify-between p-2 rounded-md border bg-muted/50">
-                        <span className="text-sm">{email}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleRemoveInvite(email)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                <ScrollArea className="max-h-[300px] pr-3">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Permissions</Label>
+                      <Select defaultValue="view">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="view">View only</SelectItem>
+                          <SelectItem value="download">View + download</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <Separator />
-
-              {/* Permissions */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Permissions</Label>
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm">Link permission:</Label>
-                  <Select value={linkPermission} onValueChange={(v: any) => setLinkPermission(v)}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="view">View only</SelectItem>
-                      <SelectItem value="download">View + download assets</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3 mt-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="transcript-download" className="font-normal cursor-pointer">
-                      Allow transcript download
-                    </Label>
-                    <Switch 
-                      id="transcript-download"
-                      checked={allowTranscriptDownload}
-                      onCheckedChange={setAllowTranscriptDownload}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="recording-download" className="font-normal cursor-pointer">
-                      Allow recording download
-                    </Label>
-                    <Switch 
-                      id="recording-download"
-                      checked={allowRecordingDownload}
-                      onCheckedChange={setAllowRecordingDownload}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="comments" className="font-normal cursor-pointer">
-                      Allow comments/notes
-                    </Label>
-                    <Switch 
-                      id="comments"
-                      checked={allowComments}
-                      onCheckedChange={setAllowComments}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="resharing" className="font-normal cursor-pointer">
-                      Allow resharing
-                    </Label>
-                    <Switch 
-                      id="resharing"
-                      checked={allowResharing}
-                      onCheckedChange={setAllowResharing}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Message */}
-              <div className="space-y-3">
-                <Label htmlFor="message" className="text-base font-semibold">
-                  Message (optional)
-                </Label>
-                <Textarea 
-                  id="message"
-                  placeholder="Add a message to your invite"
-                  value={inviteMessage}
-                  onChange={(e) => setInviteMessage(e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              <Separator />
-
-              {/* Advanced */}
-              <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 hover:bg-transparent">
-                    <Label className="text-base font-semibold cursor-pointer">Advanced</Label>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-3 mt-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="watermark" className="font-normal cursor-pointer">
-                      Watermark on playback
-                    </Label>
-                    <Switch 
-                      id="watermark"
-                      checked={watermark}
-                      onCheckedChange={setWatermark}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="domain-restriction" className="text-sm">
-                      Limit downloads to specific domains
-                    </Label>
-                    <Input 
-                      id="domain-restriction"
-                      placeholder="example.com, company.com"
-                      value={domainRestriction}
-                      onChange={(e) => setDomainRestriction(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm">Default open view:</Label>
-                    <Select value={defaultView} onValueChange={(v: any) => setDefaultView(v)}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="summary">Summary</SelectItem>
-                        <SelectItem value="transcript">Transcript</SelectItem>
-                        <SelectItem value="recording">Recording</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="notify-view" className="font-normal cursor-pointer">
-                      Notify me on first view
-                    </Label>
-                    <Switch 
-                      id="notify-view"
-                      checked={notifyOnView}
-                      onCheckedChange={setNotifyOnView}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="utm-tag" className="text-sm">
-                      UTM/source tag for link analytics
-                    </Label>
-                    <Input 
-                      id="utm-tag"
-                      placeholder="campaign_name"
-                      value={utmTag}
-                      onChange={(e) => setUtmTag(e.target.value)}
-                    />
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-
-              <Separator />
-
-              {/* Summary */}
-              <div className="space-y-3 rounded-lg border bg-muted/50 p-4">
-                <Label className="text-base font-semibold">Summary</Label>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Access level:</span>
-                    <span className="font-medium">
-                      {accessLevel === 'invited' ? 'Only invited people' : 
-                       accessLevel === 'link' ? 'Anyone with the link' : 
-                       'Organization only'}
-                    </span>
-                  </div>
-                  {accessLevel !== 'invited' && (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Link expires:</span>
-                        <span className="font-medium">{linkExpiry === 'never' ? 'Never' : linkExpiry}</span>
-                      </div>
-                      {requirePassword && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Password:</span>
-                          <span className="font-medium flex items-center gap-1">
-                            <Lock className="h-3 w-3" />
-                            Required
-                          </span>
+                    {accessLevel === 'link' && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm font-normal">Require password</Label>
+                          <Switch />
                         </div>
-                      )}
-                    </>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Invitees:</span>
-                    <span className="font-medium">{inviteEmails.length} people</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Permission tier:</span>
-                    <span className="font-medium">
-                      {linkPermission === 'view' ? 'View only' : 'View + download'}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm">Link expires</Label>
+                          <Select defaultValue="never">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="never">Never</SelectItem>
+                              <SelectItem value="24h">24 hours</SelectItem>
+                              <SelectItem value="7d">7 days</SelectItem>
+                              <SelectItem value="30d">30 days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
 
-              {/* Manage & Safety */}
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-destructive">
-                    Revoke link
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-destructive">
-                    Remove all external viewers
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Eye className="h-4 w-4" />
-                    View current access
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </ScrollArea>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-normal">Allow transcript download</Label>
+                      <Switch defaultChecked />
+                    </div>
 
-          <DialogFooter className="flex-row gap-2 sm:justify-between">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-normal">Allow recording download</Label>
+                      <Switch defaultChecked />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-normal">Allow comments</Label>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                </ScrollArea>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
             <Button variant="outline" onClick={() => setShareModalOpen(false)}>
               Cancel
             </Button>
-            <div className="flex gap-2">
-              {inviteEmails.length > 0 && (
-                <Button variant="outline" onClick={handleSendInvites} className="gap-2">
-                  <Mail className="h-4 w-4" />
-                  Send invites
-                </Button>
-              )}
-              <Button onClick={handleShare} className="gap-2">
-                <Share className="h-4 w-4" />
-                Share
+            {inviteEmails.length > 0 && (
+              <Button variant="outline" onClick={handleSendInvites}>
+                Send invites
               </Button>
-            </div>
+            )}
+            <Button onClick={handleShare}>
+              Share
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
