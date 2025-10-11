@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2 } from 'lucide-react';
+import { useRef } from 'react';
+import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2, SkipBack, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,10 +13,17 @@ import { TaskRow } from '@/components/TaskRow';
 
 export default function MeetingDetail() {
   const { id } = useParams();
+  const audioRef = useRef<HTMLAudioElement>(null);
   const meeting = mockMeetings.find(m => m.id === id);
   const summary = meeting?.summaryId ? mockSummaries[meeting.summaryId] : null;
   const transcript = meeting?.transcriptId ? mockTranscripts[meeting.transcriptId] : null;
   const tasks = mockTasks.filter(t => t.meetingId === id);
+
+  const skipTime = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime += seconds;
+    }
+  };
 
   if (!meeting) {
     return (
@@ -123,17 +131,40 @@ export default function MeetingDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <audio 
-              controls 
-              className="w-full"
-              style={{
-                height: '40px',
-                accentColor: 'hsl(var(--primary))'
-              }}
-            >
-              <source src="/audio/meeting-recording.mp3" type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
+            <div className="space-y-3">
+              <audio 
+                ref={audioRef}
+                controls 
+                className="w-full"
+                style={{
+                  height: '40px',
+                  accentColor: 'hsl(var(--primary))'
+                }}
+              >
+                <source src="/audio/meeting-recording.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+              <div className="flex justify-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => skipTime(-10)}
+                  className="gap-2"
+                >
+                  <SkipBack className="h-4 w-4" />
+                  10s
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => skipTime(10)}
+                  className="gap-2"
+                >
+                  10s
+                  <SkipForward className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
