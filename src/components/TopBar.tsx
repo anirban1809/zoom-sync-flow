@@ -1,4 +1,4 @@
-import { Search, Plus, Bell, ChevronDown, Moon, Sun } from 'lucide-react';
+import { Search, Plus, Bell, ChevronDown, Moon, Sun, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,9 +13,67 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+
+const mockNotifications = [
+  {
+    id: '1',
+    type: 'success',
+    title: 'Meeting recorded',
+    message: 'Q4 Planning Meeting has been successfully recorded and processed',
+    time: '5 min ago',
+    read: false,
+  },
+  {
+    id: '2',
+    type: 'info',
+    title: 'New task assigned',
+    message: 'You have been assigned to "Review marketing proposal"',
+    time: '1 hour ago',
+    read: false,
+  },
+  {
+    id: '3',
+    type: 'alert',
+    title: 'Upcoming meeting',
+    message: 'Team Sync starts in 15 minutes',
+    time: '2 hours ago',
+    read: false,
+  },
+  {
+    id: '4',
+    type: 'success',
+    title: 'Task completed',
+    message: 'Sarah completed "Update website copy"',
+    time: '3 hours ago',
+    read: true,
+  },
+  {
+    id: '5',
+    type: 'info',
+    title: 'New integration',
+    message: 'Slack integration is now active',
+    time: '1 day ago',
+    read: true,
+  },
+];
 
 export function TopBar() {
   const { theme, setTheme } = useTheme();
+  const unreadCount = mockNotifications.filter(n => !n.read).length;
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'alert':
+        return <AlertCircle className="h-4 w-4 text-orange-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
+    }
+  };
   
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-6">
@@ -60,12 +118,76 @@ export function TopBar() {
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
         </Button>
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-            3
-          </Badge>
-        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  {unreadCount}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="end">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="font-semibold">Notifications</h3>
+              {unreadCount > 0 && (
+                <Button variant="ghost" size="sm" className="h-auto p-0 text-xs">
+                  Mark all as read
+                </Button>
+              )}
+            </div>
+            <ScrollArea className="h-[400px]">
+              {mockNotifications.length > 0 ? (
+                <div className="space-y-1 p-2">
+                  {mockNotifications.map((notification, index) => (
+                    <div key={notification.id}>
+                      <button
+                        className={`w-full text-left p-3 rounded-lg hover:bg-accent transition-colors ${
+                          !notification.read ? 'bg-accent/50' : ''
+                        }`}
+                      >
+                        <div className="flex gap-3">
+                          <div className="mt-1">{getNotificationIcon(notification.type)}</div>
+                          <div className="flex-1 space-y-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium leading-tight">
+                                {notification.title}
+                              </p>
+                              {!notification.read && (
+                                <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {notification.time}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                      {index < mockNotifications.length - 1 && (
+                        <Separator className="my-1" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Bell className="h-12 w-12 text-muted-foreground/40 mb-4" />
+                  <p className="text-sm text-muted-foreground">No notifications yet</p>
+                </div>
+              )}
+            </ScrollArea>
+            <div className="border-t p-2">
+              <Button variant="ghost" size="sm" className="w-full">
+                View all notifications
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

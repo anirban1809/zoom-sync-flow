@@ -30,7 +30,6 @@ const workflowNav = [
 
 const settingsNav = [
   { title: 'Accounts', url: '/accounts', icon: Building2 },
-  { title: 'Notifications', url: '/notifications', icon: Bell },
   { title: 'Admin', url: '/admin', icon: Settings },
   { title: 'Billing', url: '/billing', icon: CreditCard },
   { title: 'Compliance', url: '/compliance', icon: Shield },
