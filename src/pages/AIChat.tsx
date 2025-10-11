@@ -5,10 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   Send,
   Paperclip,
@@ -21,12 +17,8 @@ import {
   CheckSquare,
   ChevronDown,
   ChevronRight,
-  History,
-  Menu,
-  X,
   Download,
   Save,
-  Sparkles,
 } from "lucide-react";
 
 type Message = {
@@ -46,26 +38,11 @@ type Source = {
   confidence: string;
 };
 
-type Thread = {
-  id: string;
-  title: string;
-  lastMessage: string;
-  pinned: boolean;
-};
-
 export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [scopeChips, setScopeChips] = useState<string[]>([]);
-  const [showSources, setShowSources] = useState(true);
-  const [onlyUseScoped, setOnlyUseScoped] = useState(false);
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
-  const [threads, setThreads] = useState<Thread[]>([
-    { id: "1", title: "Q4 customer meetings", lastMessage: "Summarize last week's...", pinned: true },
-    { id: "2", title: "Action items review", lastMessage: "List open action items...", pinned: false },
-  ]);
-  const [leftRailOpen, setLeftRailOpen] = useState(false);
-  const [rightRailOpen, setRightRailOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const starterPrompts = [
@@ -147,76 +124,18 @@ export default function AIChat() {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Left Rail - Threads & History */}
-      <Sheet open={leftRailOpen} onOpenChange={setLeftRailOpen}>
-        <SheetContent side="left" className="w-80">
-          <SheetHeader>
-            <SheetTitle>Chat History</SheetTitle>
-          </SheetHeader>
-          <div className="mt-6 space-y-4">
-            <Button className="w-full" variant="outline">
-              <Plus className="mr-2 h-4 w-4" />
-              New Chat
-            </Button>
-            <Input placeholder="Search chats..." />
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <div className="space-y-2">
-                {threads.map((thread) => (
-                  <Card
-                    key={thread.id}
-                    className="cursor-pointer hover:bg-accent transition-colors"
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{thread.title}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {thread.lastMessage}
-                          </div>
-                        </div>
-                        {thread.pinned && (
-                          <Badge variant="secondary" className="ml-2">
-                            Pinned
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        </SheetContent>
-      </Sheet>
-
+    <div className="flex flex-col h-screen overflow-hidden">
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="border-b bg-background">
+        <div className="border-b bg-background flex-shrink-0">
           <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLeftRailOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-semibold">AI Chat</h1>
-                <p className="text-sm text-muted-foreground">
-                  Ask about your meetings, transcripts, and action items.
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-semibold">AI Chat</h1>
+              <p className="text-sm text-muted-foreground">
+                Ask about your meetings, transcripts, and action items.
+              </p>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setRightRailOpen(!rightRailOpen)}
-            >
-              <Sparkles className="h-5 w-5" />
-            </Button>
           </div>
 
           {/* Context Bar */}
@@ -225,10 +144,12 @@ export default function AIChat() {
               {scopeChips.map((chip) => (
                 <Badge key={chip} variant="secondary" className="gap-1">
                   {chip}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
+                  <button
+                    className="ml-1"
                     onClick={() => removeScope(chip)}
-                  />
+                  >
+                    ×
+                  </button>
                 </Badge>
               ))}
               <Button
@@ -248,7 +169,7 @@ export default function AIChat() {
         </div>
 
         {/* Conversation Area */}
-        <ScrollArea className="flex-1 p-6">
+        <div className="flex-1 overflow-y-auto p-6">
           {messages.length === 0 ? (
             <div className="max-w-3xl mx-auto space-y-6">
               <div className="text-center space-y-2 mb-8">
@@ -400,10 +321,10 @@ export default function AIChat() {
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
 
         {/* Composer */}
-        <div className="border-t bg-background p-4">
+        <div className="border-t bg-background p-4 flex-shrink-0">
           <div className="max-w-3xl mx-auto space-y-3">
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
@@ -443,77 +364,6 @@ export default function AIChat() {
           </div>
         </div>
       </div>
-
-      {/* Right Rail - Grounding */}
-      {rightRailOpen && (
-        <div className="w-80 border-l bg-background p-4 overflow-auto">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Grounding & Sources</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setRightRailOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="show-sources" className="text-sm">
-                  Show sources
-                </Label>
-                <Switch
-                  id="show-sources"
-                  checked={showSources}
-                  onCheckedChange={setShowSources}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="scoped-data" className="text-sm">
-                  Only use scoped data
-                </Label>
-                <Switch
-                  id="scoped-data"
-                  checked={onlyUseScoped}
-                  onCheckedChange={setOnlyUseScoped}
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 className="text-sm font-medium mb-3">Active Sources</h4>
-              <div className="space-y-2">
-                <Card>
-                  <CardContent className="p-3">
-                    <Badge variant="outline" className="mb-2">
-                      Meeting
-                    </Badge>
-                    <p className="text-sm font-medium">Q3 Review</p>
-                    <p className="text-xs text-muted-foreground">
-                      Oct 3, 2025 • Acme Corp
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3">
-                    <Badge variant="outline" className="mb-2">
-                      Transcript
-                    </Badge>
-                    <p className="text-sm font-medium">Product Strategy</p>
-                    <p className="text-xs text-muted-foreground">
-                      Oct 1, 2025 • Internal
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
