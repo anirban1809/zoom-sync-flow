@@ -1,12 +1,15 @@
 import { useParams } from 'react-router-dom';
-import { useRef } from 'react';
-import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2, SkipBack, SkipForward } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Calendar, Users, Video, ExternalLink, Download, Share2, Edit, Clock, CheckCircle2, AlertTriangle, HelpCircle, MessageSquare, Volume2, SkipBack, SkipForward, Link2, Mail, FileText, FileJson, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { mockMeetings, mockSummaries, mockTranscripts, mockTasks } from '@/lib/mockData';
 import { format } from 'date-fns';
 import { TaskRow } from '@/components/TaskRow';
@@ -14,6 +17,9 @@ import { TaskRow } from '@/components/TaskRow';
 export default function MeetingDetail() {
   const { id } = useParams();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const meeting = mockMeetings.find(m => m.id === id);
   const summary = meeting?.summaryId ? mockSummaries[meeting.summaryId] : null;
   const transcript = meeting?.transcriptId ? mockTranscripts[meeting.transcriptId] : null;
@@ -23,6 +29,20 @@ export default function MeetingDetail() {
     if (audioRef.current) {
       audioRef.current.currentTime += seconds;
     }
+  };
+
+  const shareUrl = `${window.location.origin}/meetings/${id}`;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleExport = (format: string) => {
+    console.log(`Exporting meeting in ${format} format`);
+    // Export logic would go here
+    setExportModalOpen(false);
   };
 
   if (!meeting) {
@@ -78,11 +98,21 @@ export default function MeetingDetail() {
             <Edit className="h-4 w-4" />
             Edit
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => setShareModalOpen(true)}
+          >
             <Share2 className="h-4 w-4" />
             Share
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => setExportModalOpen(true)}
+          >
             <Download className="h-4 w-4" />
             Export
           </Button>
@@ -370,6 +400,112 @@ export default function MeetingDetail() {
           </CardContent>
         </Card>
       )}
+
+      {/* Share Modal */}
+      <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share Meeting</DialogTitle>
+            <DialogDescription>
+              Share this meeting with your team members
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>Share Link</Label>
+              <div className="flex gap-2">
+                <Input 
+                  value={shareUrl} 
+                  readOnly 
+                  className="flex-1"
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={handleCopyLink}
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div className="space-y-2">
+              <Label>Share via</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email
+                </Button>
+                <Button variant="outline" className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Slack
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Modal */}
+      <Dialog open={exportModalOpen} onOpenChange={setExportModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export Meeting</DialogTitle>
+            <DialogDescription>
+              Choose a format to export the meeting data
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-4">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-3"
+              onClick={() => handleExport('pdf')}
+            >
+              <FileText className="h-5 w-5" />
+              <div className="text-left">
+                <div className="font-medium">Export as PDF</div>
+                <div className="text-xs text-muted-foreground">
+                  Summary, transcript, and action items
+                </div>
+              </div>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-3"
+              onClick={() => handleExport('json')}
+            >
+              <FileJson className="h-5 w-5" />
+              <div className="text-left">
+                <div className="font-medium">Export as JSON</div>
+                <div className="text-xs text-muted-foreground">
+                  Raw meeting data for integrations
+                </div>
+              </div>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-3"
+              onClick={() => handleExport('audio')}
+            >
+              <Volume2 className="h-5 w-5" />
+              <div className="text-left">
+                <div className="font-medium">Export Audio Recording</div>
+                <div className="text-xs text-muted-foreground">
+                  Download the meeting audio file
+                </div>
+              </div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
