@@ -577,30 +577,30 @@ export default function Search() {
             </div>
 
             {/* Meetings Tab */}
-            <TabsContent value="meetings" className="space-y-3 mt-0">
+            <TabsContent value="meetings" className="space-y-6 mt-0">
               {mockMeetings.map((meeting) => (
                 <Card key={meeting.id} className="hover:border-primary/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1 flex-1">
-                          <h3 className="font-semibold text-lg hover:text-primary cursor-pointer">
+                  <CardContent className="p-6">
+                    <div className="space-y-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-3 flex-1">
+                          <h3 className="font-semibold text-lg hover:text-primary cursor-pointer leading-relaxed">
                             {meeting.title}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
+                          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
                               {meeting.date} • {meeting.time}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Users className="h-3 w-3" />
+                            <span className="flex items-center gap-1.5">
+                              <Users className="h-3.5 w-3.5" />
                               {meeting.owner}
                             </span>
                             <span>{meeting.attendees} attendees</span>
                             <span>{meeting.account}</span>
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <Badge variant="outline">{meeting.provider}</Badge>
                           {meeting.decisions > 0 && (
                             <Badge variant="secondary">{meeting.decisions} decisions</Badge>
@@ -611,15 +611,15 @@ export default function Search() {
                         </div>
                       </div>
 
-                      <div className="pl-4 border-l-2 border-muted space-y-1">
+                      <div className="pl-5 border-l-2 border-muted space-y-2 py-1">
                         {meeting.summary.map((item, idx) => (
-                          <p key={idx} className="text-sm text-muted-foreground">
+                          <p key={idx} className="text-sm text-muted-foreground leading-relaxed">
                             • {item}
                           </p>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 pt-1">
                         <Button size="sm">Open</Button>
                         <Button size="sm" variant="outline">
                           View summary
@@ -728,15 +728,15 @@ export default function Search() {
             </TabsContent>
 
             {/* Transcript & Notes Tab */}
-            <TabsContent value="transcripts" className="space-y-3 mt-0">
+            <TabsContent value="transcripts" className="space-y-6 mt-0">
               {mockTranscripts.map((transcript) => (
                 <Card key={transcript.id} className="hover:border-primary/50 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
+                  <CardContent className="p-6">
+                    <div className="space-y-5">
                       <div className="flex items-start justify-between">
-                        <div className="space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{transcript.speaker}</span>
+                        <div className="space-y-3 flex-1">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="font-semibold text-base">{transcript.speaker}</span>
                             <Badge variant="outline" className="text-xs">
                               <Clock className="h-3 w-3 mr-1" />
                               {transcript.timestamp}
@@ -745,18 +745,18 @@ export default function Search() {
                               {transcript.meeting}
                             </span>
                           </div>
-                          <p className="text-sm text-muted-foreground">{transcript.context}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{transcript.context}</p>
                         </div>
                       </div>
 
-                      <div className="pl-4 border-l-2 border-primary/50 py-2">
-                        <p className="text-sm">
+                      <div className="pl-5 border-l-2 border-primary/50 py-3">
+                        <p className="text-sm leading-relaxed">
                           {transcript.content.split('mobile app features').map((part, idx, arr) => {
                             if (idx < arr.length - 1) {
                               return (
                                 <span key={idx}>
                                   {part}
-                                  <mark className="bg-primary/20 px-1 rounded">mobile app features</mark>
+                                  <mark className="bg-primary/20 px-1.5 py-0.5 rounded">mobile app features</mark>
                                 </span>
                               );
                             }
@@ -765,7 +765,7 @@ export default function Search() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 pt-1">
                         <Button size="sm" variant="outline">
                           <Play className="h-3 w-3 mr-1" />
                           Play from here
