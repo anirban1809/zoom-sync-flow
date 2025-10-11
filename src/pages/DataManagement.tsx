@@ -26,6 +26,10 @@ export default function DataManagement() {
   const [autoDeleteAudio, setAutoDeleteAudio] = useState(true);
   const [restoreDate, setRestoreDate] = useState<Date>();
   const [byokModalOpen, setByokModalOpen] = useState(false);
+  const [backupsEnabled, setBackupsEnabled] = useState(true);
+  const [backupFrequency, setBackupFrequency] = useState('daily');
+  const [backupDayOfWeek, setBackupDayOfWeek] = useState('monday');
+  const [backupDayOfMonth, setBackupDayOfMonth] = useState('1');
 
   const pastExports = [
     { date: '8 Nov 2025', range: 'Last 30 days', format: 'Full ZIP', status: 'Ready', action: 'download' },
@@ -233,38 +237,75 @@ export default function DataManagement() {
             <CardTitle>Backups</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-green-500">Automatic daily backups On</Badge>
-            <span className="text-sm text-muted-foreground">We keep backups for 90 days.</span>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Enable backups</Label>
+              <p className="text-sm text-muted-foreground">Automatically backup your meeting data</p>
+            </div>
+            <Switch checked={backupsEnabled} onCheckedChange={setBackupsEnabled} />
           </div>
 
-          <div className="space-y-4">
-            <Label>Point-in-time restore</Label>
-            <div className="flex gap-2 flex-wrap">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-[200px] justify-start text-left">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {restoreDate ? format(restoreDate, 'PPP') : 'Pick a date'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={restoreDate} onSelect={setRestoreDate} />
-                </PopoverContent>
-              </Popover>
-              <Select defaultValue="specific">
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="specific">Specific meetings</SelectItem>
-                  <SelectItem value="range">Everything in a date range</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button>Preview restore</Button>
+          {backupsEnabled && (
+            <div className="space-y-4 pl-4 border-l-2">
+              <div className="space-y-2">
+                <Label>Backup frequency</Label>
+                <Select value={backupFrequency} onValueChange={setBackupFrequency}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {backupFrequency === 'weekly' && (
+                <div className="space-y-2">
+                  <Label>Day of week</Label>
+                  <Select value={backupDayOfWeek} onValueChange={setBackupDayOfWeek}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monday">Monday</SelectItem>
+                      <SelectItem value="tuesday">Tuesday</SelectItem>
+                      <SelectItem value="wednesday">Wednesday</SelectItem>
+                      <SelectItem value="thursday">Thursday</SelectItem>
+                      <SelectItem value="friday">Friday</SelectItem>
+                      <SelectItem value="saturday">Saturday</SelectItem>
+                      <SelectItem value="sunday">Sunday</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {backupFrequency === 'monthly' && (
+                <div className="space-y-2">
+                  <Label>Day of month</Label>
+                  <Select value={backupDayOfMonth} onValueChange={setBackupDayOfMonth}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                        <SelectItem key={day} value={day.toString()}>
+                          {day}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    For months with fewer days, backup runs on the last day
+                  </p>
+                </div>
+              )}
+
+              <Button size="sm">Save backup settings</Button>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
