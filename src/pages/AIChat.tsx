@@ -128,18 +128,16 @@ export default function AIChat() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="border-b bg-background flex-shrink-0">
-          <div className="flex items-center justify-between p-4">
-            <div>
-              <h1 className="text-2xl font-semibold">AI Chat</h1>
-              <p className="text-sm text-muted-foreground">
-                Ask about your meetings, transcripts, and action items.
-              </p>
-            </div>
+        <div className="flex-shrink-0 p-6 pb-0">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
+            <p className="text-muted-foreground mt-2">
+              Ask about your meetings, transcripts, and action items.
+            </p>
           </div>
 
           {/* Context Bar */}
-          <div className="px-4 pb-4">
+          <div className="px-6 pb-4">
             <div className="flex items-center gap-2 flex-wrap">
               {scopeChips.map((chip) => (
                 <Badge key={chip} variant="secondary" className="gap-1">
