@@ -134,7 +134,7 @@ export default function AIChat() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full relative">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>
@@ -170,7 +170,7 @@ export default function AIChat() {
       </div>
 
       {/* Conversation Area */}
-      <div className="flex-1 overflow-y-auto px-6 pb-[280px]">
+      <div className="flex-1 overflow-y-auto pb-[280px]">
         {messages.length === 0 ? (
           <div className="max-w-3xl mx-auto space-y-6 py-6">
             <div className="text-center space-y-2 mb-8">
@@ -322,8 +322,8 @@ export default function AIChat() {
         )}
       </div>
 
-      {/* Composer - Floating Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-10">
+      {/* Composer - Sticky at bottom */}
+      <div className="sticky bottom-0 border-t bg-background p-4 mt-auto">
         <div className="max-w-3xl mx-auto w-full space-y-3">
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
