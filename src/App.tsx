@@ -15,7 +15,6 @@ import Search from "./pages/Search";
 import Automations from "./pages/Automations";
 import Integrations from "./pages/Integrations";
 import Insights from "./pages/Insights";
-import Accounts from "./pages/Accounts";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
 import Billing from "./pages/Billing";
@@ -44,7 +43,6 @@ const App = () => (
           <Route path="/automations" element={<AppShell><Automations /></AppShell>} />
           <Route path="/integrations" element={<AppShell><Integrations /></AppShell>} />
           <Route path="/insights" element={<AppShell><Insights /></AppShell>} />
-          <Route path="/accounts" element={<AppShell><Accounts /></AppShell>} />
           <Route path="/notifications" element={<AppShell><Notifications /></AppShell>} />
           <Route path="/admin" element={<AppShell><Admin /></AppShell>} />
           <Route path="/billing" element={<AppShell><Billing /></AppShell>} />

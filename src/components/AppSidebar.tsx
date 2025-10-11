@@ -1,4 +1,4 @@
-import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Building2, Bell, Settings, CreditCard, Shield, StickyNote, Database } from 'lucide-react';
+import { Home, Calendar, CheckSquare, FileText, Search, Zap, Plug, BarChart3, Bell, Settings, CreditCard, Shield, StickyNote, Database } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -29,7 +29,6 @@ const workflowNav = [
 ];
 
 const settingsNav = [
-  { title: 'Accounts', url: '/accounts', icon: Building2 },
   { title: 'Admin', url: '/admin', icon: Settings },
   { title: 'Billing', url: '/billing', icon: CreditCard },
   { title: 'Compliance', url: '/compliance', icon: Shield },
