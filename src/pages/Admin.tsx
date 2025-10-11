@@ -1,20 +1,39 @@
-import { useState } from 'react';
-import { Settings, Users, Shield, Database, Key, FileText, Clock, CheckCircle2, XCircle, MoreVertical, Plus, Mail } from 'lucide-react';
-import { InviteUserModal } from '@/components/InviteUserModal';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { useState } from "react";
+import {
+  Settings,
+  Users,
+  Shield,
+  Database,
+  Key,
+  FileText,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  MoreVertical,
+  Plus,
+  Mail,
+} from "lucide-react";
+import { InviteUserModal } from "@/components/InviteUserModal";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -22,61 +41,61 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const users = [
   {
-    id: '1',
-    name: 'Alex Kim',
-    email: 'alex@acme.com',
-    role: 'Admin',
-    status: 'active',
-    lastActive: '2 minutes ago',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
+    id: "1",
+    name: "Alex Kim",
+    email: "alex@acme.com",
+    role: "Admin",
+    status: "active",
+    lastActive: "2 minutes ago",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
   },
   {
-    id: '2',
-    name: 'Sarah Johnson',
-    email: 'sarah@acme.com',
-    role: 'Manager',
-    status: 'active',
-    lastActive: '1 hour ago',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    id: "2",
+    name: "Sarah Johnson",
+    email: "sarah@acme.com",
+    role: "Manager",
+    status: "active",
+    lastActive: "1 hour ago",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
   },
   {
-    id: '3',
-    name: 'John Smith',
-    email: 'john@acme.com',
-    role: 'Member',
-    status: 'active',
-    lastActive: '3 hours ago',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
+    id: "3",
+    name: "John Smith",
+    email: "john@acme.com",
+    role: "Member",
+    status: "active",
+    lastActive: "3 hours ago",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   },
   {
-    id: '4',
-    name: 'Lisa Wang',
-    email: 'lisa@acme.com',
-    role: 'Member',
-    status: 'invited',
-    lastActive: 'Never',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa',
+    id: "4",
+    name: "Lisa Wang",
+    email: "lisa@acme.com",
+    role: "Member",
+    status: "invited",
+    lastActive: "Never",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
   },
 ];
 
 export default function Admin() {
-  const [selectedTab, setSelectedTab] = useState('users');
+  const [selectedTab, setSelectedTab] = useState("users");
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
     <div className="p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
           <Settings className="h-6 w-6 text-primary" />
@@ -112,7 +131,9 @@ export default function Admin() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Team Members</CardTitle>
-                    <CardDescription>Manage user access and permissions</CardDescription>
+                    <CardDescription>
+                      Manage user access and permissions
+                    </CardDescription>
                   </div>
                   <Button onClick={() => setInviteModalOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
@@ -142,18 +163,24 @@ export default function Admin() {
                             </Avatar>
                             <div>
                               <p className="font-medium">{user.name}</p>
-                              <p className="text-sm text-muted-foreground">{user.email}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.email}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>
+                          <Badge
+                            variant={
+                              user.role === "Admin" ? "default" : "secondary"
+                            }
+                          >
                             {user.role}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {user.status === 'active' ? (
+                            {user.status === "active" ? (
                               <CheckCircle2 className="h-4 w-4 text-success" />
                             ) : (
                               <Clock className="h-4 w-4 text-warning" />
@@ -161,7 +188,9 @@ export default function Admin() {
                             <span className="capitalize">{user.status}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{user.lastActive}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {user.lastActive}
+                        </TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -207,16 +236,24 @@ export default function Admin() {
 
                 <div className="space-y-4 pt-4">
                   {[
-                    { label: 'View all meetings', enabled: true },
-                    { label: 'View transcripts', enabled: true },
-                    { label: 'Export meetings', enabled: true },
-                    { label: 'Share externally', enabled: false },
-                    { label: 'Manage integrations', enabled: false },
-                    { label: 'Manage users', enabled: false },
+                    { label: "View all meetings", enabled: true },
+                    { label: "View transcripts", enabled: true },
+                    { label: "Export meetings", enabled: true },
+                    { label: "Share externally", enabled: false },
+                    { label: "Manage integrations", enabled: false },
+                    { label: "Manage users", enabled: false },
                   ].map((permission, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <Label htmlFor={`perm-${index}`}>{permission.label}</Label>
-                      <Switch id={`perm-${index}`} defaultChecked={permission.enabled} />
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <Label htmlFor={`perm-${index}`}>
+                        {permission.label}
+                      </Label>
+                      <Switch
+                        id={`perm-${index}`}
+                        defaultChecked={permission.enabled}
+                      />
                     </div>
                   ))}
                 </div>
@@ -229,7 +266,9 @@ export default function Admin() {
             <Card>
               <CardHeader>
                 <CardTitle>Recording & Bot Settings</CardTitle>
-                <CardDescription>Configure meeting recording behavior</CardDescription>
+                <CardDescription>
+                  Configure meeting recording behavior
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -244,14 +283,18 @@ export default function Admin() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Record video</Label>
-                    <p className="text-sm text-muted-foreground">Save video along with audio</p>
+                    <p className="text-sm text-muted-foreground">
+                      Save video along with audio
+                    </p>
                   </div>
                   <Switch />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Speaker identification</Label>
-                    <p className="text-sm text-muted-foreground">Identify speakers in transcript</p>
+                    <p className="text-sm text-muted-foreground">
+                      Identify speakers in transcript
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -261,7 +304,9 @@ export default function Admin() {
             <Card>
               <CardHeader>
                 <CardTitle>Data Retention</CardTitle>
-                <CardDescription>Control how long data is stored</CardDescription>
+                <CardDescription>
+                  Control how long data is stored
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -297,16 +342,21 @@ export default function Admin() {
             <Card>
               <CardHeader>
                 <CardTitle>PII Redaction</CardTitle>
-                <CardDescription>Automatically remove sensitive information</CardDescription>
+                <CardDescription>
+                  Automatically remove sensitive information
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  'Credit card numbers',
-                  'Social security numbers',
-                  'Email addresses',
-                  'Phone numbers',
+                  "Credit card numbers",
+                  "Social security numbers",
+                  "Email addresses",
+                  "Phone numbers",
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
                     <Label htmlFor={`pii-${index}`}>{item}</Label>
                     <Switch id={`pii-${index}`} defaultChecked />
                   </div>
@@ -335,7 +385,9 @@ export default function Admin() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Two-factor authentication</Label>
-                    <p className="text-sm text-muted-foreground">Require 2FA for all users</p>
+                    <p className="text-sm text-muted-foreground">
+                      Require 2FA for all users
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -354,7 +406,9 @@ export default function Admin() {
             <Card>
               <CardHeader>
                 <CardTitle>Sharing & Export</CardTitle>
-                <CardDescription>Control how data can be shared</CardDescription>
+                <CardDescription>
+                  Control how data can be shared
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -390,35 +444,42 @@ export default function Admin() {
             <Card>
               <CardHeader>
                 <CardTitle>Audit Log</CardTitle>
-                <CardDescription>Recent security events and actions</CardDescription>
+                <CardDescription>
+                  Recent security events and actions
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {[
                     {
-                      action: 'User role changed',
-                      user: 'Alex Kim',
-                      time: '2 hours ago',
-                      details: 'Sarah Johnson promoted to Manager',
+                      action: "User role changed",
+                      user: "Alex Kim",
+                      time: "2 hours ago",
+                      details: "Sarah Johnson promoted to Manager",
                     },
                     {
-                      action: 'Export created',
-                      user: 'John Smith',
-                      time: '5 hours ago',
-                      details: 'Exported 12 meeting transcripts',
+                      action: "Export created",
+                      user: "John Smith",
+                      time: "5 hours ago",
+                      details: "Exported 12 meeting transcripts",
                     },
                     {
-                      action: 'Settings modified',
-                      user: 'Alex Kim',
-                      time: '1 day ago',
-                      details: 'Enabled PII redaction',
+                      action: "Settings modified",
+                      user: "Alex Kim",
+                      time: "1 day ago",
+                      details: "Enabled PII redaction",
                     },
                   ].map((event, index) => (
-                    <div key={index} className="flex items-start gap-3 p-3 rounded-lg border">
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 p-3 rounded-lg border"
+                    >
                       <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
                         <p className="font-medium">{event.action}</p>
-                        <p className="text-sm text-muted-foreground">{event.details}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {event.details}
+                        </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {event.user} • {event.time}
                         </p>
@@ -432,7 +493,10 @@ export default function Admin() {
         </Tabs>
       </div>
 
-      <InviteUserModal open={inviteModalOpen} onOpenChange={setInviteModalOpen} />
+      <InviteUserModal
+        open={inviteModalOpen}
+        onOpenChange={setInviteModalOpen}
+      />
     </div>
   );
 }

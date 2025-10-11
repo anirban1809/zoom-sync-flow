@@ -1,8 +1,23 @@
-import { CreditCard, Download, Calendar, CheckCircle2, AlertCircle, TrendingUp, Users, Clock } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import {
+  CreditCard,
+  Download,
+  Calendar,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
+  Users,
+  Clock,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -10,19 +25,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 
 const invoices = [
-  { id: 'INV-2024-001', date: 'Jan 1, 2024', amount: '$299.00', status: 'paid' },
-  { id: 'INV-2023-012', date: 'Dec 1, 2023', amount: '$299.00', status: 'paid' },
-  { id: 'INV-2023-011', date: 'Nov 1, 2023', amount: '$299.00', status: 'paid' },
-  { id: 'INV-2023-010', date: 'Oct 1, 2023', amount: '$299.00', status: 'paid' },
+  {
+    id: "INV-2024-001",
+    date: "Jan 1, 2024",
+    amount: "$299.00",
+    status: "paid",
+  },
+  {
+    id: "INV-2023-012",
+    date: "Dec 1, 2023",
+    amount: "$299.00",
+    status: "paid",
+  },
+  {
+    id: "INV-2023-011",
+    date: "Nov 1, 2023",
+    amount: "$299.00",
+    status: "paid",
+  },
+  {
+    id: "INV-2023-010",
+    date: "Oct 1, 2023",
+    amount: "$299.00",
+    status: "paid",
+  },
 ];
 
 export default function Billing() {
   return (
     <div className="p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -54,7 +89,9 @@ export default function Billing() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Next billing date</p>
+                <p className="text-sm text-muted-foreground">
+                  Next billing date
+                </p>
                 <p className="font-medium flex items-center gap-2 mt-1">
                   <Calendar className="h-4 w-4" />
                   February 1, 2024
@@ -168,7 +205,9 @@ export default function Billing() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Payment Method</CardTitle>
-                <CardDescription>Manage your payment information</CardDescription>
+                <CardDescription>
+                  Manage your payment information
+                </CardDescription>
               </div>
               <Button variant="outline">Update</Button>
             </div>
@@ -193,7 +232,9 @@ export default function Billing() {
         <Card>
           <CardHeader>
             <CardTitle>Invoice History</CardTitle>
-            <CardDescription>Download past invoices and receipts</CardDescription>
+            <CardDescription>
+              Download past invoices and receipts
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -213,7 +254,10 @@ export default function Billing() {
                     <TableCell>{invoice.date}</TableCell>
                     <TableCell>{invoice.amount}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="flex items-center gap-1 w-fit">
+                      <Badge
+                        variant="secondary"
+                        className="flex items-center gap-1 w-fit"
+                      >
                         <CheckCircle2 className="h-3 w-3" />
                         {invoice.status}
                       </Badge>
@@ -235,7 +279,9 @@ export default function Billing() {
         <Card>
           <CardHeader>
             <CardTitle>Need More?</CardTitle>
-            <CardDescription>Upgrade your plan for additional features</CardDescription>
+            <CardDescription>
+              Upgrade your plan for additional features
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
@@ -250,7 +296,9 @@ export default function Billing() {
               </div>
               <div className="p-4 rounded-lg border">
                 <h4 className="font-medium mb-2">Extra Storage</h4>
-                <p className="text-sm text-muted-foreground mb-4">$10/month per 100 GB</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  $10/month per 100 GB
+                </p>
                 <Button variant="outline" className="w-full">
                   Add Storage
                 </Button>

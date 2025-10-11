@@ -1,13 +1,41 @@
 import { useState } from "react";
-import { Search, ChevronDown, ChevronRight, ExternalLink, Clock, AlertCircle, CheckCircle, FileText, Upload, Send } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  FileText,
+  Upload,
+  Send,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
@@ -30,29 +58,100 @@ const quickActions = [
 ];
 
 const featuredHelp = [
-  { title: "Recordings & Transcripts", description: "Learn how to manage and share your meeting recordings", category: "Recordings" },
-  { title: "Meetings & Calendar", description: "Sync calendars and schedule meetings efficiently", category: "Calendar" },
-  { title: "Tasks & Automations", description: "Automate workflows and manage action items", category: "Automation" },
-  { title: "Data Management & Security", description: "Understand data retention and security policies", category: "Security" },
-  { title: "Billing & Accounts", description: "Manage subscriptions and payment methods", category: "Billing" },
-  { title: "Integrations (Zoom/Meet/Teams/CRM)", description: "Connect with your favorite tools", category: "Integrations" },
+  {
+    title: "Recordings & Transcripts",
+    description: "Learn how to manage and share your meeting recordings",
+    category: "Recordings",
+  },
+  {
+    title: "Meetings & Calendar",
+    description: "Sync calendars and schedule meetings efficiently",
+    category: "Calendar",
+  },
+  {
+    title: "Tasks & Automations",
+    description: "Automate workflows and manage action items",
+    category: "Automation",
+  },
+  {
+    title: "Data Management & Security",
+    description: "Understand data retention and security policies",
+    category: "Security",
+  },
+  {
+    title: "Billing & Accounts",
+    description: "Manage subscriptions and payment methods",
+    category: "Billing",
+  },
+  {
+    title: "Integrations (Zoom/Meet/Teams/CRM)",
+    description: "Connect with your favorite tools",
+    category: "Integrations",
+  },
 ];
 
 const faqs = [
-  { question: "How do I record a meeting?", answer: "To record a meeting, simply add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins." },
-  { question: "Where can I find my transcripts?", answer: "All transcripts are available in the Meetings section. Click on any past meeting to view its recording, transcript, and AI-generated summary." },
-  { question: "Can I edit transcripts?", answer: "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section to make changes." },
-  { question: "How do I share a recording?", answer: "Navigate to the meeting detail page and click the 'Share' button. You can generate a shareable link or invite specific people via email." },
-  { question: "What integrations are supported?", answer: "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and many more. Check the Integrations page for the full list." },
-  { question: "How do I cancel my subscription?", answer: "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan at any time." },
-  { question: "Is my data secure?", answer: "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards. Learn more in our Security & Compliance page." },
-  { question: "How long are recordings stored?", answer: "Recordings are stored based on your plan. Free plans retain data for 30 days, while paid plans offer unlimited storage." },
+  {
+    question: "How do I record a meeting?",
+    answer:
+      "To record a meeting, simply add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins.",
+  },
+  {
+    question: "Where can I find my transcripts?",
+    answer:
+      "All transcripts are available in the Meetings section. Click on any past meeting to view its recording, transcript, and AI-generated summary.",
+  },
+  {
+    question: "Can I edit transcripts?",
+    answer:
+      "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section to make changes.",
+  },
+  {
+    question: "How do I share a recording?",
+    answer:
+      "Navigate to the meeting detail page and click the 'Share' button. You can generate a shareable link or invite specific people via email.",
+  },
+  {
+    question: "What integrations are supported?",
+    answer:
+      "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and many more. Check the Integrations page for the full list.",
+  },
+  {
+    question: "How do I cancel my subscription?",
+    answer:
+      "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan at any time.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards. Learn more in our Security & Compliance page.",
+  },
+  {
+    question: "How long are recordings stored?",
+    answer:
+      "Recordings are stored based on your plan. Free plans retain data for 30 days, while paid plans offer unlimited storage.",
+  },
 ];
 
 const recentTickets = [
-  { id: "#12345", subject: "Recording not joining meeting", status: "In Progress", updated: "2 hours ago" },
-  { id: "#12344", subject: "Transcript accuracy issue", status: "Resolved", updated: "1 day ago" },
-  { id: "#12343", subject: "Integration connection failed", status: "Waiting for response", updated: "2 days ago" },
+  {
+    id: "#12345",
+    subject: "Recording not joining meeting",
+    status: "In Progress",
+    updated: "2 hours ago",
+  },
+  {
+    id: "#12344",
+    subject: "Transcript accuracy issue",
+    status: "Resolved",
+    updated: "1 day ago",
+  },
+  {
+    id: "#12343",
+    subject: "Integration connection failed",
+    status: "Waiting for response",
+    updated: "2 days ago",
+  },
 ];
 
 const quickLinks = [
@@ -63,10 +162,36 @@ const quickLinks = [
 ];
 
 const articles = [
-  { title: "Getting Started with Recordin.ai", snippet: "Learn the basics of setting up your account and recording your first meeting", category: "Getting Started", readTime: "5 min", badge: "New" },
-  { title: "Advanced Search Tips", snippet: "Master search operators to find exactly what you need in your transcripts", category: "Features", readTime: "3 min", badge: null },
-  { title: "Setting Up Zoom Integration", snippet: "Step-by-step guide to connect your Zoom account", category: "Integrations", readTime: "4 min", badge: "Updated" },
-  { title: "Understanding Your Bill", snippet: "Breakdown of pricing tiers and usage calculations", category: "Billing", readTime: "6 min", badge: null },
+  {
+    title: "Getting Started with Recordin.ai",
+    snippet:
+      "Learn the basics of setting up your account and recording your first meeting",
+    category: "Getting Started",
+    readTime: "5 min",
+    badge: "New",
+  },
+  {
+    title: "Advanced Search Tips",
+    snippet:
+      "Master search operators to find exactly what you need in your transcripts",
+    category: "Features",
+    readTime: "3 min",
+    badge: null,
+  },
+  {
+    title: "Setting Up Zoom Integration",
+    snippet: "Step-by-step guide to connect your Zoom account",
+    category: "Integrations",
+    readTime: "4 min",
+    badge: "Updated",
+  },
+  {
+    title: "Understanding Your Bill",
+    snippet: "Breakdown of pricing tiers and usage calculations",
+    category: "Billing",
+    readTime: "6 min",
+    badge: null,
+  },
 ];
 
 export default function HelpSupport() {
@@ -88,7 +213,7 @@ export default function HelpSupport() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Help & Support</h1>
@@ -104,7 +229,9 @@ export default function HelpSupport() {
             <CheckCircle className="h-5 w-5 text-green-500" />
             <div>
               <p className="font-medium">All systems operational</p>
-              <p className="text-sm text-muted-foreground">Last updated: 5 minutes ago</p>
+              <p className="text-sm text-muted-foreground">
+                Last updated: 5 minutes ago
+              </p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="gap-2">
@@ -144,7 +271,11 @@ export default function HelpSupport() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {quickActions.map((action, idx) => (
-          <Button key={idx} variant="outline" className="h-auto py-4 justify-start gap-3">
+          <Button
+            key={idx}
+            variant="outline"
+            className="h-auto py-4 justify-start gap-3"
+          >
             <action.icon className="h-5 w-5" />
             <span>{action.label}</span>
           </Button>
@@ -163,16 +294,25 @@ export default function HelpSupport() {
             <CardContent>
               <div className="grid sm:grid-cols-2 gap-4">
                 {featuredHelp.map((item, idx) => (
-                  <Card key={idx} className="hover:border-primary transition-colors cursor-pointer">
+                  <Card
+                    key={idx}
+                    className="hover:border-primary transition-colors cursor-pointer"
+                  >
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-base">{item.title}</CardTitle>
-                          <Badge variant="outline" className="mt-2">{item.category}</Badge>
+                          <CardTitle className="text-base">
+                            {item.title}
+                          </CardTitle>
+                          <Badge variant="outline" className="mt-2">
+                            {item.category}
+                          </Badge>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
                       </div>
-                      <CardDescription className="mt-2">{item.description}</CardDescription>
+                      <CardDescription className="mt-2">
+                        {item.description}
+                      </CardDescription>
                     </CardHeader>
                   </Card>
                 ))}
@@ -184,20 +324,26 @@ export default function HelpSupport() {
           <Card>
             <CardHeader>
               <CardTitle>Frequently Asked Questions</CardTitle>
-              <CardDescription>Quick answers to common questions</CardDescription>
+              <CardDescription>
+                Quick answers to common questions
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
                 {faqs.map((faq, idx) => (
                   <AccordionItem key={idx} value={`item-${idx}`}>
-                    <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+                    <AccordionTrigger className="text-left">
+                      {faq.question}
+                    </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">
                       {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
-              <Button variant="link" className="mt-4">View all FAQs →</Button>
+              <Button variant="link" className="mt-4">
+                View all FAQs →
+              </Button>
             </CardContent>
           </Card>
 
@@ -220,17 +366,27 @@ export default function HelpSupport() {
             </CardHeader>
             <CardContent className="space-y-4">
               {articles.map((article, idx) => (
-                <div key={idx} className="flex items-start justify-between p-4 border rounded-lg hover:border-primary transition-colors cursor-pointer">
+                <div
+                  key={idx}
+                  className="flex items-start justify-between p-4 border rounded-lg hover:border-primary transition-colors cursor-pointer"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium">{article.title}</h4>
                       {article.badge && (
-                        <Badge variant={article.badge === "New" ? "default" : "secondary"} className="text-xs">
+                        <Badge
+                          variant={
+                            article.badge === "New" ? "default" : "secondary"
+                          }
+                          className="text-xs"
+                        >
                           {article.badge}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{article.snippet}</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {article.snippet}
+                    </p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>{article.category}</span>
                       <span className="flex items-center gap-1">
@@ -242,7 +398,9 @@ export default function HelpSupport() {
                   <ChevronRight className="h-5 w-5 text-muted-foreground mt-1" />
                 </div>
               ))}
-              <Button variant="outline" className="w-full">Load more articles</Button>
+              <Button variant="outline" className="w-full">
+                Load more articles
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -261,10 +419,16 @@ export default function HelpSupport() {
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
                   <div>
                     <p className="font-medium">Ticket submitted!</p>
-                    <p className="text-sm text-muted-foreground mt-1">Ticket ID: #12346</p>
-                    <p className="text-sm text-muted-foreground">We'll respond within 24 hours</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Ticket ID: #12346
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      We'll respond within 24 hours
+                    </p>
                   </div>
-                  <Button size="sm" variant="outline">View ticket</Button>
+                  <Button size="sm" variant="outline">
+                    View ticket
+                  </Button>
                 </div>
               ) : (
                 <Tabs defaultValue="email">
@@ -283,16 +447,29 @@ export default function HelpSupport() {
                     </div>
                     <div className="space-y-2">
                       <Label>Category</Label>
-                      <Select value={ticketCategory} onValueChange={setTicketCategory}>
+                      <Select
+                        value={ticketCategory}
+                        onValueChange={setTicketCategory}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="recordings">Recordings/Transcripts</SelectItem>
-                          <SelectItem value="meetings">Meetings/Calendar</SelectItem>
-                          <SelectItem value="tasks">Tasks/Automations</SelectItem>
-                          <SelectItem value="integrations">Integrations</SelectItem>
-                          <SelectItem value="security">Data/Security</SelectItem>
+                          <SelectItem value="recordings">
+                            Recordings/Transcripts
+                          </SelectItem>
+                          <SelectItem value="meetings">
+                            Meetings/Calendar
+                          </SelectItem>
+                          <SelectItem value="tasks">
+                            Tasks/Automations
+                          </SelectItem>
+                          <SelectItem value="integrations">
+                            Integrations
+                          </SelectItem>
+                          <SelectItem value="security">
+                            Data/Security
+                          </SelectItem>
                           <SelectItem value="billing">Billing</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
@@ -321,7 +498,11 @@ export default function HelpSupport() {
                     </div>
                     <div className="space-y-2">
                       <Label>Attachments</Label>
-                      <Button variant="outline" size="sm" className="w-full gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2"
+                      >
                         <Upload className="h-4 w-4" />
                         Upload files
                       </Button>
@@ -329,15 +510,22 @@ export default function HelpSupport() {
                     <Separator />
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="diagnostics" className="text-sm">Include diagnostic info</Label>
+                        <Label htmlFor="diagnostics" className="text-sm">
+                          Include diagnostic info
+                        </Label>
                         <Switch id="diagnostics" />
                       </div>
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="logs" className="text-sm">Include last meeting logs</Label>
+                        <Label htmlFor="logs" className="text-sm">
+                          Include last meeting logs
+                        </Label>
                         <Switch id="logs" />
                       </div>
                     </div>
-                    <Button className="w-full gap-2" onClick={handleSubmitTicket}>
+                    <Button
+                      className="w-full gap-2"
+                      onClick={handleSubmitTicket}
+                    >
                       <Send className="h-4 w-4" />
                       Submit ticket
                     </Button>
@@ -348,12 +536,16 @@ export default function HelpSupport() {
                         <AlertCircle className="h-6 w-6" />
                       </div>
                       <div>
-                        <p className="font-medium">Chat currently unavailable</p>
+                        <p className="font-medium">
+                          Chat currently unavailable
+                        </p>
                         <p className="text-sm text-muted-foreground mt-1">
                           Please use email support or schedule a call
                         </p>
                       </div>
-                      <Button variant="outline" size="sm">Schedule a call</Button>
+                      <Button variant="outline" size="sm">
+                        Schedule a call
+                      </Button>
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -368,21 +560,36 @@ export default function HelpSupport() {
             </CardHeader>
             <CardContent className="space-y-3">
               {recentTickets.map((ticket) => (
-                <div key={ticket.id} className="p-3 border rounded-lg hover:border-primary transition-colors cursor-pointer">
+                <div
+                  key={ticket.id}
+                  className="p-3 border rounded-lg hover:border-primary transition-colors cursor-pointer"
+                >
                   <div className="flex items-start justify-between mb-1">
                     <p className="font-medium text-sm">{ticket.id}</p>
-                    <Badge variant={
-                      ticket.status === "Resolved" ? "default" :
-                      ticket.status === "In Progress" ? "secondary" : "outline"
-                    } className="text-xs">
+                    <Badge
+                      variant={
+                        ticket.status === "Resolved"
+                          ? "default"
+                          : ticket.status === "In Progress"
+                          ? "secondary"
+                          : "outline"
+                      }
+                      className="text-xs"
+                    >
                       {ticket.status}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-1">{ticket.subject}</p>
-                  <p className="text-xs text-muted-foreground">{ticket.updated}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {ticket.subject}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {ticket.updated}
+                  </p>
                 </div>
               ))}
-              <Button variant="link" className="w-full">View all tickets →</Button>
+              <Button variant="link" className="w-full">
+                View all tickets →
+              </Button>
             </CardContent>
           </Card>
 
@@ -393,7 +600,12 @@ export default function HelpSupport() {
             </CardHeader>
             <CardContent className="space-y-2">
               {quickLinks.map((link, idx) => (
-                <Button key={idx} variant="ghost" className="w-full justify-between" asChild>
+                <Button
+                  key={idx}
+                  variant="ghost"
+                  className="w-full justify-between"
+                  asChild
+                >
                   <a href={link.url}>
                     {link.label}
                     <ExternalLink className="h-4 w-4" />

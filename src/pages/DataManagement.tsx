@@ -1,25 +1,64 @@
-import { useState } from 'react';
-import { Database, Download, Shield, Clock, Trash2, Activity, HardDrive, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
-import { format } from 'date-fns';
-import { toast } from '@/hooks/use-toast';
+import { useState } from "react";
+import {
+  Database,
+  Download,
+  Shield,
+  Clock,
+  Trash2,
+  Activity,
+  HardDrive,
+  ChevronDown,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
 export default function DataManagement() {
   const [storageModalOpen, setStorageModalOpen] = useState(false);
-  const [storageLocation, setStorageLocation] = useState('recordin');
-  const [dataRegion, setDataRegion] = useState('mumbai');
+  const [storageLocation, setStorageLocation] = useState("recordin");
+  const [dataRegion, setDataRegion] = useState("mumbai");
   const [scheduledExportEnabled, setScheduledExportEnabled] = useState(false);
   const [requireSignIn, setRequireSignIn] = useState(true);
   const [zipPassword, setZipPassword] = useState(false);
@@ -27,19 +66,46 @@ export default function DataManagement() {
   const [restoreDate, setRestoreDate] = useState<Date>();
   const [byokModalOpen, setByokModalOpen] = useState(false);
   const [backupsEnabled, setBackupsEnabled] = useState(true);
-  const [backupFrequency, setBackupFrequency] = useState('daily');
-  const [backupDayOfWeek, setBackupDayOfWeek] = useState('monday');
-  const [backupDayOfMonth, setBackupDayOfMonth] = useState('1');
+  const [backupFrequency, setBackupFrequency] = useState("daily");
+  const [backupDayOfWeek, setBackupDayOfWeek] = useState("monday");
+  const [backupDayOfMonth, setBackupDayOfMonth] = useState("1");
 
   const pastExports = [
-    { date: '8 Nov 2025', range: 'Last 30 days', format: 'Full ZIP', status: 'Ready', action: 'download' },
-    { date: '1 Nov 2025', range: 'Oct 2025', format: 'PDF', status: 'Ready', action: 'download' },
+    {
+      date: "8 Nov 2025",
+      range: "Last 30 days",
+      format: "Full ZIP",
+      status: "Ready",
+      action: "download",
+    },
+    {
+      date: "1 Nov 2025",
+      range: "Oct 2025",
+      format: "PDF",
+      status: "Ready",
+      action: "download",
+    },
   ];
 
   const activityLog = [
-    { time: '10:12', action: 'Export created', by: 'You', details: '12 meetings • PDF' },
-    { time: '09:45', action: 'Settings changed', by: 'You', details: 'Retention policy updated' },
-    { time: 'Yesterday', action: 'Backup completed', by: 'System', details: 'Daily backup' },
+    {
+      time: "10:12",
+      action: "Export created",
+      by: "You",
+      details: "12 meetings • PDF",
+    },
+    {
+      time: "09:45",
+      action: "Settings changed",
+      by: "You",
+      details: "Retention policy updated",
+    },
+    {
+      time: "Yesterday",
+      action: "Backup completed",
+      by: "System",
+      details: "Daily backup",
+    },
   ];
 
   const handleStorageChange = () => {
@@ -59,11 +125,12 @@ export default function DataManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Data Management</h1>
         <p className="text-muted-foreground mt-1">
-          Control where your meeting data lives, how long we keep it, and how to export it.
+          Control where your meeting data lives, how long we keep it, and how to
+          export it.
         </p>
       </div>
 
@@ -80,7 +147,11 @@ export default function DataManagement() {
             <Label>Where your data is stored</Label>
             <div className="flex items-center justify-between">
               <span className="text-sm">Recordin secure cloud</span>
-              <Button variant="outline" size="sm" onClick={() => setStorageModalOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setStorageModalOpen(true)}
+              >
                 Change
               </Button>
             </div>
@@ -93,9 +164,12 @@ export default function DataManagement() {
             </div>
             <Progress value={9.1} className="h-2" />
             <p className="text-xs text-muted-foreground">
-              Audio 8.5 GB • Transcripts 2.1 GB • Notes 0.3 GB • Attachments 7.3 GB
+              Audio 8.5 GB • Transcripts 2.1 GB • Notes 0.3 GB • Attachments 7.3
+              GB
             </p>
-            <Button variant="outline" size="sm">Free up space</Button>
+            <Button variant="outline" size="sm">
+              Free up space
+            </Button>
           </div>
 
           <div className="space-y-2">
@@ -106,13 +180,16 @@ export default function DataManagement() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="mumbai">Asia South Mumbai</SelectItem>
-                <SelectItem value="singapore">Asia Southeast Singapore</SelectItem>
+                <SelectItem value="singapore">
+                  Asia Southeast Singapore
+                </SelectItem>
                 <SelectItem value="us-east">US East</SelectItem>
                 <SelectItem value="eu-west">EU West</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Used for all new meetings. Moving regions does not move existing files.
+              Used for all new meetings. Moving regions does not move existing
+              files.
             </p>
           </div>
         </CardContent>
@@ -158,7 +235,10 @@ export default function DataManagement() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>Scheduled export</Label>
-              <Switch checked={scheduledExportEnabled} onCheckedChange={setScheduledExportEnabled} />
+              <Switch
+                checked={scheduledExportEnabled}
+                onCheckedChange={setScheduledExportEnabled}
+              />
             </div>
             {scheduledExportEnabled && (
               <div className="space-y-3 pl-4 border-l-2">
@@ -216,8 +296,12 @@ export default function DataManagement() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="sm">Download</Button>
-                          <Button variant="ghost" size="sm">Delete</Button>
+                          <Button variant="ghost" size="sm">
+                            Download
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            Delete
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -241,16 +325,24 @@ export default function DataManagement() {
           <div className="flex items-center justify-between">
             <div>
               <Label>Enable backups</Label>
-              <p className="text-sm text-muted-foreground">Automatically backup your meeting data</p>
+              <p className="text-sm text-muted-foreground">
+                Automatically backup your meeting data
+              </p>
             </div>
-            <Switch checked={backupsEnabled} onCheckedChange={setBackupsEnabled} />
+            <Switch
+              checked={backupsEnabled}
+              onCheckedChange={setBackupsEnabled}
+            />
           </div>
 
           {backupsEnabled && (
             <div className="space-y-4 pl-4 border-l-2">
               <div className="space-y-2">
                 <Label>Backup frequency</Label>
-                <Select value={backupFrequency} onValueChange={setBackupFrequency}>
+                <Select
+                  value={backupFrequency}
+                  onValueChange={setBackupFrequency}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -262,10 +354,13 @@ export default function DataManagement() {
                 </Select>
               </div>
 
-              {backupFrequency === 'weekly' && (
+              {backupFrequency === "weekly" && (
                 <div className="space-y-2">
                   <Label>Day of week</Label>
-                  <Select value={backupDayOfWeek} onValueChange={setBackupDayOfWeek}>
+                  <Select
+                    value={backupDayOfWeek}
+                    onValueChange={setBackupDayOfWeek}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -282,19 +377,24 @@ export default function DataManagement() {
                 </div>
               )}
 
-              {backupFrequency === 'monthly' && (
+              {backupFrequency === "monthly" && (
                 <div className="space-y-2">
                   <Label>Day of month</Label>
-                  <Select value={backupDayOfMonth} onValueChange={setBackupDayOfMonth}>
+                  <Select
+                    value={backupDayOfMonth}
+                    onValueChange={setBackupDayOfMonth}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                        <SelectItem key={day} value={day.toString()}>
-                          {day}
-                        </SelectItem>
-                      ))}
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                        (day) => (
+                          <SelectItem key={day} value={day.toString()}>
+                            {day}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">
@@ -322,7 +422,11 @@ export default function DataManagement() {
             <Label>Encryption at rest</Label>
             <div className="flex items-center justify-between">
               <span className="text-sm">Managed by Recordin</span>
-              <Button variant="outline" size="sm" onClick={() => setByokModalOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setByokModalOpen(true)}
+              >
                 Advanced
               </Button>
             </div>
@@ -331,7 +435,10 @@ export default function DataManagement() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>Require sign-in for all downloads</Label>
-              <Switch checked={requireSignIn} onCheckedChange={setRequireSignIn} />
+              <Switch
+                checked={requireSignIn}
+                onCheckedChange={setRequireSignIn}
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -378,7 +485,9 @@ export default function DataManagement() {
                   <SelectItem value="forever">Keep forever</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Next cleanup on 12 Nov 2025</p>
+              <p className="text-xs text-muted-foreground">
+                Next cleanup on 12 Nov 2025
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -394,7 +503,9 @@ export default function DataManagement() {
                   <SelectItem value="forever">Keep forever</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Next cleanup on 12 Nov 2025</p>
+              <p className="text-xs text-muted-foreground">
+                Next cleanup on 12 Nov 2025
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -409,16 +520,23 @@ export default function DataManagement() {
                   <SelectItem value="forever">Keep forever</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Next cleanup on 12 Nov 2025</p>
+              <p className="text-xs text-muted-foreground">
+                Next cleanup on 12 Nov 2025
+              </p>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
               <Label>Delete original audio after transcription</Label>
-              <p className="text-xs text-muted-foreground">Saves space. Transcripts and notes stay.</p>
+              <p className="text-xs text-muted-foreground">
+                Saves space. Transcripts and notes stay.
+              </p>
             </div>
-            <Switch checked={autoDeleteAudio} onCheckedChange={setAutoDeleteAudio} />
+            <Switch
+              checked={autoDeleteAudio}
+              onCheckedChange={setAutoDeleteAudio}
+            />
           </div>
 
           <Button>Apply changes</Button>
@@ -467,7 +585,10 @@ export default function DataManagement() {
                 <SelectItem value="90days">Last 90 days</SelectItem>
               </SelectContent>
             </Select>
-            <Input placeholder="Search by person or action" className="flex-1 min-w-[200px]" />
+            <Input
+              placeholder="Search by person or action"
+              className="flex-1 min-w-[200px]"
+            />
           </div>
 
           <div className="border rounded-lg">
@@ -483,10 +604,14 @@ export default function DataManagement() {
               <TableBody>
                 {activityLog.map((log, i) => (
                   <TableRow key={i}>
-                    <TableCell className="font-mono text-sm">{log.time}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {log.time}
+                    </TableCell>
                     <TableCell>{log.action}</TableCell>
                     <TableCell>{log.by}</TableCell>
-                    <TableCell className="text-muted-foreground">{log.details}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {log.details}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -503,18 +628,24 @@ export default function DataManagement() {
           <DialogHeader>
             <DialogTitle>Change Storage Location</DialogTitle>
             <DialogDescription>
-              New files will be saved to the new location. Existing files stay where they are.
+              New files will be saved to the new location. Existing files stay
+              where they are.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Storage Location</Label>
-              <Select value={storageLocation} onValueChange={setStorageLocation}>
+              <Select
+                value={storageLocation}
+                onValueChange={setStorageLocation}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recordin">Recordin secure cloud</SelectItem>
+                  <SelectItem value="recordin">
+                    Recordin secure cloud
+                  </SelectItem>
                   <SelectItem value="aws">My AWS S3</SelectItem>
                   <SelectItem value="azure">My Azure Blob</SelectItem>
                   <SelectItem value="gcp">My Google Cloud</SelectItem>
@@ -522,7 +653,7 @@ export default function DataManagement() {
               </Select>
             </div>
 
-            {storageLocation !== 'recordin' && (
+            {storageLocation !== "recordin" && (
               <>
                 <div className="space-y-2">
                   <Label>Bucket or Container</Label>
@@ -536,7 +667,10 @@ export default function DataManagement() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setStorageModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setStorageModalOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleStorageChange}>Save</Button>

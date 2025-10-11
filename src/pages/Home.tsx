@@ -18,9 +18,8 @@ export default function Home() {
     (m) => m.start.toDateString() === new Date().toDateString()
   );
 
-
   return (
-    <div className="space-y-6">
+    <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Good morning, Anirban</h1>
@@ -29,7 +28,12 @@ export default function Home() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button size="lg" variant="outline" className="gap-2" onClick={() => setCreateMeetingOpen(true)}>
+          <Button
+            size="lg"
+            variant="outline"
+            className="gap-2"
+            onClick={() => setCreateMeetingOpen(true)}
+          >
             <Calendar className="h-5 w-5" />
             Create Meeting
           </Button>
@@ -40,8 +44,8 @@ export default function Home() {
         </div>
       </div>
 
-      <CreateMeetingModal 
-        open={createMeetingOpen} 
+      <CreateMeetingModal
+        open={createMeetingOpen}
         onOpenChange={setCreateMeetingOpen}
       />
 

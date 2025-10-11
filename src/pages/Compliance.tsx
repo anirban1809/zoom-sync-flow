@@ -1,10 +1,26 @@
-import { useState } from 'react';
-import { Shield, FileText, Eye, Download, Lock, AlertTriangle, CheckCircle2, Clock, Search } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from "react";
+import {
+  Shield,
+  FileText,
+  Eye,
+  Download,
+  Lock,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Search,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -12,119 +28,119 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 const auditLogs = [
   {
-    id: '1',
-    action: 'Meeting viewed',
-    user: 'Alex Kim',
-    resource: 'Q4 Planning Meeting',
-    timestamp: '2024-01-15 10:34:22',
-    ip: '192.168.1.1',
+    id: "1",
+    action: "Meeting viewed",
+    user: "Alex Kim",
+    resource: "Q4 Planning Meeting",
+    timestamp: "2024-01-15 10:34:22",
+    ip: "192.168.1.1",
   },
   {
-    id: '2',
-    action: 'Transcript exported',
-    user: 'Sarah Johnson',
-    resource: 'Product Roadmap Discussion',
-    timestamp: '2024-01-15 09:22:11',
-    ip: '192.168.1.5',
+    id: "2",
+    action: "Transcript exported",
+    user: "Sarah Johnson",
+    resource: "Product Roadmap Discussion",
+    timestamp: "2024-01-15 09:22:11",
+    ip: "192.168.1.5",
   },
   {
-    id: '3',
-    action: 'Meeting shared',
-    user: 'John Smith',
-    resource: 'Sales Call - Acme Corp',
-    timestamp: '2024-01-15 08:15:44',
-    ip: '192.168.1.3',
+    id: "3",
+    action: "Meeting shared",
+    user: "John Smith",
+    resource: "Sales Call - Acme Corp",
+    timestamp: "2024-01-15 08:15:44",
+    ip: "192.168.1.3",
   },
   {
-    id: '4',
-    action: 'User role changed',
-    user: 'Alex Kim',
-    resource: 'Sarah Johnson promoted to Manager',
-    timestamp: '2024-01-14 16:45:33',
-    ip: '192.168.1.1',
+    id: "4",
+    action: "User role changed",
+    user: "Alex Kim",
+    resource: "Sarah Johnson promoted to Manager",
+    timestamp: "2024-01-14 16:45:33",
+    ip: "192.168.1.1",
   },
   {
-    id: '5',
-    action: 'Integration connected',
-    user: 'Alex Kim',
-    resource: 'HubSpot integration',
-    timestamp: '2024-01-14 14:20:17',
-    ip: '192.168.1.1',
+    id: "5",
+    action: "Integration connected",
+    user: "Alex Kim",
+    resource: "HubSpot integration",
+    timestamp: "2024-01-14 14:20:17",
+    ip: "192.168.1.1",
   },
 ];
 
 const dlpMatches = [
   {
-    id: '1',
-    meeting: 'Customer Support Call',
-    type: 'Credit Card',
-    severity: 'high',
-    action: 'Redacted',
-    timestamp: '2024-01-15 11:22:33',
+    id: "1",
+    meeting: "Customer Support Call",
+    type: "Credit Card",
+    severity: "high",
+    action: "Redacted",
+    timestamp: "2024-01-15 11:22:33",
   },
   {
-    id: '2',
-    meeting: 'HR Interview',
-    type: 'SSN',
-    severity: 'high',
-    action: 'Redacted',
-    timestamp: '2024-01-15 10:15:22',
+    id: "2",
+    meeting: "HR Interview",
+    type: "SSN",
+    severity: "high",
+    action: "Redacted",
+    timestamp: "2024-01-15 10:15:22",
   },
   {
-    id: '3',
-    meeting: 'Sales Demo',
-    type: 'Email Address',
-    severity: 'medium',
-    action: 'Flagged',
-    timestamp: '2024-01-14 15:44:11',
+    id: "3",
+    meeting: "Sales Demo",
+    type: "Email Address",
+    severity: "medium",
+    action: "Flagged",
+    timestamp: "2024-01-14 15:44:11",
   },
 ];
 
 const dataRequests = [
   {
-    id: '1',
-    type: 'Export',
-    requestor: 'john.doe@example.com',
-    status: 'completed',
-    created: '2024-01-10',
-    completed: '2024-01-11',
+    id: "1",
+    type: "Export",
+    requestor: "john.doe@example.com",
+    status: "completed",
+    created: "2024-01-10",
+    completed: "2024-01-11",
   },
   {
-    id: '2',
-    type: 'Erase',
-    requestor: 'jane.smith@example.com',
-    status: 'pending_approval',
-    created: '2024-01-14',
+    id: "2",
+    type: "Erase",
+    requestor: "jane.smith@example.com",
+    status: "pending_approval",
+    created: "2024-01-14",
     completed: null,
   },
   {
-    id: '3',
-    type: 'Export',
-    requestor: 'bob.wilson@example.com',
-    status: 'processing',
-    created: '2024-01-15',
+    id: "3",
+    type: "Export",
+    requestor: "bob.wilson@example.com",
+    status: "processing",
+    created: "2024-01-15",
     completed: null,
   },
 ];
 
 export default function Compliance() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTab, setSelectedTab] = useState('audit');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTab, setSelectedTab] = useState("audit");
 
   return (
     <div className="p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -153,7 +169,9 @@ export default function Compliance() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">98.5%</p>
-              <p className="text-sm text-muted-foreground mt-1">Overall score</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Overall score
+              </p>
             </CardContent>
           </Card>
 
@@ -192,7 +210,9 @@ export default function Compliance() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">3</p>
-              <p className="text-sm text-muted-foreground mt-1">Active requests</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Active requests
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -267,10 +287,18 @@ export default function Compliance() {
                         <TableCell>
                           <Badge variant="secondary">{log.action}</Badge>
                         </TableCell>
-                        <TableCell className="font-medium">{log.user}</TableCell>
-                        <TableCell className="text-muted-foreground">{log.resource}</TableCell>
-                        <TableCell className="text-muted-foreground">{log.timestamp}</TableCell>
-                        <TableCell className="text-muted-foreground">{log.ip}</TableCell>
+                        <TableCell className="font-medium">
+                          {log.user}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {log.resource}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {log.timestamp}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {log.ip}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -302,18 +330,20 @@ export default function Compliance() {
                   <TableBody>
                     {dlpMatches.map((match) => (
                       <TableRow key={match.id}>
-                        <TableCell className="font-medium">{match.meeting}</TableCell>
+                        <TableCell className="font-medium">
+                          {match.meeting}
+                        </TableCell>
                         <TableCell>
                           <Badge variant="outline">{match.type}</Badge>
                         </TableCell>
                         <TableCell>
                           <Badge
                             variant={
-                              match.severity === 'high'
-                                ? 'destructive'
-                                : match.severity === 'medium'
-                                ? 'secondary'
-                                : 'outline'
+                              match.severity === "high"
+                                ? "destructive"
+                                : match.severity === "medium"
+                                ? "secondary"
+                                : "outline"
                             }
                           >
                             {match.severity}
@@ -325,7 +355,9 @@ export default function Compliance() {
                             <span>{match.action}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{match.timestamp}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {match.timestamp}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -359,31 +391,43 @@ export default function Compliance() {
                     {dataRequests.map((request) => (
                       <TableRow key={request.id}>
                         <TableCell>
-                          <Badge variant={request.type === 'Export' ? 'secondary' : 'destructive'}>
+                          <Badge
+                            variant={
+                              request.type === "Export"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                          >
                             {request.type}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium">{request.requestor}</TableCell>
+                        <TableCell className="font-medium">
+                          {request.requestor}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {request.status === 'completed' && (
+                            {request.status === "completed" && (
                               <CheckCircle2 className="h-4 w-4 text-success" />
                             )}
-                            {request.status === 'processing' && (
+                            {request.status === "processing" && (
                               <Clock className="h-4 w-4 text-warning" />
                             )}
-                            {request.status === 'pending_approval' && (
+                            {request.status === "pending_approval" && (
                               <AlertTriangle className="h-4 w-4 text-warning" />
                             )}
-                            <span className="capitalize">{request.status.replace('_', ' ')}</span>
+                            <span className="capitalize">
+                              {request.status.replace("_", " ")}
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">{request.created}</TableCell>
                         <TableCell className="text-muted-foreground">
-                          {request.completed || '—'}
+                          {request.created}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {request.completed || "—"}
                         </TableCell>
                         <TableCell className="text-right">
-                          {request.status === 'pending_approval' && (
+                          {request.status === "pending_approval" && (
                             <div className="flex gap-2 justify-end">
                               <Button size="sm" variant="outline">
                                 Approve
@@ -393,7 +437,7 @@ export default function Compliance() {
                               </Button>
                             </div>
                           )}
-                          {request.status === 'completed' && (
+                          {request.status === "completed" && (
                             <Button size="sm" variant="ghost">
                               <Download className="h-4 w-4 mr-2" />
                               Download
