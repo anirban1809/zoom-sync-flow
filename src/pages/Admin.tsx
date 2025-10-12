@@ -94,7 +94,7 @@ export default function Admin() {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
-    <div className="p-8">
+    <div className="p-8 max-w-7xl mx-auto">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">

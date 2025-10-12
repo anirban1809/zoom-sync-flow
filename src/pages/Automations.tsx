@@ -1,74 +1,97 @@
-import { useState } from 'react';
-import { Plus, Zap, Play, Pause, Edit, Trash2, Clock, Check } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import CreateAutomationModal from '@/components/CreateAutomationModal';
+import { useState } from "react";
+import {
+  Plus,
+  Zap,
+  Play,
+  Pause,
+  Edit,
+  Trash2,
+  Clock,
+  Check,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import CreateAutomationModal from "@/components/CreateAutomationModal";
 
 const automations = [
   {
-    id: '1',
-    name: 'Auto-create tasks from action items',
-    description: 'Automatically create tasks when action items are mentioned in meetings',
-    trigger: 'Meeting ends',
-    actions: ['Extract action items', 'Create tasks', 'Assign to attendees'],
+    id: "1",
+    name: "Auto-create tasks from action items",
+    description:
+      "Automatically create tasks when action items are mentioned in meetings",
+    trigger: "Meeting ends",
+    actions: ["Extract action items", "Create tasks", "Assign to attendees"],
     enabled: true,
     runs: 342,
-    lastRun: '2 hours ago',
+    lastRun: "2 hours ago",
   },
   {
-    id: '2',
-    name: 'Send meeting summary emails',
-    description: 'Send summary emails to all participants after meetings',
-    trigger: 'Transcript complete',
-    actions: ['Generate summary', 'Send email to attendees'],
+    id: "2",
+    name: "Send meeting summary emails",
+    description: "Send summary emails to all participants after meetings",
+    trigger: "Transcript complete",
+    actions: ["Generate summary", "Send email to attendees"],
     enabled: true,
     runs: 287,
-    lastRun: '5 hours ago',
+    lastRun: "5 hours ago",
   },
   {
-    id: '3',
-    name: 'Update CRM with meeting notes',
-    description: 'Sync meeting notes and outcomes to your CRM',
+    id: "3",
+    name: "Update CRM with meeting notes",
+    description: "Sync meeting notes and outcomes to your CRM",
     trigger: 'Meeting tagged as "customer"',
-    actions: ['Format notes', 'Update CRM record', 'Log activity'],
+    actions: ["Format notes", "Update CRM record", "Log activity"],
     enabled: false,
     runs: 156,
-    lastRun: '2 days ago',
+    lastRun: "2 days ago",
   },
   {
-    id: '4',
-    name: 'Alert on competitor mentions',
-    description: 'Get notified when competitors are mentioned in meetings',
-    trigger: 'Competitor keyword detected',
-    actions: ['Send Slack notification', 'Tag meeting', 'Create alert'],
+    id: "4",
+    name: "Alert on competitor mentions",
+    description: "Get notified when competitors are mentioned in meetings",
+    trigger: "Competitor keyword detected",
+    actions: ["Send Slack notification", "Tag meeting", "Create alert"],
     enabled: true,
     runs: 45,
-    lastRun: '1 day ago',
+    lastRun: "1 day ago",
   },
 ];
 
 const templates = [
   {
-    id: '1',
-    name: 'Lead Qualification Workflow',
-    description: 'Automatically score and qualify leads from sales calls',
-    category: 'Sales',
+    id: "1",
+    name: "Lead Qualification Workflow",
+    description: "Automatically score and qualify leads from sales calls",
+    category: "Sales",
   },
   {
-    id: '2',
-    name: 'Customer Onboarding',
-    description: 'Create onboarding tasks and follow-ups from kickoff meetings',
-    category: 'Customer Success',
+    id: "2",
+    name: "Customer Onboarding",
+    description: "Create onboarding tasks and follow-ups from kickoff meetings",
+    category: "Customer Success",
   },
   {
-    id: '3',
-    name: 'Weekly Report Generation',
-    description: 'Compile weekly meeting insights and send to team',
-    category: 'Reporting',
+    id: "3",
+    name: "Weekly Report Generation",
+    description: "Compile weekly meeting insights and send to team",
+    category: "Reporting",
   },
 ];
 
@@ -76,7 +99,7 @@ export default function Automations() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Automations</h1>
@@ -90,18 +113,22 @@ export default function Automations() {
         </Button>
       </div>
 
-      <CreateAutomationModal 
-        open={isCreateModalOpen} 
+      <CreateAutomationModal
+        open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
       />
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Active Automations</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Automations
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{automations.filter(a => a.enabled).length}</div>
+            <div className="text-3xl font-bold">
+              {automations.filter((a) => a.enabled).length}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {automations.length} total created
             </p>
@@ -115,9 +142,7 @@ export default function Automations() {
             <div className="text-3xl font-bold">
               {automations.reduce((sum, a) => sum + a.runs, 0)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              This month
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">This month</p>
           </CardContent>
         </Card>
         <Card>
@@ -136,7 +161,9 @@ export default function Automations() {
       <Card>
         <CardHeader>
           <CardTitle>Your Automations</CardTitle>
-          <CardDescription>Manage and monitor your automation workflows</CardDescription>
+          <CardDescription>
+            Manage and monitor your automation workflows
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -160,7 +187,9 @@ export default function Automations() {
                         <Zap className="h-4 w-4 text-primary" />
                         <span className="font-medium">{automation.name}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">{automation.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {automation.description}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -181,12 +210,16 @@ export default function Automations() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Switch checked={automation.enabled} />
-                      <Badge variant={automation.enabled ? 'default' : 'secondary'}>
-                        {automation.enabled ? 'Active' : 'Disabled'}
+                      <Badge
+                        variant={automation.enabled ? "default" : "secondary"}
+                      >
+                        {automation.enabled ? "Active" : "Disabled"}
                       </Badge>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">{automation.runs}</TableCell>
+                  <TableCell className="text-right">
+                    {automation.runs}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1 text-sm">
                       <Clock className="h-3 w-3" />
@@ -199,7 +232,11 @@ export default function Automations() {
                         <Edit className="h-3 w-3 mr-2" />
                         Edit
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-destructive">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive"
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
@@ -214,7 +251,9 @@ export default function Automations() {
       <Card>
         <CardHeader>
           <CardTitle>Automation Templates</CardTitle>
-          <CardDescription>Get started quickly with pre-built workflows</CardDescription>
+          <CardDescription>
+            Get started quickly with pre-built workflows
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -233,7 +272,9 @@ export default function Automations() {
                   <TableCell>
                     <Badge variant="secondary">{template.category}</Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{template.description}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {template.description}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm">
                       Use Template

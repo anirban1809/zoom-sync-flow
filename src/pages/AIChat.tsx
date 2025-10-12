@@ -134,7 +134,7 @@ export default function AIChat() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto flex flex-col h-full relative">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Chat</h1>

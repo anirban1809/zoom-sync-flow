@@ -35,7 +35,11 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const topics = [
   {
@@ -77,20 +81,67 @@ const topics = [
 ];
 
 const faqChips = [
-  { question: "How do I record a meeting?", answer: "Add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins." },
-  { question: "Where are my transcripts?", answer: "All transcripts are in the Meetings section. Click any past meeting to view its recording, transcript, and AI summary." },
-  { question: "Can I edit transcripts?", answer: "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section." },
-  { question: "How do I share recordings?", answer: "Go to the meeting detail page and click 'Share'. Generate a link or invite people via email." },
-  { question: "What integrations are supported?", answer: "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and more." },
-  { question: "How do I cancel my subscription?", answer: "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan anytime." },
-  { question: "Is my data secure?", answer: "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards." },
-  { question: "How long are recordings stored?", answer: "Free plans retain data for 30 days, paid plans offer unlimited storage." },
+  {
+    question: "How do I record a meeting?",
+    answer:
+      "Add the Recordin.ai bot to your calendar invite. The bot will automatically join and start recording when the meeting begins.",
+  },
+  {
+    question: "Where are my transcripts?",
+    answer:
+      "All transcripts are in the Meetings section. Click any past meeting to view its recording, transcript, and AI summary.",
+  },
+  {
+    question: "Can I edit transcripts?",
+    answer:
+      "Yes, you can edit transcripts directly in the meeting detail page. Click the edit icon next to any section.",
+  },
+  {
+    question: "How do I share recordings?",
+    answer:
+      "Go to the meeting detail page and click 'Share'. Generate a link or invite people via email.",
+  },
+  {
+    question: "What integrations are supported?",
+    answer:
+      "We support Google Meet, Zoom, Microsoft Teams, Slack, Salesforce, HubSpot, and more.",
+  },
+  {
+    question: "How do I cancel my subscription?",
+    answer:
+      "Go to Settings > Billing and click 'Manage Subscription'. You can cancel or modify your plan anytime.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Yes, we use enterprise-grade encryption and comply with SOC 2, GDPR, and HIPAA standards.",
+  },
+  {
+    question: "How long are recordings stored?",
+    answer:
+      "Free plans retain data for 30 days, paid plans offer unlimited storage.",
+  },
 ];
 
 const recentTickets = [
-  { id: "#12345", subject: "Recording not joining meeting", status: "In Progress", updated: "2 hours ago" },
-  { id: "#12344", subject: "Transcript accuracy issue", status: "Resolved", updated: "1 day ago" },
-  { id: "#12343", subject: "Integration connection failed", status: "Waiting for response", updated: "2 days ago" },
+  {
+    id: "#12345",
+    subject: "Recording not joining meeting",
+    status: "In Progress",
+    updated: "2 hours ago",
+  },
+  {
+    id: "#12344",
+    subject: "Transcript accuracy issue",
+    status: "Resolved",
+    updated: "1 day ago",
+  },
+  {
+    id: "#12343",
+    subject: "Integration connection failed",
+    status: "Waiting for response",
+    updated: "2 days ago",
+  },
 ];
 
 export default function HelpSupport() {
@@ -115,7 +166,7 @@ export default function HelpSupport() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       {/* Header - Simple, decision-first */}
       <div className="space-y-6 mb-8">
         <h1 className="text-3xl font-bold">Help & Support</h1>
@@ -146,7 +197,9 @@ export default function HelpSupport() {
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-500" />
-            <span className="text-muted-foreground">All systems operational</span>
+            <span className="text-muted-foreground">
+              All systems operational
+            </span>
           </div>
           <Button variant="link" size="sm" className="gap-1 h-auto p-0">
             View status
@@ -190,11 +243,17 @@ export default function HelpSupport() {
                 <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
                 <div>
                   <p className="font-medium">Ticket submitted!</p>
-                  <p className="text-sm text-muted-foreground mt-1">Ticket ID: #12346</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Ticket ID: #12346
+                  </p>
                 </div>
                 <div className="flex gap-2 justify-center">
-                  <Button size="sm" variant="outline">View ticket</Button>
-                  <Button size="sm" variant="outline">Add more info</Button>
+                  <Button size="sm" variant="outline">
+                    View ticket
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    Add more info
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -214,17 +273,28 @@ export default function HelpSupport() {
                   </div>
                   <div className="space-y-2">
                     <Label>Category</Label>
-                    <Select value={ticketCategory} onValueChange={setTicketCategory}>
+                    <Select
+                      value={ticketCategory}
+                      onValueChange={setTicketCategory}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="recordings">Recordings/Transcripts</SelectItem>
-                        <SelectItem value="meetings">Meetings/Calendar</SelectItem>
-                        <SelectItem value="automations">Tasks/Automations</SelectItem>
+                        <SelectItem value="recordings">
+                          Recordings/Transcripts
+                        </SelectItem>
+                        <SelectItem value="meetings">
+                          Meetings/Calendar
+                        </SelectItem>
+                        <SelectItem value="automations">
+                          Tasks/Automations
+                        </SelectItem>
                         <SelectItem value="security">Data/Security</SelectItem>
                         <SelectItem value="billing">Billing</SelectItem>
-                        <SelectItem value="integrations">Integrations</SelectItem>
+                        <SelectItem value="integrations">
+                          Integrations
+                        </SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
@@ -240,14 +310,21 @@ export default function HelpSupport() {
                   </div>
                   <div className="space-y-2">
                     <Label>Attachments</Label>
-                    <Button variant="outline" size="sm" className="w-full gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                    >
                       <Upload className="h-4 w-4" />
                       Attach files
                     </Button>
                   </div>
 
                   {/* Progressive disclosure */}
-                  <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+                  <Collapsible
+                    open={showAdvanced}
+                    onOpenChange={setShowAdvanced}
+                  >
                     <CollapsibleTrigger asChild>
                       <Button variant="link" size="sm" className="h-auto p-0">
                         {showAdvanced ? "Hide" : "Add details"}
@@ -304,33 +381,6 @@ export default function HelpSupport() {
 
       {/* Self-serve section */}
       <div className="space-y-8">
-        {/* Quick answers - FAQ chips */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Quick Answers</h2>
-          <div className="space-y-2">
-            {faqChips.map((faq, idx) => (
-              <Card key={idx} className="border">
-                <Collapsible open={expandedFaq === idx} onOpenChange={(open) => setExpandedFaq(open ? idx : null)}>
-                  <CollapsibleTrigger className="w-full">
-                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
-                      <p className="text-sm font-medium text-left">{faq.question}</p>
-                      <ChevronRight className={`h-4 w-4 transition-transform ${expandedFaq === idx ? 'rotate-90' : ''}`} />
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <CardContent className="px-4 pb-4 pt-0">
-                      <p className="text-sm text-muted-foreground">{faq.answer}</p>
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
-              </Card>
-            ))}
-          </div>
-          <Button variant="link" className="mt-4 h-auto p-0">
-            View all FAQs →
-          </Button>
-        </div>
-
         {/* Browse by topic */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Browse by Topic</h2>
@@ -347,7 +397,9 @@ export default function HelpSupport() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <CardTitle className="text-base">{topic.title}</CardTitle>
-                      <CardDescription className="mt-1">{topic.description}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {topic.description}
+                      </CardDescription>
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   </div>
@@ -355,6 +407,44 @@ export default function HelpSupport() {
               </Card>
             ))}
           </div>
+        </div>
+
+        {/* Quick answers - FAQ chips */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Quick Answers</h2>
+          <div className="space-y-2">
+            {faqChips.map((faq, idx) => (
+              <Card key={idx} className="border">
+                <Collapsible
+                  open={expandedFaq === idx}
+                  onOpenChange={(open) => setExpandedFaq(open ? idx : null)}
+                >
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4">
+                      <p className="text-sm font-medium text-left">
+                        {faq.question}
+                      </p>
+                      <ChevronRight
+                        className={`h-4 w-4 transition-transform ${
+                          expandedFaq === idx ? "rotate-90" : ""
+                        }`}
+                      />
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="px-4 pb-4 pt-0">
+                      <p className="text-sm text-muted-foreground">
+                        {faq.answer}
+                      </p>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Collapsible>
+              </Card>
+            ))}
+          </div>
+          <Button variant="link" className="mt-4 h-auto p-0">
+            View all FAQs →
+          </Button>
         </div>
 
         {/* Your tickets */}
@@ -383,8 +473,12 @@ export default function HelpSupport() {
                         {ticket.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">{ticket.subject}</p>
-                    <p className="text-xs text-muted-foreground">{ticket.updated}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {ticket.subject}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {ticket.updated}
+                    </p>
                   </div>
                 </div>
               ))}

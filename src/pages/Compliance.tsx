@@ -139,7 +139,7 @@ export default function Compliance() {
   const [selectedTab, setSelectedTab] = useState("audit");
 
   return (
-    <div className="p-8">
+    <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
