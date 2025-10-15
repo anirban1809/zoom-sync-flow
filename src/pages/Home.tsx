@@ -9,7 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MeetingCard } from "@/components/MeetingCard";
-import { mockMeetings } from "@/lib/mockData";
+import { TaskRow } from "@/components/TaskRow";
+import { mockMeetings, mockTasks } from "@/lib/mockData";
 import { CreateMeetingModal } from "@/components/CreateMeetingModal";
 
 export default function Home() {
@@ -17,6 +18,8 @@ export default function Home() {
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
+  
+  const upcomingTasks = mockTasks.filter((t) => t.status !== 'done').slice(0, 5);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -65,6 +68,24 @@ export default function Home() {
               <Button variant="outline" size="sm">
                 Connect Calendar
               </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Action Items</CardTitle>
+          <CardDescription>Your pending tasks</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {upcomingTasks.length > 0 ? (
+            upcomingTasks.map((task) => (
+              <TaskRow key={task.id} task={task} />
+            ))
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No pending tasks</p>
             </div>
           )}
         </CardContent>
