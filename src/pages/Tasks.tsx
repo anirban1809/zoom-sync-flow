@@ -41,6 +41,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -139,16 +140,16 @@ const views = [
 
 const priorityColors = {
   Low: "bg-muted text-muted-foreground",
-  Medium: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-  High: "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300",
-  Urgent: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  Medium: "bg-info/10 text-info border-info/20",
+  High: "bg-warning/10 text-warning border-warning/20",
+  Urgent: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
 const statusColors = {
-  Open: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  "In review": "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-  Blocked: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  Done: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  Open: "bg-muted text-muted-foreground",
+  "In review": "bg-info/10 text-info border-info/20",
+  Blocked: "bg-destructive/10 text-destructive border-destructive/20",
+  Done: "bg-success/10 text-success border-success/20",
 };
 
 export default function Tasks() {
@@ -164,205 +165,170 @@ export default function Tasks() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      {/* Left Rail */}
-      <div className="w-64 border-r bg-background flex-shrink-0 overflow-y-auto">
-        <div className="p-4 space-y-1">
-          {views.map((view) => {
-            const Icon = view.icon;
-            return (
-              <button
-                key={view.id}
-                onClick={() => setSelectedView(view.id)}
-                className={cn(
-                  "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                  selectedView === view.id
-                    ? "bg-accent text-accent-foreground font-medium"
-                    : "hover:bg-accent/50"
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="flex-1 text-left">{view.label}</span>
-                {view.badge && (
-                  <Badge variant="secondary" className="ml-auto">
-                    {view.badge}
-                  </Badge>
-                )}
-              </button>
-            );
-          })}
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Tasks</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage and track your action items
+          </p>
         </div>
-
-        <div className="px-4 py-2 border-t">
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2">
-            Smart Folders
-          </h3>
-          <div className="space-y-1">
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-accent/50">
-              <Zap className="h-4 w-4" />
-              <span>From last 7 days</span>
-            </button>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-accent/50">
-              <User className="h-4 w-4" />
-              <span>With @you mentioned</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="px-4 py-2 border-t">
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center justify-between">
-            <span>Tags</span>
-            <ChevronDown className="h-4 w-4" />
-          </h3>
-          <div className="space-y-1">
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-accent/50">
-              <Tag className="h-4 w-4" />
-              <span>#sales</span>
-            </button>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-accent/50">
-              <Tag className="h-4 w-4" />
-              <span>#release</span>
-            </button>
-          </div>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Download className="h-4 w-4" />
+                Import/Export
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Upload className="h-4 w-4 mr-2" />
+                Import from CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" />
+                Export to CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Download className="h-4 w-4 mr-2" />
+                Export to JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button size="sm" className="gap-2" onClick={() => setQuickCaptureOpen(true)}>
+            <Plus className="h-4 w-4" />
+            New task
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header Bar */}
-        <div className="border-b bg-background p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Tasks</h1>
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Import/Export
-                    <ChevronDown className="h-4 w-4 ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import from CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export to CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export to JSON
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button size="sm" onClick={() => setQuickCaptureOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                New task
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Capture */}
-          {quickCaptureOpen && (
-            <div className="mb-4 p-3 border rounded-md bg-muted/30">
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="Add a task… (e.g., 'Follow up with Acme @rita due next Tue #sales')"
-                  className="flex-1"
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") setQuickCaptureOpen(false);
-                  }}
-                  autoFocus
-                />
-                <Button size="sm" variant="ghost" onClick={() => setQuickCaptureOpen(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Use @name for assignee, #tag for tags, "due [date]" for due date
-              </p>
-            </div>
-          )}
-
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Quick Capture */}
+      {quickCaptureOpen && (
+        <div className="p-4 border rounded-lg bg-muted/30">
+          <div className="flex items-center gap-2">
             <Input
-              placeholder="Search tasks, people, meetings…"
-              className="pl-9"
+              placeholder="Add a task… (e.g., 'Follow up with Acme @rita due next Tue #sales')"
+              className="flex-1"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setQuickCaptureOpen(false);
+              }}
+              autoFocus
             />
+            <Button size="sm" variant="ghost" onClick={() => setQuickCaptureOpen(false)}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Use @name for assignee, #tag for tags, "due [date]" for due date
+          </p>
         </div>
+      )}
 
-        {/* Controls Row */}
-        <div className="border-b bg-background p-3 flex items-center gap-2 flex-wrap">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
-          </Button>
-          <Button variant="outline" size="sm">
-            <User className="h-4 w-4 mr-2" />
-            Assignee
-          </Button>
-          <Button variant="outline" size="sm">
-            <Flag className="h-4 w-4 mr-2" />
-            Priority
-          </Button>
-          <Button variant="outline" size="sm">
-            <Calendar className="h-4 w-4 mr-2" />
-            Due date
-          </Button>
-          <div className="ml-auto flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Sort
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Due date</DropdownMenuItem>
-                <DropdownMenuItem>Priority</DropdownMenuItem>
-                <DropdownMenuItem>Recently updated</DropdownMenuItem>
-                <DropdownMenuItem>Confidence</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Group by
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>None</DropdownMenuItem>
-                <DropdownMenuItem>Assignee</DropdownMenuItem>
-                <DropdownMenuItem>Due date</DropdownMenuItem>
-                <DropdownMenuItem>Status</DropdownMenuItem>
-                <DropdownMenuItem>Priority</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      {/* Search and Filters */}
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[300px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tasks, people, meetings…"
+            className="pl-9"
+          />
         </div>
+        <Tabs value={selectedView} onValueChange={setSelectedView} className="w-auto">
+          <TabsList>
+            <TabsTrigger value="my-tasks">My tasks</TabsTrigger>
+            <TabsTrigger value="inbox">
+              Inbox
+              {views.find(v => v.id === 'inbox')?.badge && (
+                <Badge variant="secondary" className="ml-2">
+                  {views.find(v => v.id === 'inbox')?.badge}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="due-today">Due today</TabsTrigger>
+            <TabsTrigger value="overdue">
+              Overdue
+              {views.find(v => v.id === 'overdue')?.badge && (
+                <Badge variant="secondary" className="ml-2">
+                  {views.find(v => v.id === 'overdue')?.badge}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
-        {/* Task List */}
-        <div className="flex-1 overflow-y-auto">
-          {selectedView === "overdue" && (
-            <div className="bg-destructive/10 border-b border-destructive/20 p-3 text-sm text-destructive">
-              <AlertCircle className="inline h-4 w-4 mr-2" />
-              3 tasks are overdue. Review now.
-            </div>
-          )}
+      {/* Controls Row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button variant="outline" size="sm" className="gap-2">
+          <Filter className="h-4 w-4" />
+          Filters
+        </Button>
+        <Button variant="outline" size="sm" className="gap-2">
+          <User className="h-4 w-4" />
+          Assignee
+        </Button>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Flag className="h-4 w-4" />
+          Priority
+        </Button>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Calendar className="h-4 w-4" />
+          Due date
+        </Button>
+        <div className="ml-auto flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                Sort
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Due date</DropdownMenuItem>
+              <DropdownMenuItem>Priority</DropdownMenuItem>
+              <DropdownMenuItem>Recently updated</DropdownMenuItem>
+              <DropdownMenuItem>Confidence</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                Group by
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>None</DropdownMenuItem>
+              <DropdownMenuItem>Assignee</DropdownMenuItem>
+              <DropdownMenuItem>Due date</DropdownMenuItem>
+              <DropdownMenuItem>Status</DropdownMenuItem>
+              <DropdownMenuItem>Priority</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
-          <div className="divide-y">
+      {/* Overdue Alert */}
+      {selectedView === "overdue" && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive flex items-center gap-2">
+          <AlertCircle className="h-4 w-4" />
+          3 tasks are overdue. Review now.
+        </div>
+      )}
+
+      {/* Task List Card */}
+      <div className="border rounded-lg bg-card">
+        <div className="divide-y">
             {tasks.map((task) => (
               <div
                 key={task.id}
                 onClick={() => setSelectedTask(task)}
                 className={cn(
-                  "flex items-center gap-3 p-3 hover:bg-accent/50 cursor-pointer transition-colors",
+                  "flex items-center gap-3 p-4 hover:bg-muted/50 cursor-pointer transition-colors",
                   task.completed && "opacity-60"
                 )}
               >
@@ -407,10 +373,10 @@ export default function Tasks() {
                     {task.due}
                   </Badge>
                 )}
-                <Badge className={cn("text-xs", priorityColors[task.priority])}>
+                <Badge variant="outline" className={cn("text-xs border", priorityColors[task.priority])}>
                   {task.priority}
                 </Badge>
-                <Badge className={cn("text-xs", statusColors[task.status])}>
+                <Badge variant="outline" className={cn("text-xs border", statusColors[task.status])}>
                   {task.status}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
@@ -443,18 +409,17 @@ export default function Tasks() {
                 </DropdownMenu>
               </div>
             ))}
-          </div>
-
-          {tasks.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Nothing here yet</h3>
-              <p className="text-sm text-muted-foreground">
-                Capture from your next meeting or create a task.
-              </p>
-            </div>
-          )}
         </div>
+
+        {tasks.length === 0 && (
+          <div className="flex flex-col items-center justify-center text-center py-12">
+            <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nothing here yet</h3>
+            <p className="text-sm text-muted-foreground">
+              Capture from your next meeting or create a task.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Right Side Drawer */}
@@ -469,10 +434,10 @@ export default function Tasks() {
               <div className="mt-6 space-y-6">
                 {/* Status chips */}
                 <div className="flex flex-wrap gap-2">
-                  <Badge className={statusColors[selectedTask.status]}>
+                  <Badge variant="outline" className={cn("border", statusColors[selectedTask.status])}>
                     {selectedTask.status}
                   </Badge>
-                  <Badge className={priorityColors[selectedTask.priority]}>
+                  <Badge variant="outline" className={cn("border", priorityColors[selectedTask.priority])}>
                     <Flag className="h-3 w-3 mr-1" />
                     {selectedTask.priority}
                   </Badge>
