@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import AIChat from "./pages/AIChat";
 import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
+import Tasks from "./pages/Tasks";
 import Calendars from "./pages/Calendars";
 import Search from "./pages/Search";
 import Automations from "./pages/Automations";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/ai-chat" element={<AppShell><AIChat /></AppShell>} />
           <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
           <Route path="/meetings/:id" element={<AppShell><MeetingDetail /></AppShell>} />
+          <Route path="/tasks" element={<AppShell><Tasks /></AppShell>} />
           <Route path="/calendars" element={<AppShell><Calendars /></AppShell>} />
           <Route path="/search" element={<AppShell><Search /></AppShell>} />
           <Route path="/automations" element={<AppShell><Automations /></AppShell>} />

@@ -12,6 +12,7 @@ import {
   Database,
   HelpCircle,
   MessageSquare,
+  CheckSquare,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -30,6 +31,7 @@ const mainNav = [
   { title: "Home", url: "/", icon: Home },
   { title: "AI Chat", url: "/ai-chat", icon: MessageSquare },
   { title: "Meetings", url: "/meetings", icon: Calendar },
+  { title: "Tasks", url: "/tasks", icon: CheckSquare },
   { title: "Calendars", url: "/calendars", icon: Calendar },
 ];
 
