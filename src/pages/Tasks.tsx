@@ -22,6 +22,7 @@ import {
   Link2,
   X,
 } from "lucide-react";
+import { CreateTaskModal } from "@/components/CreateTaskModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -157,6 +158,7 @@ export default function Tasks() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
+  const [createTaskOpen, setCreateTaskOpen] = useState(false);
 
   const toggleTaskComplete = (taskId: string) => {
     setTasks(tasks.map(t => 
@@ -198,7 +200,7 @@ export default function Tasks() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm" className="gap-2" onClick={() => setQuickCaptureOpen(true)}>
+          <Button size="sm" className="gap-2" onClick={() => setCreateTaskOpen(true)}>
             <Plus className="h-4 w-4" />
             New task
           </Button>
@@ -525,6 +527,9 @@ export default function Tasks() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Create Task Modal */}
+      <CreateTaskModal open={createTaskOpen} onOpenChange={setCreateTaskOpen} />
     </div>
   );
 }
