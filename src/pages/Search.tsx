@@ -82,7 +82,8 @@ const mockResults = [
   {
     id: "t2",
     type: "transcript" as const,
-    snippet: "The pricing feedback from enterprise customers has been consistently positive...",
+    snippet:
+      "The pricing feedback from enterprise customers has been consistently positive...",
     speaker: "Alex Rivera",
     timestamp: "00:08:15",
     meetingTitle: "Customer Feedback Review",
@@ -124,7 +125,9 @@ export default function Search() {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showRecentSearches, setShowRecentSearches] = useState(false);
-  const [operatorChips, setOperatorChips] = useState<Array<{ key: string; value: string }>>([]);
+  const [operatorChips, setOperatorChips] = useState<
+    Array<{ key: string; value: string }>
+  >([]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -135,8 +138,10 @@ export default function Search() {
         const match = searchQuery.match(/owner:(\w+)/);
         if (match) operators.push({ key: "owner", value: match[1] });
       }
-      if (searchQuery.includes("has:recording")) operators.push({ key: "has", value: "recording" });
-      if (searchQuery.includes("has:transcript")) operators.push({ key: "has", value: "transcript" });
+      if (searchQuery.includes("has:recording"))
+        operators.push({ key: "has", value: "recording" });
+      if (searchQuery.includes("has:transcript"))
+        operators.push({ key: "has", value: "transcript" });
       if (searchQuery.includes("tag:")) {
         const match = searchQuery.match(/tag:(\w+)/);
         if (match) operators.push({ key: "tag", value: match[1] });
@@ -212,27 +217,49 @@ export default function Search() {
                 <div className="space-y-2 text-sm">
                   <div>
                     <code className="bg-muted px-2 py-1 rounded">owner:me</code>
-                    <span className="text-muted-foreground ml-2">Items owned by you</span>
+                    <span className="text-muted-foreground ml-2">
+                      Items owned by you
+                    </span>
                   </div>
                   <div>
-                    <code className="bg-muted px-2 py-1 rounded">has:recording</code>
-                    <span className="text-muted-foreground ml-2">Meetings with recordings</span>
+                    <code className="bg-muted px-2 py-1 rounded">
+                      has:recording
+                    </code>
+                    <span className="text-muted-foreground ml-2">
+                      Meetings with recordings
+                    </span>
                   </div>
                   <div>
-                    <code className="bg-muted px-2 py-1 rounded">has:transcript</code>
-                    <span className="text-muted-foreground ml-2">Meetings with transcripts</span>
+                    <code className="bg-muted px-2 py-1 rounded">
+                      has:transcript
+                    </code>
+                    <span className="text-muted-foreground ml-2">
+                      Meetings with transcripts
+                    </span>
                   </div>
                   <div>
-                    <code className="bg-muted px-2 py-1 rounded">tag:customer</code>
-                    <span className="text-muted-foreground ml-2">Items tagged "customer"</span>
+                    <code className="bg-muted px-2 py-1 rounded">
+                      tag:customer
+                    </code>
+                    <span className="text-muted-foreground ml-2">
+                      Items tagged "customer"
+                    </span>
                   </div>
                   <div>
-                    <code className="bg-muted px-2 py-1 rounded">before:2025-10-01</code>
-                    <span className="text-muted-foreground ml-2">Before a date</span>
+                    <code className="bg-muted px-2 py-1 rounded">
+                      before:2025-10-01
+                    </code>
+                    <span className="text-muted-foreground ml-2">
+                      Before a date
+                    </span>
                   </div>
                   <div>
-                    <code className="bg-muted px-2 py-1 rounded">after:2025-09-01</code>
-                    <span className="text-muted-foreground ml-2">After a date</span>
+                    <code className="bg-muted px-2 py-1 rounded">
+                      after:2025-09-01
+                    </code>
+                    <span className="text-muted-foreground ml-2">
+                      After a date
+                    </span>
                   </div>
                 </div>
               </div>
@@ -271,7 +298,9 @@ export default function Search() {
         {/* Recent Searches Dropdown */}
         {showRecentSearches && recentSearches.length > 0 && (
           <Card className="absolute z-50 w-full mt-1 p-2">
-            <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">Recent searches</div>
+            <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">
+              Recent searches
+            </div>
             {recentSearches.map((search, idx) => (
               <button
                 key={idx}
@@ -289,7 +318,9 @@ export default function Search() {
       {/* Suggested Prompts (when empty) */}
       {!searchQuery && !showResults && (
         <div className="mb-6">
-          <div className="text-sm text-muted-foreground mb-2">Try searching for:</div>
+          <div className="text-sm text-muted-foreground mb-2">
+            Try searching for:
+          </div>
           <div className="flex flex-wrap gap-2">
             {suggestedPrompts.map((prompt, idx) => (
               <Button
@@ -442,7 +473,7 @@ export default function Search() {
             {filteredResults.map((result) => (
               <Card
                 key={result.id}
-                className="p-4 hover:bg-accent/50 cursor-pointer transition-colors"
+                className="p-4 hover:bg-muted/50 cursor-pointer transition-colors"
               >
                 {result.type === "meeting" && (
                   <div className="flex items-start justify-between">
@@ -477,7 +508,11 @@ export default function Search() {
                         </span>
                         <span>{result.provider}</span>
                         {result.tags.map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs">
+                          <Badge
+                            key={tag}
+                            variant="outline"
+                            className="text-xs"
+                          >
                             <Tag className="h-3 w-3 mr-1" />
                             {tag}
                           </Badge>
@@ -549,7 +584,9 @@ export default function Search() {
                         </Badge>
                         <Badge
                           variant={
-                            result.status === "completed" ? "default" : "secondary"
+                            result.status === "completed"
+                              ? "default"
+                              : "secondary"
                           }
                           className="text-xs"
                         >
@@ -566,7 +603,9 @@ export default function Search() {
                           <Users className="h-3 w-3" />
                           {result.assignee}
                         </span>
-                        <span className="text-xs">From: {result.sourceMeeting}</span>
+                        <span className="text-xs">
+                          From: {result.sourceMeeting}
+                        </span>
                       </p>
                     </div>
                     <div className="flex gap-2">
