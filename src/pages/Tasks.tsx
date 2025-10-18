@@ -243,10 +243,11 @@ export default function Tasks() {
   const handleQuickAdd = () => {
     if (!quickAddText.trim()) return;
 
+    const assigneeValue = parsedFields.find((f) => f.type === "assignee")?.value;
     const newTask: Task = {
       id: Date.now().toString(),
       title: quickAddText.replace(/@\w+|due\s+[\w\s]+|#\w+/gi, "").trim(),
-      assignee: parsedFields.find((f) => f.type === "assignee")?.value,
+      assignee: assigneeValue && assigneeValue !== "unassigned" ? assigneeValue : undefined,
       due: parsedFields.find((f) => f.type === "due")?.value,
       tags: parsedFields.filter((f) => f.type === "tag").map((f) => f.value),
       priority: "Medium",
@@ -283,7 +284,7 @@ export default function Tasks() {
     setEditingTask(task);
     setEditTitle(task.title);
     setEditNotes(task.notes || "");
-    setEditAssignee(task.assignee || "");
+    setEditAssignee(task.assignee || "unassigned");
     setEditStatus(task.status);
     setEditDue(task.due || "");
     setEditPriority(task.priority);
@@ -299,7 +300,7 @@ export default function Tasks() {
               ...t,
               title: editTitle,
               notes: editNotes,
-              assignee: editAssignee || undefined,
+              assignee: editAssignee && editAssignee !== "unassigned" ? editAssignee : undefined,
               status: editStatus,
               due: editDue || undefined,
               priority: editPriority,
@@ -891,7 +892,7 @@ export default function Tasks() {
                         <SelectValue placeholder="Unassigned" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Unassigned</SelectItem>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
                         <SelectItem value="You">You</SelectItem>
                         <SelectItem value="Rita Johnson">Rita Johnson</SelectItem>
                         <SelectItem value="Alex Chen">Alex Chen</SelectItem>
