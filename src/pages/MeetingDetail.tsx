@@ -36,6 +36,7 @@ export default function MeetingDetail() {
   const [inviteInput, setInviteInput] = useState('');
   const [inviteMessage, setInviteMessage] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
   const meeting = mockMeetings.find(m => m.id === id);
   const summary = meeting?.summaryId ? mockSummaries[meeting.summaryId] : null;
   const transcript = meeting?.transcriptId ? mockTranscripts[meeting.transcriptId] : null;
@@ -141,10 +142,13 @@ export default function MeetingDetail() {
               <Clock className="h-4 w-4" />
               <span>{format(meeting.start, 'h:mm a')} - {format(meeting.end, 'h:mm a')}</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <button 
+              className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
+              onClick={() => setParticipantsModalOpen(true)}
+            >
               <Users className="h-4 w-4" />
               <span>{meeting.participants.length} participants</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -181,31 +185,6 @@ export default function MeetingDetail() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Participants</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {meeting.participants.map((participant) => (
-              <div key={participant.id} className="flex items-center gap-2 rounded-lg border bg-card p-2 pr-4">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={participant.avatarUrl} />
-                  <AvatarFallback>
-                    {participant.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-sm">
-                  <p className="font-medium">{participant.name}</p>
-                  {participant.role && (
-                    <p className="text-xs text-muted-foreground">{participant.role}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {meeting.status === 'completed' && (
         <Card>
@@ -698,52 +677,81 @@ export default function MeetingDetail() {
           <DialogHeader>
             <DialogTitle>Export Meeting</DialogTitle>
             <DialogDescription>
-              Choose a format to export the meeting data
+              Choose a format to export the meeting summary and transcript
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 pt-4">
-            <Button 
-              variant="outline" 
+          <div className="space-y-4 py-4">
+            <Button
+              variant="outline"
               className="w-full justify-start gap-3"
               onClick={() => handleExport('pdf')}
             >
               <FileText className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Export as PDF</div>
-                <div className="text-xs text-muted-foreground">
-                  Summary, transcript, and action items
-                </div>
+                <div className="font-medium">PDF Document</div>
+                <div className="text-sm text-muted-foreground">Summary and transcript</div>
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start gap-3"
               onClick={() => handleExport('json')}
             >
               <FileJson className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Export as JSON</div>
-                <div className="text-xs text-muted-foreground">
-                  Raw meeting data for integrations
-                </div>
+                <div className="font-medium">JSON</div>
+                <div className="text-sm text-muted-foreground">Structured data format</div>
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full justify-start gap-3"
-              onClick={() => handleExport('audio')}
+              onClick={() => handleExport('txt')}
             >
-              <Volume2 className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Export Audio Recording</div>
-                <div className="text-xs text-muted-foreground">
-                  Download the meeting audio file
-                </div>
+                <div className="font-medium">Text File</div>
+                <div className="text-sm text-muted-foreground">Plain text transcript</div>
               </div>
             </Button>
           </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setExportModalOpen(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Participants Modal */}
+      <Dialog open={participantsModalOpen} onOpenChange={setParticipantsModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Meeting Participants</DialogTitle>
+            <DialogDescription>
+              {meeting.participants.length} {meeting.participants.length === 1 ? 'person' : 'people'} attended this meeting
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-3 pr-4">
+              {meeting.participants.map((participant) => (
+                <div key={participant.id} className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={participant.avatarUrl} />
+                    <AvatarFallback>
+                      {participant.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-medium">{participant.name}</p>
+                    {participant.role && (
+                      <p className="text-sm text-muted-foreground">{participant.role}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>
