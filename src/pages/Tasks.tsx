@@ -36,11 +36,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -424,14 +424,14 @@ export default function Tasks() {
         )}
       </div>
 
-      {/* Right Side Drawer */}
-      <Sheet open={!!selectedTask} onOpenChange={() => setSelectedTask(null)}>
-        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+      {/* Task Details Modal */}
+      <Dialog open={!!selectedTask} onOpenChange={() => setSelectedTask(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           {selectedTask && (
             <>
-              <SheetHeader>
-                <SheetTitle className="text-xl">{selectedTask.title}</SheetTitle>
-              </SheetHeader>
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedTask.title}</DialogTitle>
+              </DialogHeader>
 
               <div className="mt-6 space-y-6">
                 {/* Status chips */}
@@ -525,8 +525,8 @@ export default function Tasks() {
               </div>
             </>
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Create Task Modal */}
       <CreateTaskModal open={createTaskOpen} onOpenChange={setCreateTaskOpen} />
