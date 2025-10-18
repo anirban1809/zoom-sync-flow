@@ -109,7 +109,7 @@ export default function MeetingDetail() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col space-y-6 h-full">
       <Button 
         variant="ghost" 
         size="sm" 
@@ -234,9 +234,9 @@ export default function MeetingDetail() {
       )}
 
       {summary && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
           {/* AI Summary Card */}
-          <Card className="flex flex-col">
+          <Card className="flex flex-col h-full">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -250,8 +250,8 @@ export default function MeetingDetail() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6 flex-1">
-              <ScrollArea className="h-[600px] pr-4">
+            <CardContent className="space-y-6 flex-1 overflow-hidden">
+              <ScrollArea className="h-full pr-4">
                 <div className="space-y-6">
                   {summary.bullets.length > 0 && (
                     <div className="space-y-3">
@@ -387,14 +387,14 @@ export default function MeetingDetail() {
           </Card>
 
           {/* Transcript Card */}
-          <Card className="flex flex-col">
+          <Card className="flex flex-col h-full">
             <CardHeader>
               <CardTitle>Transcript</CardTitle>
               <CardDescription>Full conversation recording</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1">
+            <CardContent className="flex-1 overflow-hidden">
               {transcript ? (
-                <ScrollArea className="h-[600px] pr-4">
+                <ScrollArea className="h-full pr-4">
                   <div className="space-y-4">
                     {transcript.segments.map((segment) => (
                       <div key={segment.id} className="flex gap-3">
