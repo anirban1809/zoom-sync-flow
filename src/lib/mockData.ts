@@ -97,7 +97,7 @@ export const mockSummaries: Record<string, Summary> = {
         text: 'Team aligned on Q4 priorities: focus on enterprise features and API stability',
         evidence: [
           {
-            transcriptSegmentId: '1-1',
+            transcriptSegmentId: '1-3',
             timestamp: 180,
             speaker: 'Sarah Chen',
             text: "I think we should prioritize enterprise features this quarter. We're seeing strong demand from larger customers.",
@@ -122,7 +122,7 @@ export const mockSummaries: Record<string, Summary> = {
         owner: 'Sarah Chen',
         evidence: [
           {
-            transcriptSegmentId: '1-3',
+            transcriptSegmentId: '1-6',
             timestamp: 540,
             speaker: 'Sarah Chen',
             text: "Let's push the mobile redesign to Q1. It's important but not as critical as the enterprise work.",
@@ -136,7 +136,7 @@ export const mockSummaries: Record<string, Summary> = {
         severity: 'medium',
         evidence: [
           {
-            transcriptSegmentId: '1-4',
+            transcriptSegmentId: '1-5',
             timestamp: 720,
             speaker: 'Mike Torres',
             text: "The API changes could break integrations if customers don't update their code. We need a solid migration plan.",
@@ -150,7 +150,7 @@ export const mockSummaries: Record<string, Summary> = {
         askedBy: 'Mike Torres',
         evidence: [
           {
-            transcriptSegmentId: '1-5',
+            transcriptSegmentId: '1-7',
             timestamp: 900,
             speaker: 'Mike Torres',
             text: "Given our capacity constraints, should we consider bringing in contractors? What's our budget for that?",
@@ -223,6 +223,38 @@ export const mockTranscripts: Record<string, Transcript> = {
         tEnd: 68,
         speaker: 'Sarah Chen',
         text: "That's a good point. Let's keep that in mind as we prioritize. I think we should focus on enterprise features this quarter. We're seeing strong demand from larger customers.",
+        confidence: 0.94,
+      },
+      {
+        id: '1-4',
+        tStart: 69,
+        tEnd: 95,
+        speaker: 'Emma Wilson',
+        text: "I can help create some mockups for the enterprise dashboard. What timeline are we looking at?",
+        confidence: 0.92,
+      },
+      {
+        id: '1-5',
+        tStart: 96,
+        tEnd: 120,
+        speaker: 'Mike Torres',
+        text: "The API changes could break integrations if customers don't update their code. We need a solid migration plan and clear communication strategy.",
+        confidence: 0.91,
+      },
+      {
+        id: '1-6',
+        tStart: 121,
+        tEnd: 145,
+        speaker: 'Sarah Chen',
+        text: "Let's push the mobile redesign to Q1. It's important but not as critical as the enterprise work. We can revisit in the new year.",
+        confidence: 0.93,
+      },
+      {
+        id: '1-7',
+        tStart: 146,
+        tEnd: 170,
+        speaker: 'Mike Torres',
+        text: "Given our capacity constraints, should we consider bringing in contractors? What's our budget for that?",
         confidence: 0.94,
       },
     ],

@@ -20,14 +20,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { mockMeetings, mockSummaries, mockTranscripts, mockTasks } from '@/lib/mockData';
 import { format } from 'date-fns';
 import { TaskRow } from '@/components/TaskRow';
+import { cn } from '@/lib/utils';
 
 export default function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const transcriptRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [highlightedSegmentId, setHighlightedSegmentId] = useState<string | null>(null);
   
   // Share modal state
   const [linkExists, setLinkExists] = useState(true);
@@ -46,6 +49,21 @@ export default function MeetingDetail() {
     if (audioRef.current) {
       audioRef.current.currentTime += seconds;
     }
+  };
+
+  const handleViewEvidence = (segmentId: string) => {
+    setHighlightedSegmentId(segmentId);
+    
+    // Scroll to the transcript segment
+    const element = transcriptRefs.current[segmentId];
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Clear highlight after 5 seconds
+    setTimeout(() => {
+      setHighlightedSegmentId(null);
+    }, 5000);
   };
 
   const shareUrl = `${window.location.origin}/meetings/${id}`;
@@ -266,7 +284,10 @@ export default function MeetingDetail() {
                             <div className="flex-1">
                               <p className="text-sm">{bullet.text}</p>
                               {bullet.evidence.length > 0 && (
-                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                <button 
+                                  className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                  onClick={() => handleViewEvidence(bullet.evidence[0].transcriptSegmentId)}
+                                >
                                   View evidence ({bullet.evidence.length})
                                   <ExternalLink className="h-3 w-3" />
                                 </button>
@@ -294,7 +315,10 @@ export default function MeetingDetail() {
                                 <p className="text-xs text-muted-foreground mt-1">Owner: {decision.owner}</p>
                               )}
                               {decision.evidence.length > 0 && (
-                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                <button 
+                                  className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                  onClick={() => handleViewEvidence(decision.evidence[0].transcriptSegmentId)}
+                                >
                                   View evidence ({decision.evidence.length})
                                   <ExternalLink className="h-3 w-3" />
                                 </button>
@@ -322,7 +346,10 @@ export default function MeetingDetail() {
                                 <Badge variant="outline">{risk.severity}</Badge>
                               </div>
                               {risk.evidence.length > 0 && (
-                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                <button 
+                                  className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                  onClick={() => handleViewEvidence(risk.evidence[0].transcriptSegmentId)}
+                                >
                                   View evidence ({risk.evidence.length})
                                   <ExternalLink className="h-3 w-3" />
                                 </button>
@@ -350,7 +377,10 @@ export default function MeetingDetail() {
                                 <p className="text-xs text-muted-foreground mt-1">Asked by: {question.askedBy}</p>
                               )}
                               {question.evidence.length > 0 && (
-                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                <button 
+                                  className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                  onClick={() => handleViewEvidence(question.evidence[0].transcriptSegmentId)}
+                                >
                                   View evidence ({question.evidence.length})
                                   <ExternalLink className="h-3 w-3" />
                                 </button>
@@ -397,7 +427,14 @@ export default function MeetingDetail() {
                 <ScrollArea className="h-full pr-4">
                   <div className="space-y-4">
                     {transcript.segments.map((segment) => (
-                      <div key={segment.id} className="flex gap-3">
+                      <div 
+                        key={segment.id} 
+                        ref={(el) => transcriptRefs.current[segment.id] = el}
+                        className={cn(
+                          "flex gap-3 rounded-lg p-3 transition-all duration-300",
+                          highlightedSegmentId === segment.id && "bg-primary/10 ring-2 ring-primary"
+                        )}
+                      >
                         <span className="text-xs text-muted-foreground min-w-[48px] mt-0.5">
                           {Math.floor(segment.tStart / 60)}:{(segment.tStart % 60).toString().padStart(2, '0')}
                         </span>
