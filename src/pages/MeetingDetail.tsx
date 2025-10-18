@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -255,149 +255,167 @@ export default function MeetingDetail() {
       )}
 
       {summary && (
-        <Tabs defaultValue="summary" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="transcript">Transcript</TabsTrigger>
-            <TabsTrigger value="tasks">Action Items ({tasks.length})</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="summary" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>AI Summary</CardTitle>
-                    <CardDescription>
-                      Generated with {Math.round(summary.confidence * 100)}% confidence
-                    </CardDescription>
-                  </div>
-                  <Badge variant={summary.sentiment === 'positive' ? 'default' : summary.sentiment === 'negative' ? 'destructive' : 'secondary'}>
-                    {summary.sentiment}
-                  </Badge>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* AI Summary Card */}
+          <Card className="flex flex-col">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>AI Summary</CardTitle>
+                  <CardDescription>
+                    Generated with {Math.round(summary.confidence * 100)}% confidence
+                  </CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {summary.bullets.length > 0 && (
+                <Badge variant={summary.sentiment === 'positive' ? 'default' : summary.sentiment === 'negative' ? 'destructive' : 'secondary'}>
+                  {summary.sentiment}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6 flex-1">
+              <ScrollArea className="h-[600px] pr-4">
+                <div className="space-y-6">
+                  {summary.bullets.length > 0 && (
+                    <div className="space-y-3">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Key Points
+                      </h3>
+                      <ul className="space-y-3">
+                        {summary.bullets.map((bullet, i) => (
+                          <li key={i} className="flex gap-3">
+                            <span className="text-muted-foreground mt-0.5">•</span>
+                            <div className="flex-1">
+                              <p className="text-sm">{bullet.text}</p>
+                              {bullet.evidence.length > 0 && (
+                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                  View evidence ({bullet.evidence.length})
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {summary.decisions.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Decisions
+                        </h3>
+                        <ul className="space-y-3">
+                          {summary.decisions.map((decision, i) => (
+                            <li key={i} className="rounded-lg border bg-success/5 p-3">
+                              <p className="text-sm font-medium">{decision.text}</p>
+                              {decision.owner && (
+                                <p className="text-xs text-muted-foreground mt-1">Owner: {decision.owner}</p>
+                              )}
+                              {decision.evidence.length > 0 && (
+                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                  View evidence ({decision.evidence.length})
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+
+                  {summary.risks.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Risks
+                        </h3>
+                        <ul className="space-y-3">
+                          {summary.risks.map((risk, i) => (
+                            <li key={i} className="rounded-lg border bg-warning/5 p-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-medium flex-1">{risk.text}</p>
+                                <Badge variant="outline">{risk.severity}</Badge>
+                              </div>
+                              {risk.evidence.length > 0 && (
+                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                  View evidence ({risk.evidence.length})
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+
+                  {summary.questions.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <HelpCircle className="h-4 w-4" />
+                          Open Questions
+                        </h3>
+                        <ul className="space-y-3">
+                          {summary.questions.map((question, i) => (
+                            <li key={i} className="rounded-lg border bg-info/5 p-3">
+                              <p className="text-sm font-medium">{question.text}</p>
+                              {question.askedBy && (
+                                <p className="text-xs text-muted-foreground mt-1">Asked by: {question.askedBy}</p>
+                              )}
+                              {question.evidence.length > 0 && (
+                                <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
+                                  View evidence ({question.evidence.length})
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Action Items Section */}
+                  <Separator />
                   <div className="space-y-3">
                     <h3 className="font-semibold flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4" />
-                      Key Points
+                      <CheckCircle2 className="h-4 w-4" />
+                      Action Items ({tasks.length})
                     </h3>
-                    <ul className="space-y-3">
-                      {summary.bullets.map((bullet, i) => (
-                        <li key={i} className="flex gap-3">
-                          <span className="text-muted-foreground mt-0.5">•</span>
-                          <div className="flex-1">
-                            <p className="text-sm">{bullet.text}</p>
-                            {bullet.evidence.length > 0 && (
-                              <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                                View evidence ({bullet.evidence.length})
-                                <ExternalLink className="h-3 w-3" />
-                              </button>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="space-y-2">
+                      {tasks.length > 0 ? (
+                        tasks.map((task) => (
+                          <TaskRow key={task.id} task={task} />
+                        ))
+                      ) : (
+                        <div className="text-center py-4 text-muted-foreground text-sm">
+                          <p>No action items have been created for this meeting yet</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
 
-                {summary.decisions.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4" />
-                        Decisions
-                      </h3>
-                      <ul className="space-y-3">
-                        {summary.decisions.map((decision, i) => (
-                          <li key={i} className="rounded-lg border bg-success/5 p-3">
-                            <p className="text-sm font-medium">{decision.text}</p>
-                            {decision.owner && (
-                              <p className="text-xs text-muted-foreground mt-1">Owner: {decision.owner}</p>
-                            )}
-                            {decision.evidence.length > 0 && (
-                              <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                                View evidence ({decision.evidence.length})
-                                <ExternalLink className="h-3 w-3" />
-                              </button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-
-                {summary.risks.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        Risks
-                      </h3>
-                      <ul className="space-y-3">
-                        {summary.risks.map((risk, i) => (
-                          <li key={i} className="rounded-lg border bg-warning/5 p-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-sm font-medium flex-1">{risk.text}</p>
-                              <Badge variant="outline">{risk.severity}</Badge>
-                            </div>
-                            {risk.evidence.length > 0 && (
-                              <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                                View evidence ({risk.evidence.length})
-                                <ExternalLink className="h-3 w-3" />
-                              </button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-
-                {summary.questions.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <HelpCircle className="h-4 w-4" />
-                        Open Questions
-                      </h3>
-                      <ul className="space-y-3">
-                        {summary.questions.map((question, i) => (
-                          <li key={i} className="rounded-lg border bg-info/5 p-3">
-                            <p className="text-sm font-medium">{question.text}</p>
-                            {question.askedBy && (
-                              <p className="text-xs text-muted-foreground mt-1">Asked by: {question.askedBy}</p>
-                            )}
-                            {question.evidence.length > 0 && (
-                              <button className="text-xs text-primary hover:underline mt-1 flex items-center gap-1">
-                                View evidence ({question.evidence.length})
-                                <ExternalLink className="h-3 w-3" />
-                              </button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="transcript">
-            <Card>
-              <CardHeader>
-                <CardTitle>Transcript</CardTitle>
-                <CardDescription>Full conversation recording</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {transcript ? (
+          {/* Transcript Card */}
+          <Card className="flex flex-col">
+            <CardHeader>
+              <CardTitle>Transcript</CardTitle>
+              <CardDescription>Full conversation recording</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1">
+              {transcript ? (
+                <ScrollArea className="h-[600px] pr-4">
                   <div className="space-y-4">
                     {transcript.segments.map((segment) => (
                       <div key={segment.id} className="flex gap-3">
@@ -411,36 +429,15 @@ export default function MeetingDetail() {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>Transcript not available for this meeting</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="tasks">
-            <Card>
-              <CardHeader>
-                <CardTitle>Action Items</CardTitle>
-                <CardDescription>{tasks.length} tasks from this meeting</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {tasks.length > 0 ? (
-                  tasks.map((task) => (
-                    <TaskRow key={task.id} task={task} />
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p className="mb-3">No action items yet</p>
-                    <Button variant="outline" size="sm">Create Task</Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </ScrollArea>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Transcript not available for this meeting</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {!summary && meeting.status === 'completed' && (
