@@ -1,21 +1,38 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { KPICard } from "@/components/KPICard";
 import { ExceptionListItem } from "@/components/ExceptionListItem";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { 
-  Info, 
-  AlertCircle, 
-  Mail, 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Info,
+  AlertCircle,
+  Mail,
   CheckCircle,
   Video,
   FileText,
   ListTodo,
   RotateCcw,
   HelpCircle,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,7 +44,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, Bar, ComposedChart } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  Legend,
+  ResponsiveContainer,
+  Bar,
+  ComposedChart,
+} from "recharts";
 
 export default function Insights() {
   const navigate = useNavigate();
@@ -41,7 +69,8 @@ export default function Insights() {
     setProviderFilter("all");
   };
 
-  const hasActiveFilters = dateRange !== "30" || teamFilter !== "all" || providerFilter !== "all";
+  const hasActiveFilters =
+    dateRange !== "30" || teamFilter !== "all" || providerFilter !== "all";
 
   // Mock KPI data
   const kpiData = [
@@ -170,32 +199,38 @@ export default function Insights() {
   const metricDefinitions = [
     {
       name: "Meetings Captured",
-      definition: "Total number of meetings recorded and processed by the system during the selected time period.",
+      definition:
+        "Total number of meetings recorded and processed by the system during the selected time period.",
     },
     {
       name: "Transcript Success Rate",
-      definition: "Percentage of recorded meetings that successfully generated accurate transcripts. Calculated as (meetings with transcripts / total meetings) × 100.",
+      definition:
+        "Percentage of recorded meetings that successfully generated accurate transcripts. Calculated as (meetings with transcripts / total meetings) × 100.",
     },
     {
       name: "Recap Delivery Rate",
-      definition: "Percentage of completed meetings where recap summaries were successfully sent to all participants. Calculated as (meetings with sent recaps / completed meetings) × 100.",
+      definition:
+        "Percentage of completed meetings where recap summaries were successfully sent to all participants. Calculated as (meetings with sent recaps / completed meetings) × 100.",
     },
     {
       name: "Unique Viewers",
-      definition: "Count of distinct individuals who accessed meeting recordings, transcripts, or recaps during the selected period.",
+      definition:
+        "Count of distinct individuals who accessed meeting recordings, transcripts, or recaps during the selected period.",
     },
     {
       name: "Action Items Created",
-      definition: "Total number of action items extracted from meeting transcripts and summaries during the selected time period.",
+      definition:
+        "Total number of action items extracted from meeting transcripts and summaries during the selected time period.",
     },
     {
       name: "Action Follow-through",
-      definition: "Percentage of action items that were completed by their due date. Calculated as (completed on-time actions / total due actions) × 100.",
+      definition:
+        "Percentage of action items that were completed by their due date. Calculated as (completed on-time actions / total due actions) × 100.",
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
       {/* Page Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -207,7 +242,10 @@ export default function Insights() {
                   <Info className="h-5 w-5 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="max-w-xs">Track meeting performance, engagement, and action item follow-through across your organization</p>
+                  <p className="max-w-xs">
+                    Track meeting performance, engagement, and action item
+                    follow-through across your organization
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -276,7 +314,9 @@ export default function Insights() {
       <Card>
         <CardHeader>
           <CardTitle>30-Day Trend</CardTitle>
-          <CardDescription>Meeting capture volume and action follow-through rate over time</CardDescription>
+          <CardDescription>
+            Meeting capture volume and action follow-through rate over time
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -287,8 +327,20 @@ export default function Insights() {
               <YAxis yAxisId="right" orientation="right" />
               <RechartsTooltip />
               <Legend />
-              <Bar yAxisId="left" dataKey="meetings" fill="hsl(var(--primary))" name="Meetings Captured" />
-              <Line yAxisId="right" type="monotone" dataKey="followThrough" stroke="hsl(var(--chart-2))" name="Follow-through %" strokeWidth={2} />
+              <Bar
+                yAxisId="left"
+                dataKey="meetings"
+                fill="hsl(var(--primary))"
+                name="Meetings Captured"
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="followThrough"
+                stroke="hsl(var(--chart-2))"
+                name="Follow-through %"
+                strokeWidth={2}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </CardContent>
@@ -318,7 +370,11 @@ export default function Insights() {
               ))}
             </div>
             <div className="p-4 border-t">
-              <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/meetings")}>
+              <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={() => navigate("/meetings")}
+              >
                 View all capture issues →
               </Button>
             </div>
@@ -350,7 +406,11 @@ export default function Insights() {
               ))}
             </div>
             <div className="p-4 border-t">
-              <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/meetings")}>
+              <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={() => navigate("/meetings")}
+              >
                 View all unsent recaps →
               </Button>
             </div>
@@ -378,7 +438,11 @@ export default function Insights() {
               ))}
             </div>
             <div className="p-4 border-t">
-              <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/tasks")}>
+              <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={() => navigate("/tasks")}
+              >
                 View all overdue tasks →
               </Button>
             </div>
@@ -407,7 +471,9 @@ export default function Insights() {
                 {metricDefinitions.map((metric, index) => (
                   <div key={index} className="space-y-1">
                     <h4 className="font-semibold">{metric.name}</h4>
-                    <p className="text-sm text-muted-foreground">{metric.definition}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {metric.definition}
+                    </p>
                   </div>
                 ))}
               </div>
