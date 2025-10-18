@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -115,6 +116,7 @@ const recentSearches = [
 ];
 
 export default function Search() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [dateRange, setDateRange] = useState("30");
   const [owner, setOwner] = useState("all");
@@ -194,6 +196,18 @@ export default function Search() {
     const url = `${window.location.origin}/search?${params.toString()}`;
     navigator.clipboard.writeText(url);
     toast.success("Search link copied to clipboard");
+  };
+
+  const handleResultClick = (result: typeof mockResults[0]) => {
+    if (result.type === "meeting") {
+      navigate(`/meetings/${result.id}`);
+    } else if (result.type === "transcript") {
+      // Navigate to meeting detail with timestamp
+      const meetingId = result.meetingTitle.toLowerCase().replace(/\s+/g, "-");
+      navigate(`/meetings/${meetingId}?timestamp=${result.timestamp}`);
+    } else if (result.type === "task") {
+      navigate(`/tasks?taskId=${result.id}`);
+    }
   };
 
   const filteredResults = showResults ? mockResults : [];
@@ -474,6 +488,7 @@ export default function Search() {
               <Card
                 key={result.id}
                 className="p-4 hover:bg-muted/50 cursor-pointer transition-colors"
+                onClick={() => handleResultClick(result)}
               >
                 {result.type === "meeting" && (
                   <div className="flex items-start justify-between">
@@ -519,7 +534,7 @@ export default function Search() {
                         ))}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button variant="outline" size="sm">
                         <FileText className="h-4 w-4 mr-1" />
                         Summary
@@ -561,7 +576,7 @@ export default function Search() {
                         <span className="text-xs">• {result.meetingDate}</span>
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button variant="outline" size="sm">
                         <PlayCircle className="h-4 w-4 mr-1" />
                         Play at time
@@ -608,7 +623,7 @@ export default function Search() {
                         </span>
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       {result.status !== "completed" && (
                         <Button variant="outline" size="sm">
                           <CheckSquare className="h-4 w-4 mr-1" />
