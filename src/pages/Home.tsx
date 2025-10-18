@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Calendar } from "lucide-react";
+import { Plus, Calendar, Video, User, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,13 +8,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { MeetingCard } from "@/components/MeetingCard";
 import { TaskRow } from "@/components/TaskRow";
 import { mockMeetings, mockTasks } from "@/lib/mockData";
 import { CreateMeetingModal } from "@/components/CreateMeetingModal";
+import { Task } from "@/types";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+
+const statusColors = {
+  'todo': 'bg-muted text-muted-foreground',
+  'in-progress': 'bg-info/10 text-info border-info/20',
+  'done': 'bg-success/10 text-success border-success/20',
+  'cancelled': 'bg-muted text-muted-foreground',
+} as const;
 
 export default function Home() {
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
@@ -81,7 +102,9 @@ export default function Home() {
         <CardContent className="space-y-2">
           {upcomingTasks.length > 0 ? (
             upcomingTasks.map((task) => (
-              <TaskRow key={task.id} task={task} />
+              <div key={task.id} onClick={() => setSelectedTask(task)} className="cursor-pointer">
+                <TaskRow task={task} />
+              </div>
             ))
           ) : (
             <div className="text-center py-8 text-muted-foreground">
@@ -106,6 +129,113 @@ export default function Home() {
           ))}
         </CardContent>
       </Card>
+
+      {/* Task Details Modal */}
+      <Dialog open={!!selectedTask} onOpenChange={() => setSelectedTask(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedTask && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedTask.title}</DialogTitle>
+              </DialogHeader>
+
+              <div className="mt-6 space-y-6">
+                {/* Status chips */}
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className={cn("border", statusColors[selectedTask.status])}>
+                    {selectedTask.status}
+                  </Badge>
+                  {selectedTask.due && (
+                    <Badge variant="outline">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {format(selectedTask.due, 'MMM d, yyyy')}
+                    </Badge>
+                  )}
+                  {selectedTask.ownerName && (
+                    <Badge variant="outline">
+                      <User className="h-3 w-3 mr-1" />
+                      {selectedTask.ownerName}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Meeting origin card */}
+                {selectedTask.meetingId && (
+                  <div className="rounded-lg border p-4 bg-muted/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Video className="h-4 w-4 text-muted-foreground" />
+                      <h4 className="font-semibold text-sm">Origin Meeting</h4>
+                    </div>
+                    <p className="font-medium mb-1">
+                      {mockMeetings.find(m => m.id === selectedTask.meetingId)?.title}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {mockMeetings.find(m => m.id === selectedTask.meetingId)?.start 
+                        ? format(mockMeetings.find(m => m.id === selectedTask.meetingId)!.start, 'MMM d, yyyy h:mm a')
+                        : ''}
+                    </p>
+                    <Button variant="link" className="mt-2 p-0 h-auto text-xs text-primary">
+                      View meeting →
+                    </Button>
+                  </div>
+                )}
+
+                {/* External Links */}
+                {selectedTask.externalLinks.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">External Links</h4>
+                    <div className="space-y-2">
+                      {selectedTask.externalLinks.map((link) => (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          {link.provider}: {link.id}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Comments */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Comments</h4>
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">YO</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <Textarea
+                          placeholder="Add a comment… (use @mentions)"
+                          className="min-h-[80px]"
+                        />
+                        <Button size="sm" className="mt-2">Comment</Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Activity */}
+                <div>
+                  <Tabs defaultValue="activity" className="w-full">
+                    <TabsList>
+                      <TabsTrigger value="activity">Activity</TabsTrigger>
+                      <TabsTrigger value="related">Related</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                    <p>Created {format(selectedTask.createdAt, 'MMM d, yyyy')}</p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
