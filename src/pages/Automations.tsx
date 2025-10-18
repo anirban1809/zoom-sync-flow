@@ -3,11 +3,14 @@ import {
   Plus,
   Zap,
   Play,
-  Pause,
   Edit,
   Trash2,
-  Clock,
-  Check,
+  HelpCircle,
+  Mail,
+  MessageSquare,
+  CheckSquare,
+  AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 import {
   Card,
@@ -19,273 +22,497 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import CreateAutomationModal from "@/components/CreateAutomationModal";
 
-const automations = [
+const recipes = [
   {
-    id: "1",
-    name: "Auto-create tasks from action items",
+    id: "slack-recap",
+    name: "Send recap to Slack",
     description:
-      "Automatically create tasks when action items are mentioned in meetings",
-    trigger: "Meeting ends",
-    actions: ["Extract action items", "Create tasks", "Assign to attendees"],
-    enabled: true,
-    runs: 342,
-    lastRun: "2 hours ago",
+      "After a meeting ends, post the summary (decisions, action items, link) to a chosen Slack channel or thread.",
+    icon: MessageSquare,
   },
   {
-    id: "2",
-    name: "Send meeting summary emails",
-    description: "Send summary emails to all participants after meetings",
-    trigger: "Transcript complete",
-    actions: ["Generate summary", "Send email to attendees"],
-    enabled: true,
-    runs: 287,
-    lastRun: "5 hours ago",
+    id: "email-recap",
+    name: "Email recap to attendees",
+    description:
+      "After a meeting ends, email the recap to attendees and optional CCs.",
+    icon: Mail,
   },
   {
-    id: "3",
-    name: "Update CRM with meeting notes",
-    description: "Sync meeting notes and outcomes to your CRM",
-    trigger: 'Meeting tagged as "customer"',
-    actions: ["Format notes", "Update CRM record", "Log activity"],
-    enabled: false,
-    runs: 156,
-    lastRun: "2 days ago",
-  },
-  {
-    id: "4",
-    name: "Alert on competitor mentions",
-    description: "Get notified when competitors are mentioned in meetings",
-    trigger: "Competitor keyword detected",
-    actions: ["Send Slack notification", "Tag meeting", "Create alert"],
-    enabled: true,
-    runs: 45,
-    lastRun: "1 day ago",
+    id: "create-tasks",
+    name: "Create tasks from action items",
+    description:
+      "After a meeting ends, push detected action items to Jira/Linear/Asana with assignee and due date.",
+    icon: CheckSquare,
   },
 ];
 
-const templates = [
+const mockAutomations = [
   {
     id: "1",
-    name: "Lead Qualification Workflow",
-    description: "Automatically score and qualify leads from sales calls",
-    category: "Sales",
+    name: "Sales standup recaps",
+    enabled: true,
+    destination: "#sales-standup",
+    scope: "Tag: Sales Standups",
+    lastRun: "2 hours ago",
+    recipe: "slack-recap",
+    config: {
+      trigger: "After meeting ends",
+      scope: "Meetings with tags: Sales Standups",
+      destination: "Slack: #sales-standup",
+      content: "Summary, decisions, action items, transcript link",
+      timing: "Immediate",
+      safeguard: false,
+    },
+    recentRuns: [
+      {
+        id: "1",
+        timestamp: "2 hours ago",
+        status: "success",
+        meetingId: "m1",
+        meetingTitle: "Sales Standup - Jan 15",
+      },
+      {
+        id: "2",
+        timestamp: "1 day ago",
+        status: "success",
+        meetingId: "m2",
+        meetingTitle: "Sales Standup - Jan 14",
+      },
+      {
+        id: "3",
+        timestamp: "2 days ago",
+        status: "failed",
+        meetingId: "m3",
+        meetingTitle: "Sales Standup - Jan 13",
+        error: "Slack channel not found",
+      },
+    ],
   },
   {
     id: "2",
-    name: "Customer Onboarding",
-    description: "Create onboarding tasks and follow-ups from kickoff meetings",
-    category: "Customer Success",
+    name: "Customer call summaries",
+    enabled: true,
+    destination: "All attendees",
+    scope: "Tag: Customer Calls",
+    lastRun: "5 hours ago",
+    recipe: "email-recap",
+    config: {
+      trigger: "After meeting ends",
+      scope: "Meetings with tags: Customer Calls",
+      destination: "Email: All attendees + cs-team@company.com",
+      content: "Summary, decisions, action items, transcript link",
+      timing: "Delay 5 minutes",
+      safeguard: false,
+    },
+    recentRuns: [
+      {
+        id: "1",
+        timestamp: "5 hours ago",
+        status: "success",
+        meetingId: "m4",
+        meetingTitle: "Customer Call - Acme Corp",
+      },
+    ],
   },
   {
     id: "3",
-    name: "Weekly Report Generation",
-    description: "Compile weekly meeting insights and send to team",
-    category: "Reporting",
+    name: "Sprint planning tasks",
+    enabled: false,
+    destination: "Jira: SPRINT",
+    scope: "My meetings",
+    lastRun: "3 days ago",
+    recipe: "create-tasks",
+    config: {
+      trigger: "After meeting ends",
+      scope: "My meetings",
+      destination: "Jira: SPRINT project",
+      content: "Action items with assignee and due date",
+      timing: "Immediate",
+      safeguard: true,
+    },
+    recentRuns: [
+      {
+        id: "1",
+        timestamp: "3 days ago",
+        status: "success",
+        meetingId: "m5",
+        meetingTitle: "Sprint Planning",
+      },
+    ],
   },
 ];
 
 export default function Automations() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState<string | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [selectedAutomation, setSelectedAutomation] = useState<
+    (typeof mockAutomations)[0] | null
+  >(null);
+  const [automations, setAutomations] = useState(mockAutomations);
+
+  const handleSetupRecipe = (recipeId: string) => {
+    setSelectedRecipe(recipeId);
+    setIsCreateModalOpen(true);
+  };
+
+  const handleToggleAutomation = (id: string) => {
+    setAutomations((prev) =>
+      prev.map((auto) =>
+        auto.id === id ? { ...auto, enabled: !auto.enabled } : auto
+      )
+    );
+  };
+
+  const handleDeleteAutomation = (id: string) => {
+    setAutomations((prev) => prev.filter((auto) => auto.id !== id));
+  };
 
   return (
     <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto space-y-6">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Automations</h1>
           <p className="text-muted-foreground mt-2">
-            Automate workflows and tasks based on meeting insights
+            Automatically handle recap delivery and task creation based on
+            meeting events
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Automation
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsHelpOpen(true)}
+          >
+            <HelpCircle className="h-4 w-4 mr-2" />
+            What can automations do?
+          </Button>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Automation
+          </Button>
+        </div>
       </div>
 
+      {/* Recipes Row */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Quick Setup</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {recipes.map((recipe) => (
+            <Card key={recipe.id} className="hover:border-primary transition-colors">
+              <CardHeader className="pb-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <recipe.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-base">{recipe.name}</CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm mb-4">
+                  {recipe.description}
+                </CardDescription>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => handleSetupRecipe(recipe.id)}
+                >
+                  Set up
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* My Automations List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>My Automations</CardTitle>
+          <CardDescription>
+            Manage your active automation workflows
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {automations.length === 0 ? (
+            <div className="text-center py-12">
+              <Zap className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No automations yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Get started by creating your first automation
+              </p>
+              <Button onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Automation
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {automations.map((automation) => (
+                <div
+                  key={automation.id}
+                  className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedAutomation(automation)}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Switch
+                      checked={automation.enabled}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleAutomation(automation.id);
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">{automation.name}</div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          {automation.destination}
+                        </Badge>
+                        <span>•</span>
+                        <span>{automation.scope}</span>
+                        <span>•</span>
+                        <span>Last run {automation.lastRun}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log("Run test", automation.id);
+                      }}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Run test
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRecipe(automation.recipe);
+                        setIsCreateModalOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAutomation(automation.id);
+                      }}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create Automation Modal */}
       <CreateAutomationModal
         open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
+        onOpenChange={(open) => {
+          setIsCreateModalOpen(open);
+          if (!open) setSelectedRecipe(null);
+        }}
+        selectedRecipe={selectedRecipe}
       />
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">
-              Active Automations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {automations.filter((a) => a.enabled).length}
+      {/* Help Panel */}
+      <Dialog open={isHelpOpen} onOpenChange={setIsHelpOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>What can automations do?</DialogTitle>
+            <DialogDescription>
+              Learn about the different types of automations you can create
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {recipes.map((recipe) => (
+              <div key={recipe.id} className="flex gap-3">
+                <div className="p-2 rounded-lg bg-primary/10 h-fit">
+                  <recipe.icon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">{recipe.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {recipe.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div className="pt-4 border-t">
+              <h4 className="font-semibold mb-2">Privacy & Data</h4>
+              <p className="text-sm text-muted-foreground">
+                Automations only send data to destinations you explicitly
+                configure. Meeting summaries include only the information you
+                choose (summary, decisions, action items, links). Full
+                transcripts are never shared unless you specifically enable that
+                option.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {automations.length} total created
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {automations.reduce((sum, a) => sum + a.runs, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">This month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Time Saved</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">42h</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Estimated this month
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Automations</CardTitle>
-          <CardDescription>
-            Manage and monitor your automation workflows
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Trigger</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Runs</TableHead>
-                <TableHead className="text-right">Last Run</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {automations.map((automation) => (
-                <TableRow key={automation.id}>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-primary" />
-                        <span className="font-medium">{automation.name}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {automation.description}
-                      </p>
+      {/* Automation Details Drawer */}
+      <Sheet
+        open={selectedAutomation !== null}
+        onOpenChange={(open) => !open && setSelectedAutomation(null)}
+      >
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+          {selectedAutomation && (
+            <>
+              <SheetHeader>
+                <div className="flex items-center justify-between">
+                  <SheetTitle>{selectedAutomation.name}</SheetTitle>
+                  <Switch
+                    checked={selectedAutomation.enabled}
+                    onClick={() => handleToggleAutomation(selectedAutomation.id)}
+                  />
+                </div>
+                <SheetDescription>
+                  Automation configuration and recent activity
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="mt-6 space-y-6">
+                {/* Configuration Summary */}
+                <div>
+                  <h3 className="font-semibold mb-3">Configuration</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Trigger</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.trigger}
+                      </span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Play className="h-3 w-3 text-muted-foreground" />
-                      <span>{automation.trigger}</span>
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Scope</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.scope}
+                      </span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {automation.actions.map((action, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {action}
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Destination</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.destination}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Content</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.content}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Timing</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.timing}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">Manual review</span>
+                      <span className="font-medium">
+                        {selectedAutomation.config.safeguard ? "Required" : "Not required"}
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => {
+                      setSelectedRecipe(selectedAutomation.recipe);
+                      setIsCreateModalOpen(true);
+                      setSelectedAutomation(null);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Configuration
+                  </Button>
+                </div>
+
+                {/* Recent Runs */}
+                <div>
+                  <h3 className="font-semibold mb-3">Recent Runs</h3>
+                  <div className="space-y-2">
+                    {selectedAutomation.recentRuns.map((run) => (
+                      <div
+                        key={run.id}
+                        className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                      >
+                        {run.status === "success" ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-destructive" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium">
+                            {run.meetingTitle}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {run.timestamp}
+                            {run.error && (
+                              <span className="text-destructive ml-2">
+                                • {run.error}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <Badge
+                          variant={
+                            run.status === "success" ? "default" : "destructive"
+                          }
+                        >
+                          {run.status === "success" ? "Succeeded" : "Failed"}
                         </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Switch checked={automation.enabled} />
-                      <Badge
-                        variant={automation.enabled ? "default" : "secondary"}
-                      >
-                        {automation.enabled ? "Active" : "Disabled"}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {automation.runs}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1 text-sm">
-                      <Clock className="h-3 w-3" />
-                      {automation.lastRun}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-3 w-3 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Automation Templates</CardTitle>
-          <CardDescription>
-            Get started quickly with pre-built workflows
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {templates.map((template) => (
-                <TableRow key={template.id}>
-                  <TableCell className="font-medium">{template.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{template.category}</Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {template.description}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">
-                      Use Template
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => console.log("Run test")}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Run Test
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
