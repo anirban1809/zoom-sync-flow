@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Calendar, Video, User, Flag, Clock, MapPin } from "lucide-react";
+import { Calendar, Video, User, Flag, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -61,10 +61,6 @@ export default function Home() {
           >
             <Calendar className="h-5 w-5" />
             Create Meeting
-          </Button>
-          <Button size="lg" className="gap-2">
-            <Plus className="h-5 w-5" />
-            New Note
           </Button>
         </div>
       </div>
