@@ -74,50 +74,52 @@ export default function Home() {
         onOpenChange={setCreateMeetingOpen}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Today's Meetings</CardTitle>
-          <CardDescription>Scheduled for October 7, 2025</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {todaysMeetings.length > 0 ? (
-            todaysMeetings.map((meeting) => (
-              <MeetingCard 
-                key={meeting.id} 
-                meeting={meeting} 
-                onClick={() => setSelectedMeeting(meeting)}
-              />
-            ))
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="mb-2">No meetings scheduled for today</p>
-              <Button variant="outline" size="sm">
-                Connect Calendar
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Action Items</CardTitle>
-          <CardDescription>Your pending tasks</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {upcomingTasks.length > 0 ? (
-            upcomingTasks.map((task) => (
-              <div key={task.id} onClick={() => setSelectedTask(task)} className="cursor-pointer">
-                <TaskRow task={task} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Today's Meetings</CardTitle>
+            <CardDescription>Scheduled for October 7, 2025</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {todaysMeetings.length > 0 ? (
+              todaysMeetings.map((meeting) => (
+                <MeetingCard 
+                  key={meeting.id} 
+                  meeting={meeting} 
+                  onClick={() => setSelectedMeeting(meeting)}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="mb-2">No meetings scheduled for today</p>
+                <Button variant="outline" size="sm">
+                  Connect Calendar
+                </Button>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No pending tasks</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Action Items</CardTitle>
+            <CardDescription>Your pending tasks</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {upcomingTasks.length > 0 ? (
+              upcomingTasks.map((task) => (
+                <div key={task.id} onClick={() => setSelectedTask(task)} className="cursor-pointer">
+                  <TaskRow task={task} />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No pending tasks</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
