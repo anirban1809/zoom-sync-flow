@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockMeetings } from "@/lib/mockData";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -51,14 +52,25 @@ export default function Meetings() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredMeetings = mockMeetings.filter((meeting) => {
-    const matchesSearch = meeting.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || meeting.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Separate meetings into recorded and scheduled
+  const recordedMeetings = mockMeetings.filter((meeting) => meeting.status === "completed");
+  const scheduledMeetings = mockMeetings.filter((meeting) => 
+    meeting.status === "scheduled" || meeting.status === "live" || meeting.status === "cancelled"
+  );
+
+  const filterMeetings = (meetings: typeof mockMeetings) => {
+    return meetings.filter((meeting) => {
+      const matchesSearch = meeting.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || meeting.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  };
+
+  const filteredRecorded = filterMeetings(recordedMeetings);
+  const filteredScheduled = filterMeetings(scheduledMeetings);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -111,139 +123,273 @@ export default function Meetings() {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          {filteredMeetings.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Meeting</TableHead>
-                  <TableHead>Date & Time</TableHead>
-                  <TableHead>Participants</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMeetings.map((meeting) => (
-                  <TableRow
-                    key={meeting.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => navigate(`/meetings/${meeting.id}`)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                            providerColors[meeting.provider]
-                          }`}
-                        />
-                        <span className="font-medium">{meeting.title}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-sm">
-                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>{format(meeting.start, "MMM d, yyyy")}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Clock className="h-3.5 w-3.5" />
-                          <span>{format(meeting.start, "h:mm a")}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="flex -space-x-2">
-                          {meeting.participants
-                            .slice(0, 3)
-                            .map((participant) => (
-                              <Avatar
-                                key={participant.id}
-                                className="h-6 w-6 border-2 border-background"
-                              >
-                                <AvatarImage src={participant.avatarUrl} />
-                                <AvatarFallback className="text-xs">
-                                  {participant.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                            ))}
-                          {meeting.participants.length > 3 && (
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
-                              +{meeting.participants.length - 3}
+      <Tabs defaultValue="recorded" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="recorded">
+            Recorded ({filteredRecorded.length})
+          </TabsTrigger>
+          <TabsTrigger value="scheduled">
+            Scheduled ({filteredScheduled.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="recorded" className="mt-0">
+          <Card>
+            <CardContent className="p-0">
+              {filteredRecorded.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Meeting</TableHead>
+                      <TableHead>Date & Time</TableHead>
+                      <TableHead>Participants</TableHead>
+                      <TableHead>Tags</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredRecorded.map((meeting) => (
+                      <TableRow
+                        key={meeting.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/meetings/${meeting.id}`)}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                                providerColors[meeting.provider]
+                              }`}
+                            />
+                            <span className="font-medium">{meeting.title}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span>{format(meeting.start, "MMM d, yyyy")}</span>
                             </div>
-                          )}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {meeting.participants.length}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1 flex-wrap">
-                        {meeting.tags.slice(0, 2).map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="secondary"
-                            className="text-xs"
-                          >
-                            {tag}
+                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <Clock className="h-3.5 w-3.5" />
+                              <span>{format(meeting.start, "h:mm a")}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="flex -space-x-2">
+                              {meeting.participants
+                                .slice(0, 3)
+                                .map((participant) => (
+                                  <Avatar
+                                    key={participant.id}
+                                    className="h-6 w-6 border-2 border-background"
+                                  >
+                                    <AvatarImage src={participant.avatarUrl} />
+                                    <AvatarFallback className="text-xs">
+                                      {participant.name
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ))}
+                              {meeting.participants.length > 3 && (
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
+                                  +{meeting.participants.length - 3}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {meeting.participants.length}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            {meeting.tags.slice(0, 2).map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                            {meeting.tags.length > 2 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{meeting.tags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusColors[meeting.status]}>
+                            {meeting.status}
                           </Badge>
-                        ))}
-                        {meeting.tags.length > 2 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{meeting.tags.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={statusColors[meeting.status]}>
-                        {meeting.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div onClick={(e) => e.stopPropagation()}>
-                        {meeting.status === "scheduled" && (
+                        </TableCell>
+                        <TableCell className="text-right">
                           <Button
                             size="sm"
                             variant="outline"
                             className="gap-1.5"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <Video className="h-3.5 w-3.5" />
-                            Join
-                            <ExternalLink className="h-3 w-3" />
+                            View Details
                           </Button>
-                        )}
-                        {meeting.status === "live" && (
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="gap-1.5 animate-pulse"
-                          >
-                            <div className="h-2 w-2 rounded-full bg-white" />
-                            Live Now
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="mb-4">No meetings found</p>
-              <Button variant="outline">Clear Filters</Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p className="mb-4">No recorded meetings found</p>
+                  <Button variant="outline" onClick={() => setSearchQuery("")}>Clear Filters</Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="scheduled" className="mt-0">
+          <Card>
+            <CardContent className="p-0">
+              {filteredScheduled.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Meeting</TableHead>
+                      <TableHead>Date & Time</TableHead>
+                      <TableHead>Participants</TableHead>
+                      <TableHead>Tags</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredScheduled.map((meeting) => (
+                      <TableRow
+                        key={meeting.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/meetings/${meeting.id}`)}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                                providerColors[meeting.provider]
+                              }`}
+                            />
+                            <span className="font-medium">{meeting.title}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span>{format(meeting.start, "MMM d, yyyy")}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <Clock className="h-3.5 w-3.5" />
+                              <span>{format(meeting.start, "h:mm a")}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="flex -space-x-2">
+                              {meeting.participants
+                                .slice(0, 3)
+                                .map((participant) => (
+                                  <Avatar
+                                    key={participant.id}
+                                    className="h-6 w-6 border-2 border-background"
+                                  >
+                                    <AvatarImage src={participant.avatarUrl} />
+                                    <AvatarFallback className="text-xs">
+                                      {participant.name
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ))}
+                              {meeting.participants.length > 3 && (
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
+                                  +{meeting.participants.length - 3}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {meeting.participants.length}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            {meeting.tags.slice(0, 2).map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                            {meeting.tags.length > 2 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{meeting.tags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusColors[meeting.status]}>
+                            {meeting.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div onClick={(e) => e.stopPropagation()}>
+                            {meeting.status === "scheduled" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1.5"
+                              >
+                                <Video className="h-3.5 w-3.5" />
+                                Join
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
+                            )}
+                            {meeting.status === "live" && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="gap-1.5 animate-pulse"
+                              >
+                                <div className="h-2 w-2 rounded-full bg-white" />
+                                Live Now
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p className="mb-4">No scheduled meetings found</p>
+                  <Button variant="outline" onClick={() => setSearchQuery("")}>Clear Filters</Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
