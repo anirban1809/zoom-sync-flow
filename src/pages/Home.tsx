@@ -123,13 +123,19 @@ export default function Home() {
           <CardDescription>From the past 7 days</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {mockMeetings.slice(0, 3).map((meeting) => (
-            <MeetingCard
-              key={meeting.id}
-              meeting={meeting}
-              showActions={false}
-            />
-          ))}
+          {mockMeetings.length > 0 ? (
+            mockMeetings.slice(0, 3).map((meeting) => (
+              <MeetingCard
+                key={meeting.id}
+                meeting={meeting}
+                showActions={false}
+              />
+            ))
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No recent meetings</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
