@@ -28,7 +28,7 @@ export const mockMeetings: Meeting[] = [
       { id: '4', name: 'David Park', email: 'david@client.com', role: 'CTO' },
     ],
     tags: ['sales', 'enterprise'],
-    status: 'live',
+    status: 'scheduled',
     transcriptId: '2',
   },
   {

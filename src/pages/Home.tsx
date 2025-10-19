@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Calendar, Video, User, Flag } from "lucide-react";
+import { Plus, Calendar, Video, User, Flag, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +22,7 @@ import { MeetingCard } from "@/components/MeetingCard";
 import { TaskRow } from "@/components/TaskRow";
 import { mockMeetings, mockTasks } from "@/lib/mockData";
 import { CreateMeetingModal } from "@/components/CreateMeetingModal";
-import { Task } from "@/types";
+import { Task, Meeting } from "@/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +36,7 @@ const statusColors = {
 export default function Home() {
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
@@ -81,7 +82,9 @@ export default function Home() {
         <CardContent className="space-y-3">
           {todaysMeetings.length > 0 ? (
             todaysMeetings.map((meeting) => (
-              <MeetingCard key={meeting.id} meeting={meeting} />
+              <div key={meeting.id} onClick={() => setSelectedMeeting(meeting)}>
+                <MeetingCard meeting={meeting} />
+              </div>
             ))
           ) : (
             <div className="text-center py-8 text-muted-foreground">
@@ -129,6 +132,75 @@ export default function Home() {
           ))}
         </CardContent>
       </Card>
+
+      {/* Meeting Details Modal */}
+      <Dialog open={!!selectedMeeting} onOpenChange={() => setSelectedMeeting(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedMeeting && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedMeeting.title}</DialogTitle>
+              </DialogHeader>
+
+              <div className="mt-6 space-y-6">
+                {/* Time and Status */}
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(selectedMeeting.start, 'MMM d, yyyy h:mm a')} - {format(selectedMeeting.end, 'h:mm a')}
+                  </Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {selectedMeeting.status}
+                  </Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {selectedMeeting.provider}
+                  </Badge>
+                </div>
+
+                {/* Participants */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-3">Participants ({selectedMeeting.participants.length})</h4>
+                  <div className="space-y-2">
+                    {selectedMeeting.participants.map((participant) => (
+                      <div key={participant.id} className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="text-xs">
+                            {participant.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{participant.name}</p>
+                          <p className="text-xs text-muted-foreground">{participant.role}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {selectedMeeting.tags.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Tags</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMeeting.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button className="flex-1">Join Meeting</Button>
+                  <Button variant="outline">View Details</Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Task Details Modal */}
       <Dialog open={!!selectedTask} onOpenChange={() => setSelectedTask(null)}>
