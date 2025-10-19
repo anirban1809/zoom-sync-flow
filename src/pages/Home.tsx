@@ -82,9 +82,11 @@ export default function Home() {
         <CardContent className="space-y-3">
           {todaysMeetings.length > 0 ? (
             todaysMeetings.map((meeting) => (
-              <div key={meeting.id} onClick={() => setSelectedMeeting(meeting)}>
-                <MeetingCard meeting={meeting} />
-              </div>
+              <MeetingCard 
+                key={meeting.id} 
+                meeting={meeting} 
+                onClick={() => setSelectedMeeting(meeting)}
+              />
             ))
           ) : (
             <div className="text-center py-8 text-muted-foreground">

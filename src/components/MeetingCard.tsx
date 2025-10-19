@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 interface MeetingCardProps {
   meeting: Meeting;
   showActions?: boolean;
+  onClick?: () => void;
 }
 
 const providerColors = {
@@ -25,11 +26,19 @@ const statusColors = {
   cancelled: 'outline',
 } as const;
 
-export function MeetingCard({ meeting, showActions = true }: MeetingCardProps) {
+export function MeetingCard({ meeting, showActions = true, onClick }: MeetingCardProps) {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/meetings/${meeting.id}`);
+    }
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/meetings/${meeting.id}`)}>
+    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleClick}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
