@@ -23,6 +23,7 @@ import DataManagement from "./pages/DataManagement";
 import HelpSupport from "./pages/HelpSupport";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/" element={<AppShell><Home /></AppShell>} />
           <Route path="/ai-chat" element={<AppShell><AIChat /></AppShell>} />
           <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
