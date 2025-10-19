@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Mail } from "lucide-react";
+import { Mail, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const Login = () => {
+  const { theme, setTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -20,7 +22,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        className="absolute top-4 right-4"
+      >
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+      </Button>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-8">Recordin</h1>

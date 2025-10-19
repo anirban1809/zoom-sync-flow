@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Mail, ChevronDown } from "lucide-react";
+import { Mail, ChevronDown, Moon, Sun } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useTheme } from "next-themes";
 
 const Signup = () => {
+  const { theme, setTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -21,7 +23,16 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        className="absolute top-4 right-4"
+      >
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+      </Button>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-2">Create your account</h1>
