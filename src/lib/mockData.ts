@@ -4,8 +4,8 @@ export const mockMeetings: Meeting[] = [
   {
     id: '1',
     title: 'Q4 Product Planning',
-    start: new Date(2025, 9, 7, 10, 0),
-    end: new Date(2025, 9, 7, 11, 0),
+    start: new Date(2025, 9, 19, 10, 0),
+    end: new Date(2025, 9, 19, 11, 0),
     provider: 'zoom',
     participants: [
       { id: '1', name: 'Sarah Chen', email: 'sarah@acme.com', role: 'Product Manager' },
@@ -20,8 +20,8 @@ export const mockMeetings: Meeting[] = [
   {
     id: '2',
     title: 'Customer Discovery: Enterprise Segment',
-    start: new Date(2025, 9, 7, 14, 0),
-    end: new Date(2025, 9, 7, 15, 0),
+    start: new Date(2025, 9, 19, 14, 0),
+    end: new Date(2025, 9, 19, 15, 0),
     provider: 'meet',
     participants: [
       { id: '1', name: 'Sarah Chen', email: 'sarah@acme.com', role: 'Product Manager' },
@@ -34,8 +34,8 @@ export const mockMeetings: Meeting[] = [
   {
     id: '3',
     title: 'Weekly Standup',
-    start: new Date(2025, 9, 6, 9, 0),
-    end: new Date(2025, 9, 6, 9, 30),
+    start: new Date(2025, 9, 19, 16, 30),
+    end: new Date(2025, 9, 19, 17, 0),
     provider: 'teams',
     participants: [
       { id: '1', name: 'Sarah Chen', email: 'sarah@acme.com', role: 'Product Manager' },
@@ -44,7 +44,7 @@ export const mockMeetings: Meeting[] = [
       { id: '5', name: 'Lisa Zhang', email: 'lisa@acme.com', role: 'QA Lead' },
     ],
     tags: ['standup', 'team'],
-    status: 'completed',
+    status: 'scheduled',
     transcriptId: '3',
     summaryId: '3',
   },
