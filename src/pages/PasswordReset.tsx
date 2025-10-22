@@ -1,60 +1,178 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { cogForgotPassword, cogConfirmForgotPassword } from "@/lib/cognito";
 
 const PasswordReset = () => {
   const { theme, setTheme } = useTheme();
-  const [email, setEmail] = useState("");
-  const [resetLinkSent, setResetLinkSent] = useState(false);
+  const nav = useNavigate();
 
-  const handlePasswordReset = () => {
-    setResetLinkSent(true);
-  };
+  const [stage, setStage] = useState<"REQUEST" | "CONFIRM">("REQUEST");
+
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+
+  async function handleRequest(e?: React.FormEvent) {
+    e?.preventDefault?.();
+    setErr("");
+    setMsg("");
+    if (!emailOrUsername) {
+      setErr("Please enter your email or username.");
+      return;
+    }
+    try {
+      setLoading(true);
+      await cogForgotPassword(emailOrUsername.trim());
+      setStage("CONFIRM");
+      setMsg("We’ve sent a verification code to your email.");
+    } catch (e: any) {
+      // Common cases: UserNotFoundException, LimitExceededException, InvalidParameterException
+      const m =
+        e?.name === "UserNotFoundException"
+          ? "We couldn’t find an account with that email/username."
+          : e?.message || "Failed to start password reset.";
+      setErr(m);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleConfirm(e?: React.FormEvent) {
+    e?.preventDefault?.();
+    setErr("");
+    setMsg("");
+    if (newPassword !== confirmNewPassword) {
+      setErr("Passwords do not match.");
+      return;
+    }
+    try {
+      setLoading(true);
+      await cogConfirmForgotPassword(
+        emailOrUsername.trim(),
+        code.trim(),
+        newPassword
+      );
+      setMsg("Password reset successful. You can now log in.");
+      // optional: small delay, then navigate
+      setTimeout(() => nav("/login"), 800);
+    } catch (e: any) {
+      // Common: CodeMismatchException, ExpiredCodeException, InvalidPasswordException
+      const m =
+        e?.name === "CodeMismatchException"
+          ? "Invalid verification code."
+          : e?.name === "ExpiredCodeException"
+          ? "The code has expired. Request a new one."
+          : e?.message || "Failed to reset password.";
+      setErr(m);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         size="icon"
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         className="absolute top-4 right-4"
+        aria-label="Toggle theme"
       >
         <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
       </Button>
+
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-2">Recordin</h1>
           <h2 className="text-2xl font-semibold mb-2">Reset Password</h2>
           <p className="text-muted-foreground">
-            Enter your email and we'll send you a link to reset your password
+            {stage === "REQUEST"
+              ? "Enter your email (or username) and we’ll send you a verification code."
+              : `Enter the verification code sent to ${emailOrUsername} and choose a new password.`}
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div>
+        {stage === "REQUEST" && (
+          <form className="space-y-4" onSubmit={handleRequest}>
             <Input
               type="email"
-              placeholder="Work email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Work email or username"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
               className="h-12 text-base"
+              required
             />
-          </div>
+            {err && <div className="text-sm text-red-600">{err}</div>}
+            {msg && <div className="text-sm text-green-600">{msg}</div>}
+            <Button
+              disabled={loading}
+              className="w-full h-12 text-base"
+              size="lg"
+              type="submit"
+            >
+              {loading ? "Sending..." : "Send code"}
+            </Button>
+          </form>
+        )}
 
-          <Button onClick={handlePasswordReset} className="w-full h-12 text-base" size="lg">
-            Send reset link
-          </Button>
-
-          {resetLinkSent && (
-            <p className="text-sm text-muted-foreground text-center">
-              We've sent a password reset link to your email
-            </p>
-          )}
-        </div>
+        {stage === "CONFIRM" && (
+          <form className="space-y-4" onSubmit={handleConfirm}>
+            <Input
+              type="text"
+              placeholder="Verification code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="h-12 text-base"
+              required
+            />
+            <Input
+              type="password"
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="h-12 text-base"
+              required
+            />
+            <Input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              className="h-12 text-base"
+              required
+            />
+            {err && <div className="text-sm text-red-600">{err}</div>}
+            {msg && <div className="text-sm text-green-600">{msg}</div>}
+            <div className="flex gap-2">
+              <Button
+                disabled={loading}
+                className="w-full h-12 text-base"
+                size="lg"
+                type="submit"
+              >
+                {loading ? "Resetting..." : "Reset password"}
+              </Button>
+              <Button
+                variant="secondary"
+                type="button"
+                className="h-12 text-base"
+                onClick={() => setStage("REQUEST")}
+              >
+                Back
+              </Button>
+            </div>
+          </form>
+        )}
 
         <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground pt-4">
           <Link to="/login" className="hover:text-foreground">

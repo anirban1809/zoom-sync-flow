@@ -3,6 +3,8 @@ import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   ConfirmSignUpCommand,
+  ConfirmForgotPasswordCommand,
+  ForgotPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const REGION = import.meta.env.VITE_AWS_REGION as string;
@@ -55,4 +57,28 @@ export function hostedUiRedirect(provider?: string) {
   });
   if (provider) params.set("identity_provider", provider); // e.g., "Google", "SignInWithApple", "AzureAD", "Slack"
   window.location.href = `${base}?${params.toString()}`;
+}
+
+export async function cogForgotPassword(usernameOrEmail: string) {
+  return cip.send(
+    new ForgotPasswordCommand({
+      ClientId: APP_CLIENT_ID,
+      Username: usernameOrEmail, // can be email if your pool has email alias or email sign-in
+    })
+  );
+}
+
+export async function cogConfirmForgotPassword(
+  usernameOrEmail: string,
+  code: string,
+  newPassword: string
+) {
+  return cip.send(
+    new ConfirmForgotPasswordCommand({
+      ClientId: APP_CLIENT_ID,
+      Username: usernameOrEmail,
+      ConfirmationCode: code,
+      Password: newPassword,
+    })
+  );
 }
