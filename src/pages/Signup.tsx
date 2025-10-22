@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Mail, ChevronDown, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 
 const Signup = () => {
   const { theme, setTheme } = useTheme();
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleMagicLink = () => {
-    setMagicLinkSent(true);
+  const handleSignup = () => {
+    // Handle signup logic here
+    console.log("Signup submitted");
   };
 
   return (
@@ -70,32 +70,45 @@ const Signup = () => {
             />
           </div>
 
-          <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-            <CollapsibleTrigger className="flex items-center text-sm text-muted-foreground hover:text-foreground w-full">
-              <ChevronDown className={`h-4 w-4 mr-1 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-              Advanced fields
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 pt-4">
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Full name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="h-12 text-base"
-                />
-              </div>
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Company name"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  className="h-12 text-base"
-                />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          <div>
+            <Input
+              type="text"
+              placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="h-12 text-base"
+            />
+          </div>
+
+          <div>
+            <Input
+              type="text"
+              placeholder="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="h-12 text-base"
+            />
+          </div>
+
+          <div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-12 text-base"
+            />
+          </div>
+
+          <div>
+            <Input
+              type="password"
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="h-12 text-base"
+            />
+          </div>
 
           <div className="flex items-start space-x-2">
             <Checkbox
@@ -115,20 +128,9 @@ const Signup = () => {
             </Label>
           </div>
 
-          <Button onClick={handleMagicLink} className="w-full h-12 text-base" size="lg">
-            <Mail className="mr-2 h-5 w-5" />
-            Get magic link
+          <Button onClick={handleSignup} className="w-full h-12 text-base" size="lg">
+            Create account
           </Button>
-
-          {magicLinkSent && (
-            <p className="text-sm text-muted-foreground text-center">
-              We emailed you a secure sign-in link
-            </p>
-          )}
-
-          <p className="text-sm text-muted-foreground text-center pt-2">
-            You can add teammates later
-          </p>
         </div>
 
         <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground pt-4">
