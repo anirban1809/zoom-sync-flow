@@ -3,22 +3,16 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const Login = () => {
   const { theme, setTheme } = useTheme();
   const [email, setEmail] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
-
-  const handleMagicLink = () => {
-    setMagicLinkSent(true);
-  };
 
   const handleLogin = () => {
-    console.log("Login with password");
+    console.log("Login with email and password");
   };
 
   return (
@@ -69,43 +63,25 @@ const Login = () => {
             />
           </div>
 
-          {!showPassword ? (
-            <>
-              <Button onClick={handleMagicLink} className="w-full h-12 text-base" size="lg">
-                <Mail className="mr-2 h-5 w-5" />
-                Get magic link
-              </Button>
-              {magicLinkSent && (
-                <p className="text-sm text-muted-foreground text-center">
-                  We emailed you a secure sign-in link
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 text-base"
-                />
-              </div>
-              <Button onClick={handleLogin} className="w-full h-12 text-base" size="lg">
-                Login
-              </Button>
-            </>
-          )}
-
-          <div className="text-center">
-            <button
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-sm text-primary hover:underline"
-            >
-              {showPassword ? "Use magic link instead" : "Use password instead"}
-            </button>
+          <div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-12 text-base"
+            />
           </div>
+
+          <div className="text-right">
+            <Link to="/password-reset" className="text-sm text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+
+          <Button onClick={handleLogin} className="w-full h-12 text-base" size="lg">
+            Login
+          </Button>
         </div>
 
         <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground pt-4">
