@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Settings,
   Users,
@@ -57,41 +57,74 @@ const users = [
     email: "alex@acme.com",
     role: "Admin",
     status: "active",
-    lastActive: "2 minutes ago",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
   },
-  {
-    id: "2",
-    name: "Sarah Johnson",
-    email: "sarah@acme.com",
-    role: "Manager",
-    status: "active",
-    lastActive: "1 hour ago",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-  },
-  {
-    id: "3",
-    name: "John Smith",
-    email: "john@acme.com",
-    role: "Member",
-    status: "active",
-    lastActive: "3 hours ago",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-  },
-  {
-    id: "4",
-    name: "Lisa Wang",
-    email: "lisa@acme.com",
-    role: "Member",
-    status: "invited",
-    lastActive: "Never",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
-  },
+  // {
+  //   id: "2",
+  //   name: "Sarah Johnson",
+  //   email: "sarah@acme.com",
+  //   role: "Manager",
+  //   status: "active",
+  //   lastActive: "1 hour ago",
+  //   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarab",
+  // },
+  // {
+  //   id: "3",
+  //   name: "John Smith",
+  //   email: "john@acme.com",
+  //   role: "Member",
+  //   status: "active",
+  //   lastActive: "3 hours ago",
+  //   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+  // },
+  // {
+  //   id: "4",
+  //   name: "Lisa Wang",
+  //   email: "lisa@acme.com",
+  //   role: "Member",
+  //   status: "invited",
+  //   lastActive: "Never",
+  //   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa",
+  // },
 ];
 
 export default function Admin() {
   const [selectedTab, setSelectedTab] = useState("users");
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({
+    manager: {
+      viewAllMeetings: true,
+      viewTranscripts: true,
+      exportMeetings: true,
+      shareExternally: true,
+      manageIntegrations: true,
+      manageUsers: true,
+    },
+    admin: {
+      viewAllMeetings: true,
+      viewTranscripts: true,
+      exportMeetings: true,
+      shareExternally: true,
+      manageIntegrations: true,
+      manageUsers: true,
+    },
+    member: {
+      viewAllMeetings: true,
+      viewTranscripts: true,
+      exportMeetings: true,
+      shareExternally: true,
+      manageIntegrations: true,
+      manageUsers: true,
+    },
+  });
+
+  const [currentRole, setCurrentRole] = useState("admin");
+
+  useEffect(() => {
+    console.log("Fetching all users");
+    setCurrentRole("manager");
+  }, []);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -148,7 +181,6 @@ export default function Admin() {
                       <TableHead>User</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Last Active</TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -188,9 +220,6 @@ export default function Admin() {
                             <span className="capitalize">{user.status}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {user.lastActive}
-                        </TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -226,7 +255,11 @@ export default function Admin() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                      onChange={() => {
+                        console.log("changed role");
+                      }}
+                    >
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
                       <SelectItem value="member">Member</SelectItem>
@@ -236,7 +269,10 @@ export default function Admin() {
 
                 <div className="space-y-4 pt-4">
                   {[
-                    { label: "View all meetings", enabled: true },
+                    {
+                      label: "View all meetings",
+                      enabled: rolePermissions[currentRole].viewAllMeetings,
+                    },
                     { label: "View transcripts", enabled: true },
                     { label: "Export meetings", enabled: true },
                     { label: "Share externally", enabled: false },
