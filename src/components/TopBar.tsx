@@ -1,6 +1,7 @@
 import { Search, Plus, Bell, ChevronDown, Moon, Sun, CheckCircle2, AlertCircle, Info, Building2, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -91,6 +92,7 @@ const mockWorkspaces = [
 
 export function TopBar() {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
   const unreadCount = mockNotifications.filter(n => !n.read).length;
 
@@ -244,7 +246,7 @@ export function TopBar() {
               Switch Workspace
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Sign Out</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/login')}>Sign Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
