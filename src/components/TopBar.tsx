@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { apiFetch } from "@/lib/api/api";
 
 const mockNotifications = [
   {
@@ -274,10 +275,10 @@ export function TopBar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={async () => {
-                await fetch(
-                  "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/logout",
-                  { method: "POST", body: JSON.stringify({}) }
-                );
+                await apiFetch("/auth/logout", {
+                  method: "POST",
+                  body: JSON.stringify({}),
+                });
                 sessionStorage.removeItem("access_token");
                 navigate("/login");
               }}

@@ -41,7 +41,7 @@ const Login = () => {
         setErr(res.message);
       } else {
         // Success — tokens are in memory in the helper
-        setAccessToken(res.idToken, 3500);
+        setAccessToken(res.idToken, 60);
         nav("/"); // or wherever your app’s home is
       }
     } finally {

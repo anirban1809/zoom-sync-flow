@@ -8,6 +8,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   if (!token) throw new Error("Not authenticated");
 
   const headers = new Headers(options.headers);
+  options.credentials = "include";
   headers.set("Authorization", `Bearer ${token}`);
   return fetch(`${host}${path}`, {
     ...options,
