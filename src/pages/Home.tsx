@@ -37,6 +37,7 @@ const statusColors = {
 
 export default function Home() {
   const [userInfo, setUserInfo] = useState<any>({});
+  const [loading, setLoading] = useState(true);
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
@@ -46,14 +47,33 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const res = await apiFetch("/me");
-      setUserInfo(await res.json());
+      try {
+        const res = await apiFetch("/me");
+        setUserInfo(await res.json());
+      } catch (error) {
+        console.error("Failed to fetch user info:", error);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
   const upcomingTasks = mockTasks
     .filter((t) => t.status !== "done")
     .slice(0, 5);
+
+  if (loading) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-3">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
