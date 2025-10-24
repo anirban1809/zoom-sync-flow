@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, Video, User, Flag, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,29 +25,43 @@ import { CreateMeetingModal } from "@/components/CreateMeetingModal";
 import { Task, Meeting } from "@/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { getAccessToken } from "@/lib/api/auth";
+import { apiFetch } from "@/lib/api/api";
 
 const statusColors = {
-  'todo': 'bg-muted text-muted-foreground',
-  'in-progress': 'bg-info/10 text-info border-info/20',
-  'done': 'bg-success/10 text-success border-success/20',
-  'cancelled': 'bg-muted text-muted-foreground',
+  todo: "bg-muted text-muted-foreground",
+  "in-progress": "bg-info/10 text-info border-info/20",
+  done: "bg-success/10 text-success border-success/20",
+  cancelled: "bg-muted text-muted-foreground",
 } as const;
 
 export default function Home() {
+  const [userInfo, setUserInfo] = useState<any>({});
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
-  
-  const upcomingTasks = mockTasks.filter((t) => t.status !== 'done').slice(0, 5);
+
+  useEffect(() => {
+    (async () => {
+      const res = await apiFetch("/me");
+      setUserInfo(await res.json());
+    })();
+  }, []);
+
+  const upcomingTasks = mockTasks
+    .filter((t) => t.status !== "done")
+    .slice(0, 5);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Good morning, Anirban</h1>
+          <h1 className="text-3xl font-bold">
+            Good morning, {userInfo?.user?.given_name}
+          </h1>
           <p className="text-muted-foreground mt-1">
             Here's what's happening today
           </p>
@@ -79,9 +93,9 @@ export default function Home() {
           <CardContent className="space-y-3">
             {todaysMeetings.length > 0 ? (
               todaysMeetings.map((meeting) => (
-                <MeetingCard 
-                  key={meeting.id} 
-                  meeting={meeting} 
+                <MeetingCard
+                  key={meeting.id}
+                  meeting={meeting}
                   onClick={() => setSelectedMeeting(meeting)}
                 />
               ))
@@ -104,7 +118,11 @@ export default function Home() {
           <CardContent className="space-y-2">
             {upcomingTasks.length > 0 ? (
               upcomingTasks.map((task) => (
-                <div key={task.id} onClick={() => setSelectedTask(task)} className="cursor-pointer">
+                <div
+                  key={task.id}
+                  onClick={() => setSelectedTask(task)}
+                  className="cursor-pointer"
+                >
                   <TaskRow task={task} />
                 </div>
               ))
@@ -124,13 +142,15 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-3">
           {mockMeetings.length > 0 ? (
-            mockMeetings.slice(0, 3).map((meeting) => (
-              <MeetingCard
-                key={meeting.id}
-                meeting={meeting}
-                showActions={false}
-              />
-            ))
+            mockMeetings
+              .slice(0, 3)
+              .map((meeting) => (
+                <MeetingCard
+                  key={meeting.id}
+                  meeting={meeting}
+                  showActions={false}
+                />
+              ))
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <p>No recent meetings</p>
@@ -140,12 +160,17 @@ export default function Home() {
       </Card>
 
       {/* Meeting Details Modal */}
-      <Dialog open={!!selectedMeeting} onOpenChange={() => setSelectedMeeting(null)}>
+      <Dialog
+        open={!!selectedMeeting}
+        onOpenChange={() => setSelectedMeeting(null)}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           {selectedMeeting && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-xl">{selectedMeeting.title}</DialogTitle>
+                <DialogTitle className="text-xl">
+                  {selectedMeeting.title}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="mt-6 space-y-6">
@@ -153,7 +178,8 @@ export default function Home() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline">
                     <Clock className="h-3 w-3 mr-1" />
-                    {format(selectedMeeting.start, 'MMM d, yyyy h:mm a')} - {format(selectedMeeting.end, 'h:mm a')}
+                    {format(selectedMeeting.start, "MMM d, yyyy h:mm a")} -{" "}
+                    {format(selectedMeeting.end, "h:mm a")}
                   </Badge>
                   <Badge variant="outline" className="capitalize">
                     {selectedMeeting.status}
@@ -165,18 +191,30 @@ export default function Home() {
 
                 {/* Participants */}
                 <div>
-                  <h4 className="font-semibold text-sm mb-3">Participants ({selectedMeeting.participants.length})</h4>
+                  <h4 className="font-semibold text-sm mb-3">
+                    Participants ({selectedMeeting.participants.length})
+                  </h4>
                   <div className="space-y-2">
                     {selectedMeeting.participants.map((participant) => (
-                      <div key={participant.id} className="flex items-center gap-3">
+                      <div
+                        key={participant.id}
+                        className="flex items-center gap-3"
+                      >
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
-                            {participant.name.split(' ').map(n => n[0]).join('')}
+                            {participant.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="text-sm font-medium">{participant.name}</p>
-                          <p className="text-xs text-muted-foreground">{participant.role}</p>
+                          <p className="text-sm font-medium">
+                            {participant.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {participant.role}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -214,19 +252,24 @@ export default function Home() {
           {selectedTask && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-xl">{selectedTask.title}</DialogTitle>
+                <DialogTitle className="text-xl">
+                  {selectedTask.title}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="mt-6 space-y-6">
                 {/* Status chips */}
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className={cn("border", statusColors[selectedTask.status])}>
+                  <Badge
+                    variant="outline"
+                    className={cn("border", statusColors[selectedTask.status])}
+                  >
                     {selectedTask.status}
                   </Badge>
                   {selectedTask.due && (
                     <Badge variant="outline">
                       <Calendar className="h-3 w-3 mr-1" />
-                      {format(selectedTask.due, 'MMM d, yyyy')}
+                      {format(selectedTask.due, "MMM d, yyyy")}
                     </Badge>
                   )}
                   {selectedTask.ownerName && (
@@ -245,14 +288,27 @@ export default function Home() {
                       <h4 className="font-semibold text-sm">Origin Meeting</h4>
                     </div>
                     <p className="font-medium mb-1">
-                      {mockMeetings.find(m => m.id === selectedTask.meetingId)?.title}
+                      {
+                        mockMeetings.find(
+                          (m) => m.id === selectedTask.meetingId
+                        )?.title
+                      }
                     </p>
                     <p className="text-sm text-muted-foreground mb-2">
-                      {mockMeetings.find(m => m.id === selectedTask.meetingId)?.start 
-                        ? format(mockMeetings.find(m => m.id === selectedTask.meetingId)!.start, 'MMM d, yyyy h:mm a')
-                        : ''}
+                      {mockMeetings.find((m) => m.id === selectedTask.meetingId)
+                        ?.start
+                        ? format(
+                            mockMeetings.find(
+                              (m) => m.id === selectedTask.meetingId
+                            )!.start,
+                            "MMM d, yyyy h:mm a"
+                          )
+                        : ""}
                     </p>
-                    <Button variant="link" className="mt-2 p-0 h-auto text-xs text-primary">
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 h-auto text-xs text-primary"
+                    >
                       View meeting →
                     </Button>
                   </div>
@@ -261,7 +317,9 @@ export default function Home() {
                 {/* External Links */}
                 {selectedTask.externalLinks.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-sm mb-2">External Links</h4>
+                    <h4 className="font-semibold text-sm mb-2">
+                      External Links
+                    </h4>
                     <div className="space-y-2">
                       {selectedTask.externalLinks.map((link) => (
                         <a
@@ -291,7 +349,9 @@ export default function Home() {
                           placeholder="Add a comment… (use @mentions)"
                           className="min-h-[80px]"
                         />
-                        <Button size="sm" className="mt-2">Comment</Button>
+                        <Button size="sm" className="mt-2">
+                          Comment
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -306,7 +366,9 @@ export default function Home() {
                     </TabsList>
                   </Tabs>
                   <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    <p>Created {format(selectedTask.createdAt, 'MMM d, yyyy')}</p>
+                    <p>
+                      Created {format(selectedTask.createdAt, "MMM d, yyyy")}
+                    </p>
                   </div>
                 </div>
               </div>

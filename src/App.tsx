@@ -26,6 +26,7 @@ import Signup from "./pages/Signup";
 import PasswordReset from "./pages/PasswordReset";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./providers/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -36,31 +37,147 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/password-reset" element={<PasswordReset />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/" element={<AppShell><Home /></AppShell>} />
-          <Route path="/ai-chat" element={<AppShell><AIChat /></AppShell>} />
-          <Route path="/meetings" element={<AppShell><Meetings /></AppShell>} />
-          <Route path="/meetings/:id" element={<AppShell><MeetingDetail /></AppShell>} />
-          <Route path="/tasks" element={<AppShell><Tasks /></AppShell>} />
-          <Route path="/calendars" element={<AppShell><Calendars /></AppShell>} />
-          <Route path="/search" element={<AppShell><Search /></AppShell>} />
-          <Route path="/automations" element={<AppShell><Automations /></AppShell>} />
-          <Route path="/integrations" element={<AppShell><Integrations /></AppShell>} />
-          <Route path="/insights" element={<AppShell><Insights /></AppShell>} />
-          <Route path="/notifications" element={<AppShell><Notifications /></AppShell>} />
-          <Route path="/admin" element={<AppShell><Admin /></AppShell>} />
-          <Route path="/billing" element={<AppShell><Billing /></AppShell>} />
-          <Route path="/compliance" element={<AppShell><Compliance /></AppShell>} />
-          <Route path="/data-management" element={<AppShell><DataManagement /></AppShell>} />
-          <Route path="/help-support" element={<AppShell><HelpSupport /></AppShell>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/password-reset" element={<PasswordReset />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route
+              path="/"
+              element={
+                <AuthProvider>
+                  <AppShell>
+                    <Home />
+                  </AppShell>
+                </AuthProvider>
+              }
+            />
+            <Route
+              path="/ai-chat"
+              element={
+                <AppShell>
+                  <AIChat />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/meetings"
+              element={
+                <AppShell>
+                  <Meetings />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/meetings/:id"
+              element={
+                <AppShell>
+                  <MeetingDetail />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <AppShell>
+                  <Tasks />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/calendars"
+              element={
+                <AuthProvider>
+                  <AppShell>
+                    <Calendars />
+                  </AppShell>
+                </AuthProvider>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <AppShell>
+                  <Search />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/automations"
+              element={
+                <AppShell>
+                  <Automations />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/integrations"
+              element={
+                <AppShell>
+                  <Integrations />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/insights"
+              element={
+                <AppShell>
+                  <Insights />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <AppShell>
+                  <Notifications />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <AppShell>
+                  <Admin />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/billing"
+              element={
+                <AppShell>
+                  <Billing />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/compliance"
+              element={
+                <AppShell>
+                  <Compliance />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/data-management"
+              element={
+                <AppShell>
+                  <DataManagement />
+                </AppShell>
+              }
+            />
+            <Route
+              path="/help-support"
+              element={
+                <AppShell>
+                  <HelpSupport />
+                </AppShell>
+              }
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>

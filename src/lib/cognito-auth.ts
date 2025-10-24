@@ -21,55 +21,34 @@ let accessToken: string | null = null;
 let idToken: string | null = null;
 let refreshToken: string | null = null;
 
-export type SignInResult =
-  | {
-      kind: "OK";
-      accessToken: string;
-      idToken?: string | null;
-      refreshToken?: string | null;
-    }
-  | { kind: "MFA"; session: string; which: "SMS_MFA" | "SOFTWARE_TOKEN_MFA" }
-  | { kind: "NEW_PASSWORD_REQUIRED"; session: string }
-  | { kind: "ERROR"; message: string };
+export type SignInResult = {
+  kind?: string;
+  message?: string;
+  accessToken?: string;
+  idToken?: string | null;
+  refreshToken?: string | null;
+};
 
 export async function signIn(
   emailOrUsername: string,
   password: string
 ): Promise<SignInResult> {
-  try {
-    const r: InitiateAuthCommandOutput = await cip.send(
-      new InitiateAuthCommand({
-        ClientId: APP_CLIENT_ID,
-        AuthFlow: "USER_PASSWORD_AUTH",
-        AuthParameters: { USERNAME: emailOrUsername, PASSWORD: password },
-      })
-    );
-
-    if (
-      r.ChallengeName === "SMS_MFA" ||
-      r.ChallengeName === "SOFTWARE_TOKEN_MFA"
-    ) {
-      return { kind: "MFA", session: r.Session!, which: r.ChallengeName };
+  const response = await fetch(
+    "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/login",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        email: emailOrUsername,
+        password: password,
+      }),
     }
-    if (r.ChallengeName === "NEW_PASSWORD_REQUIRED") {
-      return { kind: "NEW_PASSWORD_REQUIRED", session: r.Session! };
-    }
+  );
 
-    const auth = r.AuthenticationResult!;
-    accessToken = auth.AccessToken ?? null;
-    idToken = auth.IdToken ?? null;
-    refreshToken = auth.RefreshToken ?? null;
-
-    return { kind: "OK", accessToken: accessToken!, idToken, refreshToken };
-  } catch (e: any) {
-    const msg =
-      e?.name === "NotAuthorizedException"
-        ? "Incorrect email/username or password."
-        : e?.name === "UserNotConfirmedException"
-        ? "Email not confirmed. Please verify your account."
-        : e?.message || "Login failed.";
-    return { kind: "ERROR", message: msg };
+  if (!response.ok) {
+    console.log(response.json());
+    return { kind: "ERROR", message: "Incorrect username or password" };
   }
+  return response.json();
 }
 
 export async function answerMfa(

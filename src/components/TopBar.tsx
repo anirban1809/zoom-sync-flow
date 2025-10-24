@@ -1,9 +1,21 @@
-import { Search, Plus, Bell, ChevronDown, Moon, Sun, CheckCircle2, AlertCircle, Info, Building2, Check } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  Search,
+  Plus,
+  Bell,
+  ChevronDown,
+  Moon,
+  Sun,
+  CheckCircle2,
+  AlertCircle,
+  Info,
+  Building2,
+  Check,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,81 +23,85 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 const mockNotifications = [
   {
-    id: '1',
-    type: 'success',
-    title: 'Meeting recorded',
-    message: 'Q4 Planning Meeting has been successfully recorded and processed',
-    time: '5 min ago',
+    id: "1",
+    type: "success",
+    title: "Meeting recorded",
+    message: "Q4 Planning Meeting has been successfully recorded and processed",
+    time: "5 min ago",
     read: false,
   },
   {
-    id: '2',
-    type: 'info',
-    title: 'New task assigned',
+    id: "2",
+    type: "info",
+    title: "New task assigned",
     message: 'You have been assigned to "Review marketing proposal"',
-    time: '1 hour ago',
+    time: "1 hour ago",
     read: false,
   },
   {
-    id: '3',
-    type: 'alert',
-    title: 'Upcoming meeting',
-    message: 'Team Sync starts in 15 minutes',
-    time: '2 hours ago',
+    id: "3",
+    type: "alert",
+    title: "Upcoming meeting",
+    message: "Team Sync starts in 15 minutes",
+    time: "2 hours ago",
     read: false,
   },
   {
-    id: '4',
-    type: 'success',
-    title: 'Task completed',
+    id: "4",
+    type: "success",
+    title: "Task completed",
     message: 'Sarah completed "Update website copy"',
-    time: '3 hours ago',
+    time: "3 hours ago",
     read: true,
   },
   {
-    id: '5',
-    type: 'info',
-    title: 'New integration',
-    message: 'Slack integration is now active',
-    time: '1 day ago',
+    id: "5",
+    type: "info",
+    title: "New integration",
+    message: "Slack integration is now active",
+    time: "1 day ago",
     read: true,
   },
 ];
 
 const mockWorkspaces = [
   {
-    id: '1',
-    name: 'Acme Corp',
-    role: 'Owner',
+    id: "1",
+    name: "Acme Corp",
+    role: "Owner",
     current: true,
   },
   {
-    id: '2',
-    name: 'TechStart Inc',
-    role: 'Admin',
+    id: "2",
+    name: "TechStart Inc",
+    role: "Admin",
     current: false,
   },
   {
-    id: '3',
-    name: 'Design Studio',
-    role: 'Member',
+    id: "3",
+    name: "Design Studio",
+    role: "Member",
     current: false,
   },
 ];
@@ -94,23 +110,23 @@ export function TopBar() {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
-  const unreadCount = mockNotifications.filter(n => !n.read).length;
+  const unreadCount = mockNotifications.filter((n) => !n.read).length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success':
+      case "success":
         return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'alert':
+      case "alert":
         return <AlertCircle className="h-4 w-4 text-orange-500" />;
       default:
         return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
-  
+
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-6">
       <SidebarTrigger />
-      
+
       <div className="flex flex-1 items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -141,10 +157,10 @@ export function TopBar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
@@ -165,7 +181,11 @@ export function TopBar() {
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="font-semibold">Notifications</h3>
               {unreadCount > 0 && (
-                <Button variant="ghost" size="sm" className="h-auto p-0 text-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 text-xs"
+                >
                   Mark all as read
                 </Button>
               )}
@@ -177,11 +197,13 @@ export function TopBar() {
                     <div key={notification.id}>
                       <button
                         className={`w-full text-left p-3 rounded-lg hover:bg-accent transition-colors ${
-                          !notification.read ? 'bg-accent/50' : ''
+                          !notification.read ? "bg-accent/50" : ""
                         }`}
                       >
                         <div className="flex gap-3">
-                          <div className="mt-1">{getNotificationIcon(notification.type)}</div>
+                          <div className="mt-1">
+                            {getNotificationIcon(notification.type)}
+                          </div>
                           <div className="flex-1 space-y-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <p className="text-sm font-medium leading-tight">
@@ -209,7 +231,9 @@ export function TopBar() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <Bell className="h-12 w-12 text-muted-foreground/40 mb-4" />
-                  <p className="text-sm text-muted-foreground">No notifications yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    No notifications yet
+                  </p>
                 </div>
               )}
             </ScrollArea>
@@ -236,7 +260,9 @@ export function TopBar() {
             <DropdownMenuLabel>
               <div className="flex flex-col">
                 <span className="text-sm font-medium">Alex Kim</span>
-                <span className="text-xs text-muted-foreground">alex@acme.com</span>
+                <span className="text-xs text-muted-foreground">
+                  alex@acme.com
+                </span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -246,12 +272,26 @@ export function TopBar() {
               Switch Workspace
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/login')}>Sign Out</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                await fetch(
+                  "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/logout",
+                  { method: "POST", body: JSON.stringify({}) }
+                );
+                sessionStorage.removeItem("access_token");
+                navigate("/login");
+              }}
+            >
+              Sign Out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      <Dialog open={showWorkspaceSwitcher} onOpenChange={setShowWorkspaceSwitcher}>
+      <Dialog
+        open={showWorkspaceSwitcher}
+        onOpenChange={setShowWorkspaceSwitcher}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Switch Workspace</DialogTitle>
@@ -276,7 +316,9 @@ export function TopBar() {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium">{workspace.name}</p>
-                  <p className="text-sm text-muted-foreground">{workspace.role}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {workspace.role}
+                  </p>
                 </div>
                 {workspace.current && (
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />

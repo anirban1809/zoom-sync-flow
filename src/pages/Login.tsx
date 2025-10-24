@@ -12,6 +12,7 @@ import {
   hostedUiRedirect,
   type SignInResult,
 } from "@/lib/cognito-auth";
+import { setAccessToken } from "@/lib/api/auth";
 
 const Login = () => {
   const { theme, setTheme } = useTheme();
@@ -38,20 +39,9 @@ const Login = () => {
       const res: SignInResult = await signIn(emailOrUsername.trim(), password);
       if (res.kind === "ERROR") {
         setErr(res.message);
-      } else if (res.kind === "MFA") {
-        setSession(res.session);
-        setStage("MFA");
-        setMsg(
-          res.which === "SMS_MFA"
-            ? "Enter the code we sent via SMS."
-            : "Enter your authenticator app code."
-        );
-      } else if (res.kind === "NEW_PASSWORD_REQUIRED") {
-        setSession(res.session);
-        setStage("NEWPW");
-        setMsg("You must set a new password to continue.");
       } else {
         // Success — tokens are in memory in the helper
+        setAccessToken(res.idToken, 3500);
         nav("/"); // or wherever your app’s home is
       }
     } finally {
@@ -109,7 +99,7 @@ const Login = () => {
 
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-8">Recordin</h1>
+          <h1 className="text-4xl font-bold mb-8">Log in to luminote.ai</h1>
         </div>
 
         {/* Hosted UI buttons */}
