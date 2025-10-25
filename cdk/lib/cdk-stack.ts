@@ -32,7 +32,6 @@ export class ReactHostingStack extends Stack {
       bucketName: `${envName}-react-site-${this.account}-${this.region}`,
       websiteIndexDocument: "index.html",
       websiteErrorDocument: "index.html",
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       autoDeleteObjects: true,
       removalPolicy:
         envName === "production" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY, // keep prod, destroy staging
