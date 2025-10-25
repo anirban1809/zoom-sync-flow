@@ -13,6 +13,7 @@ import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 interface ReactHostingStackProps extends StackProps {
   envName: string;
@@ -45,6 +46,12 @@ export class ReactHostingStack extends Stack {
 
     siteBucket.grantRead(originAccess);
 
+    const certificate = Certificate.fromCertificateArn(
+      this,
+      `${envName}-Certificate`,
+      "arn:aws:acm:us-east-1:779844646698:certificate/abbdc0d1-5d22-42f4-9b18-606f985db085"
+    );
+
     const distribution = new cloudfront.Distribution(
       this,
       `${envName}-CloudFrontDist`,
@@ -54,6 +61,8 @@ export class ReactHostingStack extends Stack {
           viewerProtocolPolicy:
             cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         },
+        domainNames: ["staging.luminote.ai"],
+        certificate,
         defaultRootObject: "index.html",
         comment: `React Hosting (${envName})`,
         priceClass:
