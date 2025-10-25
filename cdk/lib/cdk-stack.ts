@@ -100,7 +100,7 @@ export class ReactHostingStack extends Stack {
 
     // Deploy the React build folder (relative to repo root)
     new s3deploy.BucketDeployment(this, `${envName}-DeployReact`, {
-      sources: [s3deploy.Source.asset("../build")],
+      sources: [s3deploy.Source.asset("../dist")],
       destinationBucket: siteBucket,
       distribution,
       distributionPaths: ["/*"],
