@@ -72,16 +72,11 @@ jobs:
 
       - name: Bootstrap CDK environment
         run: |
-          cd cdk
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          echo "Bootstrapping for account $ACCOUNT_ID in ${AWS_REGION}"
-          npx cdk bootstrap aws://$ACCOUNT_ID/${AWS_REGION}
+          cd cdk && cdk bootstrap aws://$ACCOUNT_ID/${AWS_REGION}
 
       - name: Deploy CDK stack
         run: |
-          cd cdk
-          echo "Deploying ReactHostingStack-${APP_ENV}..."
-          npx cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
+          cd cdk && cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
 
       - name: Display CDK outputs
         run: |
