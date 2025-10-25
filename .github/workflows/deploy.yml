@@ -1,0 +1,72 @@
+name: Deploy React App with CDK (Staging & Production)
+
+on:
+  push:
+    branches:
+      - main
+      - live
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
+      CDK_APP_PATH: ./cdk
+      # Determine environment based on branch
+      APP_ENV: ${{ github.ref_name == 'live' && 'production' || 'staging' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Display environment
+        run: |
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Environment: $APP_ENV"
+
+      # --- Build React app ---
+      - name: Install React dependencies
+        run: npm ci
+
+      - name: Build React app
+        run: |
+          echo "REACT_APP_ENV=$APP_ENV" >> $GITHUB_ENV
+          npm run build
+
+      # --- CDK setup ---
+      - name: Install CDK dependencies
+        run: |
+          cd $CDK_APP_PATH
+          npm ci
+
+      # --- Configure AWS access via OIDC ---
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ github.ref_name == 'live' && 'arn:aws:iam::779844646698:role/luminote-ui-role-prod' || 'arn:aws:iam::779844646698:role/luminote-ui-role-staging' }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # --- Deploy CDK stack ---
+      - name: Deploy CDK Stack
+        run: |
+          cd $CDK_APP_PATH
+          npm run build
+          npx cdk bootstrap
+          npx cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
+
+      # --- Show outputs for visibility ---
+      - name: Display CDK Outputs
+        run: |
+          cd $CDK_APP_PATH
+          npx cdk outputs

@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 // simple cache using sessionStorage
 export function setAccessToken(token: string, expiresInSec: number) {
   const expiry = Date.now() + expiresInSec * 1000;
@@ -24,7 +26,10 @@ export async function refreshAccessToken(): Promise<string | null> {
       credentials: "include",
     }
   );
-  if (!res.ok) return null;
+  if (!res.ok) {
+    window.location.href = "/login";
+    return null;
+  }
   const data = await res.json();
   setAccessToken(data.accessToken, data.expiresIn);
   return data.accessToken;

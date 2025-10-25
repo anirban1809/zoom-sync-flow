@@ -97,7 +97,10 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-3 border rounded-lg">
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 border rounded-lg"
+                >
                   <Skeleton className="h-4 w-4 rounded" />
                   <Skeleton className="h-4 flex-1" />
                 </div>

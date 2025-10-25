@@ -12,6 +12,7 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   headers.set("Authorization", `Bearer ${token}`);
   return fetch(`${host}${path}`, {
     ...options,
+    credentials: "include",
     headers,
   });
 }
