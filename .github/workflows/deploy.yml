@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write # required for OIDC
+  id-token: write
   contents: read
 
 jobs:
@@ -18,7 +18,6 @@ jobs:
     env:
       AWS_REGION: us-east-1
       CDK_APP_PATH: ./cdk
-      # Automatically pick environment based on branch
       APP_ENV: ${{ github.ref_name == 'live' && 'production' || 'staging' }}
 
     steps:
@@ -33,11 +32,12 @@ jobs:
       - name: Display environment info
         run: |
           echo "Branch: $GITHUB_REF_NAME"
-          echo "App Env: $APP_ENV"
+          echo "Environment: $APP_ENV"
+          echo "AWS Region: $AWS_REGION"
 
-      # -------------------------------
-      # Build React App (output: dist/)
-      # -------------------------------
+      # -------------------------------------
+      # React build steps
+      # -------------------------------------
       - name: Install React dependencies
         run: npm ci
 
@@ -46,53 +46,49 @@ jobs:
           echo "REACT_APP_ENV=$APP_ENV" >> $GITHUB_ENV
           npm run build
 
-      # -------------------------------
-      # Configure AWS credentials via OIDC
-      # -------------------------------
-      - name: Configure AWS credentials via OIDC
+      # -------------------------------------
+      # Configure AWS OIDC Credentials
+      # -------------------------------------
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ github.ref_name == 'live' && 'arn:aws:iam::<ACCOUNT_ID>:role/GitHubActionsDeployRole-Prod' || 'arn:aws:iam::<ACCOUNT_ID>:role/GitHubActionsDeployRole-Staging' }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # -------------------------------
-      # Install CDK dependencies
-      # -------------------------------
+      # -------------------------------------
+      # CDK steps
+      # -------------------------------------
       - name: Install CDK dependencies
-        working-directory: ${{ env.CDK_APP_PATH }}
-        run: npm ci
-
-      # -------------------------------
-      # Verify CDK sees stacks
-      # -------------------------------
-      - name: Verify CDK stack visibility
-        working-directory: ${{ env.CDK_APP_PATH }}
         run: |
-          echo "Verifying CDK app from $(pwd)"
-          if ! npx cdk ls; then
-            echo "❌ No CDK stacks detected — check bin/app.ts or env variable setup."
-            exit 1
-          fi
+          cd cdk
+          npm ci
 
-      # -------------------------------
-      # Build & Deploy CDK Stack
-      # -------------------------------
-      - name: Build & Deploy CDK Stack
-        working-directory: ${{ env.CDK_APP_PATH }}
+      - name: Build CDK project
         run: |
-          echo "Running CDK from $(pwd)"
+          cd cdk
           npm run build
-          echo "Bootstrapping account..."
+
+      - name: Verify CDK stack visibility
+        run: |
+          cd cdk
+          echo "Listing available stacks..."
+          npx cdk ls || { echo "❌ No stacks detected — check bin/app.ts or APP_ENV"; exit 1; }
+
+      - name: Bootstrap CDK environment
+        run: |
+          cd cdk
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "Bootstrapping for account $ACCOUNT_ID in ${AWS_REGION}"
           npx cdk bootstrap aws://$ACCOUNT_ID/${AWS_REGION}
-          echo "Deploying stack ReactHostingStack-${APP_ENV}..."
+
+      - name: Deploy CDK stack
+        run: |
+          cd cdk
+          echo "Deploying ReactHostingStack-${APP_ENV}..."
           npx cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
 
-      # -------------------------------
-      # Show CDK Outputs
-      # -------------------------------
-      - name: Display CDK Outputs
-        working-directory: ${{ env.CDK_APP_PATH }}
+      - name: Display CDK outputs
         run: |
-          echo "Stack outputs:"
+          cd cdk
+          echo "CDK Outputs:"
           npx cdk outputs
