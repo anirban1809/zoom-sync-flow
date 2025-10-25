@@ -60,19 +60,15 @@ jobs:
       # -------------------------------------
       - name: Install CDK dependencies
         run: |
-          cd cdk
-          npm ci
+          cd cdk && npm ci
 
       - name: Build CDK project
         run: |
-          cd cdk
-          npm run build
+          cd cdk && npm run build
 
       - name: Verify CDK stack visibility
         run: |
-          cd cdk
-          echo "Listing available stacks..."
-          npx cdk ls || { echo "❌ No stacks detected — check bin/app.ts or APP_ENV"; exit 1; }
+          cd cdk && npx cdk ls || { echo "❌ No stacks detected — check bin/app.ts or APP_ENV"; exit 1; }
 
       - name: Bootstrap CDK environment
         run: |
