@@ -36,6 +36,27 @@ const statusColors = {
   cancelled: "bg-muted text-muted-foreground",
 } as const;
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  
+  if (hour < 12) {
+    return {
+      greeting: "Good morning",
+      caption: "Here's what's happening today"
+    };
+  } else if (hour < 16) {
+    return {
+      greeting: "Good afternoon",
+      caption: "Let's keep the momentum going."
+    };
+  } else {
+    return {
+      greeting: "Good evening",
+      caption: "Time to wrap up the day's goals."
+    };
+  }
+};
+
 export default function Home() {
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
@@ -45,6 +66,7 @@ export default function Home() {
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
+  const { greeting, caption } = getGreeting();
 
   useEffect(() => {
     (async () => {
@@ -132,10 +154,10 @@ export default function Home() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Good morning, {userInfo?.user?.given_name}
+            {greeting}, {userInfo?.user?.given_name}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Here's what's happening today
+            {caption}
           </p>
         </div>
         <div className="flex gap-2">
