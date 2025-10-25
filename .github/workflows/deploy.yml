@@ -58,6 +58,10 @@ jobs:
       # -------------------------------------
       # CDK steps
       # -------------------------------------
+      - name: Install CDK
+        run: |
+          npm i -g aws-cdk
+
       - name: Install CDK dependencies
         run: |
           cd cdk && npm ci
