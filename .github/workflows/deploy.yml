@@ -44,12 +44,6 @@ jobs:
           echo "REACT_APP_ENV=$APP_ENV" >> $GITHUB_ENV
           npm run build
 
-      # --- CDK setup ---
-      - name: Install CDK dependencies
-        run: |
-          cd $CDK_APP_PATH
-          npm ci
-
       # --- Configure AWS access via OIDC ---
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -61,6 +55,8 @@ jobs:
       - name: Deploy CDK Stack
         run: |
           cd $CDK_APP_PATH
+          pwd
+          npm ci
           npm run build
           npx cdk bootstrap
           npx cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
@@ -69,4 +65,5 @@ jobs:
       - name: Display CDK Outputs
         run: |
           cd $CDK_APP_PATH
+          pwd
           npx cdk outputs
