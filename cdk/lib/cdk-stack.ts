@@ -38,6 +38,14 @@ export class ReactHostingStack extends Stack {
         envName === "production" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY, // keep prod, destroy staging
     });
 
+    const originAccess = new cloudfront.OriginAccessIdentity(
+      this,
+      `${envName}-OAI`,
+      { comment: `Access for CloudFront (${envName})` }
+    );
+
+    siteBucket.grantRead(originAccess);
+
     const distribution = new cloudfront.Distribution(
       this,
       `${envName}-CloudFrontDist`,
