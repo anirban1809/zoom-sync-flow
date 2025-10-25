@@ -76,7 +76,7 @@ jobs:
 
       - name: Bootstrap CDK environment
         run: |
-          cd cdk && cdk bootstrap aws://$ACCOUNT_ID/${AWS_REGION}
+          cd cdk && cdk bootstrap aws://779844646698/${AWS_REGION}
 
       - name: Deploy CDK stack
         run: |
