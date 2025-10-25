@@ -52,7 +52,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ github.ref_name == 'live' && 'arn:aws:iam::<ACCOUNT_ID>:role/GitHubActionsDeployRole-Prod' || 'arn:aws:iam::<ACCOUNT_ID>:role/GitHubActionsDeployRole-Staging' }}
+          role-to-assume: ${{ github.ref_name == 'live' && 'arn:aws:iam::779844646698:role/luminote-ui-role-prod' || 'arn:aws:iam::779844646698:role/luminote-ui-role-staging' }}
           aws-region: ${{ env.AWS_REGION }}
 
       # -------------------------------------
