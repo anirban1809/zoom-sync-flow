@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write # Required for OIDC
+  id-token: write
   contents: read
 
 jobs:
@@ -18,7 +18,6 @@ jobs:
     env:
       AWS_REGION: us-east-1
       CDK_APP_PATH: ./cdk
-      # Determine environment based on branch
       APP_ENV: ${{ github.ref_name == 'live' && 'production' || 'staging' }}
 
     steps:
@@ -30,12 +29,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Display environment
+      - name: Display environment info
         run: |
           echo "Branch: $GITHUB_REF_NAME"
-          echo "Environment: $APP_ENV"
+          echo "App Env: $APP_ENV"
 
-      # --- Build React app ---
+      # Build React app
       - name: Install React dependencies
         run: npm ci
 
@@ -44,26 +43,25 @@ jobs:
           echo "REACT_APP_ENV=$APP_ENV" >> $GITHUB_ENV
           npm run build
 
-      # --- Configure AWS access via OIDC ---
-      - name: Configure AWS credentials (OIDC)
+      # Configure AWS access
+      - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ github.ref_name == 'live' && 'arn:aws:iam::779844646698:role/luminote-ui-role-prod' || 'arn:aws:iam::779844646698:role/luminote-ui-role-staging' }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # --- Deploy CDK stack ---
+      # Build and deploy CDK (runs in cdk/ directory)
+      - name: Install CDK dependencies
+        working-directory: ${{ env.CDK_APP_PATH }}
+        run: npm ci
+
       - name: Deploy CDK Stack
+        working-directory: ${{ env.CDK_APP_PATH }}
         run: |
-          cd $CDK_APP_PATH
-          pwd
-          npm ci
           npm run build
           npx cdk bootstrap
           npx cdk deploy ReactHostingStack-${APP_ENV} --require-approval never
 
-      # --- Show outputs for visibility ---
       - name: Display CDK Outputs
-        run: |
-          cd $CDK_APP_PATH
-          pwd
-          npx cdk outputs
+        working-directory: ${{ env.CDK_APP_PATH }}
+        run: npx cdk outputs
