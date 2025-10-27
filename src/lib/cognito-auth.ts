@@ -37,6 +37,7 @@ export async function signIn(
             email: emailOrUsername,
             password: password,
         }),
+        credentials: "include",
     });
 
     if (!response.ok) {
