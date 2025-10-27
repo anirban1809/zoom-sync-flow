@@ -64,7 +64,7 @@ const PasswordReset = () => {
             setMsg("Password reset successful. You can now log in.");
             // optional: small delay, then navigate
             setTimeout(() => nav("/login"), 800);
-        } catch (e: any) {
+        } catch (e) {
             // Common: CodeMismatchException, ExpiredCodeException, InvalidPasswordException
             const m =
                 e?.name === "CodeMismatchException"

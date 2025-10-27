@@ -12,18 +12,15 @@ export async function signUp(
     firstName: string,
     lastName: string
 ) {
-    const response = await fetch(
-        "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/signup",
-        {
-            method: "POST",
-            body: JSON.stringify({
-                email,
-                password,
-                firstName,
-                lastName,
-            }),
-        }
-    );
+    const response = await fetch("https://stagingapi.luminote.ai/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({
+            email,
+            password,
+            firstName,
+            lastName,
+        }),
+    });
 
     if (!response.ok) {
         console.log(response.json());
@@ -33,16 +30,13 @@ export async function signUp(
 }
 
 export async function cogConfirmSignUp(email: string, code: string) {
-    const response = await fetch(
-        "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/verify",
-        {
-            method: "POST",
-            body: JSON.stringify({
-                email,
-                code,
-            }),
-        }
-    );
+    const response = await fetch("https://stagingapi.luminote.ai/auth/verify", {
+        method: "POST",
+        body: JSON.stringify({
+            email,
+            code,
+        }),
+    });
 
     if (!response.ok) {
         console.log(response.json());
@@ -71,7 +65,7 @@ export function hostedUiRedirect(provider?: string) {
 
 export async function forgotPassword(usernameOrEmail: string) {
     const response = await fetch(
-        "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/forgot-password",
+        "https://stagingapi.luminote.ai/auth/forgot-password",
         {
             method: "POST",
             body: JSON.stringify({
@@ -96,7 +90,7 @@ export async function cogConfirmForgotPassword(
     newPassword: string
 ) {
     const response = await fetch(
-        "https://jkl3auy9fi.execute-api.us-east-1.amazonaws.com/v1/auth/reset-password",
+        "https://stagingapi.luminote.ai/auth/reset-password",
         {
             method: "POST",
             body: JSON.stringify({
