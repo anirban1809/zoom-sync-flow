@@ -26,6 +26,6 @@ export async function refreshAccessToken(): Promise<string | null> {
         return null;
     }
     const data = await res.json();
-    setAccessToken(data.accessToken, data.expiresIn);
-    return data.accessToken;
+    setAccessToken(data.idToken, data.expiresIn);
+    return data.idToken;
 }
