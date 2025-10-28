@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Check, Calendar, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, Calendar, Video, Mail, MessageSquare, X, Settings, ExternalLink } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,49 +15,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 
 interface OnboardingWizardProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-type OnboardingStep = "welcome" | "calendar" | "capture" | "recap" | "finish" | "invite";
+type OnboardingStep = "welcome" | "connect" | "workspace" | "defaults" | "privacy" | "complete";
+type IntentType = "personal" | "team" | "company" | null;
 
 const OnboardingWizard = ({ open, onOpenChange }: OnboardingWizardProps) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState<OnboardingStep>("welcome");
   
-  // Calendar state
-  const [calendarConnected, setCalendarConnected] = useState(false);
-  const [selectedCalendar, setSelectedCalendar] = useState<"google" | "outlook" | null>(null);
-  const [connectedEmail, setConnectedEmail] = useState("");
+  // Step 1: Welcome & Intent
+  const [intent, setIntent] = useState<IntentType>(null);
+  const [autoStart, setAutoStart] = useState(true);
+  const [language, setLanguage] = useState("en");
+  const [locale, setLocale] = useState("US");
   
-  // Capture state
-  const [autoJoinEnabled, setAutoJoinEnabled] = useState(true);
-  const [captureScope, setCaptureScope] = useState<"organize" | "all">("organize");
+  // Step 2: Connect
+  const [calendarProvider, setCalendarProvider] = useState<string | null>(null);
+  const [calendarEmail, setCalendarEmail] = useState("");
+  const [conferencingProvider, setConferencingProvider] = useState<string | null>(null);
+  const [conferencingEmail, setConferencingEmail] = useState("");
+  const [autoJoinOrganizer, setAutoJoinOrganizer] = useState(true);
+  const [askBeforeExternal, setAskBeforeExternal] = useState(true);
   
-  // Recap state
-  const [recapMethod, setRecapMethod] = useState<"email" | "slack">("email");
-  const [slackConnected, setSlackConnected] = useState(false);
-  const [slackChannel, setSlackChannel] = useState("");
-  const [includeDecisions, setIncludeDecisions] = useState(true);
-  const [includeTranscript, setIncludeTranscript] = useState(true);
-  
-  // Invite state
+  // Step 3: Workspace
+  const [workspaceName, setWorkspaceName] = useState("My Workspace");
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [currentEmail, setCurrentEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
+  const [requireSSO, setRequireSSO] = useState(false);
   
-  // Privacy acknowledgement
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  // Step 4: Meeting Defaults
+  const [recordMeetings, setRecordMeetings] = useState(true);
+  const [autoAnnounce, setAutoAnnounce] = useState(true);
+  const [transcriptionLanguage, setTranscriptionLanguage] = useState("en");
+  const [diarizeSpeakers, setDiarizeSpeakers] = useState(true);
+  const [captureMainRoom, setCaptureMainRoom] = useState(true);
+  const [captureBreakout, setCaptureBreakout] = useState(false);
+  const [captureChat, setCaptureChat] = useState(true);
+  const [detectActionItems, setDetectActionItems] = useState(true);
+  const [actionDestination, setActionDestination] = useState("tasks");
+  
+  // Step 5: Privacy
+  const [retentionDays, setRetentionDays] = useState("90");
+  const [allowAnalytics, setAllowAnalytics] = useState(false);
 
-  const handleConnectCalendar = (provider: "google" | "outlook") => {
-    setSelectedCalendar(provider);
-    setCalendarConnected(true);
-    setConnectedEmail(`user@${provider === "google" ? "gmail.com" : "outlook.com"}`);
+  const handleConnectCalendar = (provider: string) => {
+    setCalendarProvider(provider);
+    setCalendarEmail(`user@${provider === "google" ? "gmail.com" : "outlook.com"}`);
   };
 
-  const handleConnectSlack = () => {
-    setSlackConnected(true);
-    setSlackChannel("general");
+  const handleConnectConferencing = (provider: string) => {
+    setConferencingProvider(provider);
+    setConferencingEmail(`user@${provider === "google-meet" ? "gmail.com" : provider}.com`);
   };
 
   const addInviteEmail = () => {
@@ -71,8 +86,9 @@ const OnboardingWizard = ({ open, onOpenChange }: OnboardingWizardProps) => {
     setInviteEmails(inviteEmails.filter(e => e !== email));
   };
 
+  const stepOrder: OnboardingStep[] = ["welcome", "connect", "workspace", "defaults", "privacy", "complete"];
+  
   const handleNext = () => {
-    const stepOrder: OnboardingStep[] = ["welcome", "calendar", "capture", "recap", "finish"];
     const currentIndex = stepOrder.indexOf(step);
     if (currentIndex < stepOrder.length - 1) {
       setStep(stepOrder[currentIndex + 1]);
@@ -80,7 +96,6 @@ const OnboardingWizard = ({ open, onOpenChange }: OnboardingWizardProps) => {
   };
 
   const handleBack = () => {
-    const stepOrder: OnboardingStep[] = ["welcome", "calendar", "capture", "recap", "finish"];
     const currentIndex = stepOrder.indexOf(step);
     if (currentIndex > 0) {
       setStep(stepOrder[currentIndex - 1]);
@@ -92,376 +107,649 @@ const OnboardingWizard = ({ open, onOpenChange }: OnboardingWizardProps) => {
   };
 
   const handleFinish = () => {
-    if (!privacyAccepted) return;
-    setStep("invite");
+    setStep("complete");
   };
 
+  const getStepNumber = () => stepOrder.indexOf(step);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Step 1: Welcome */}
-        {step === "welcome" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Welcome to Recordin</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <p className="text-base text-muted-foreground">
-                Capture meetings, generate accurate summaries, and share action items automatically.
-              </p>
-              
-              <div className="space-y-3">
-                <p className="text-sm font-medium">What happens next:</p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 mt-0.5 text-primary" />
-                    <span>Connect your calendar</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 mt-0.5 text-primary" />
-                    <span>Enable automatic capture</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 mt-0.5 text-primary" />
-                    <span>Choose where recaps go</span>
-                  </li>
-                </ul>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+        {/* Top Bar */}
+        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b bg-background">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-lg">Recordin</span>
+          </div>
+          
+          {step !== "complete" && (
+            <>
+              {/* Stepper */}
+              <div className="flex items-center gap-2">
+                {stepOrder.slice(0, -1).map((s, idx) => (
+                  <div
+                    key={s}
+                    className={`h-2 w-2 rounded-full transition-all ${
+                      idx <= getStepNumber() ? "bg-primary" : "bg-muted"
+                    }`}
+                  />
+                ))}
               </div>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={handleSkip}>
-                Skip for now
-              </Button>
-              <Button onClick={handleNext} size="lg">
-                Get started
-              </Button>
-            </div>
-          </>
-        )}
 
-        {/* Step 2: Connect Calendar */}
-        {step === "calendar" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Connect calendar</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => handleConnectCalendar("google")}
-                  className={`flex items-center justify-center gap-3 p-6 rounded-lg border-2 transition-all ${
-                    calendarConnected && selectedCalendar === "google"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-muted-foreground"
-                  }`}
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={handleSkip}>
+                  Skip for now
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={handleNext}
+                  disabled={
+                    (step === "welcome" && !intent) ||
+                    (step === "connect" && (!calendarProvider || !conferencingProvider))
+                  }
                 >
-                  <Calendar className="h-6 w-6" />
-                  <span className="font-medium">Google Calendar</span>
-                </button>
-                
-                <button
-                  onClick={() => handleConnectCalendar("outlook")}
-                  className={`flex items-center justify-center gap-3 p-6 rounded-lg border-2 transition-all ${
-                    calendarConnected && selectedCalendar === "outlook"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-muted-foreground"
-                  }`}
-                >
-                  <Calendar className="h-6 w-6" />
-                  <span className="font-medium">Microsoft Outlook</span>
-                </button>
+                  Continue
+                </Button>
               </div>
+            </>
+          )}
+        </div>
 
-              {calendarConnected && (
-                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary" />
-                    <span className="font-medium">Connected:</span>
-                    <span className="text-muted-foreground">{connectedEmail}</span>
-                  </div>
-                </div>
-              )}
-
-              <p className="text-sm text-muted-foreground">
-                Used only to find meetings you organize or attend. No emails are read.
-              </p>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={handleSkip}>
-                Skip
-              </Button>
-              <Button 
-                onClick={handleNext} 
-                size="lg"
-                disabled={!calendarConnected}
-              >
-                Continue
-              </Button>
-            </div>
-          </>
-        )}
-
-        {/* Step 3: Turn on Capture */}
-        {step === "capture" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Turn on capture</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="space-y-1">
-                  <Label htmlFor="auto-join" className="text-base font-medium">
-                    Auto-join with recorder
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Joins your online meetings and captures transcript + audio where supported.
-                  </p>
-                </div>
-                <Switch 
-                  id="auto-join" 
-                  checked={autoJoinEnabled} 
-                  onCheckedChange={setAutoJoinEnabled} 
-                />
-              </div>
-
-              {autoJoinEnabled && (
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">Capture scope</Label>
-                  <RadioGroup value={captureScope} onValueChange={(val) => setCaptureScope(val as "organize" | "all")}>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                      <RadioGroupItem value="organize" id="organize" />
-                      <Label htmlFor="organize" className="flex-1 cursor-pointer">
-                        Only meetings I organize
-                        <Badge variant="secondary" className="ml-2">Default</Badge>
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                      <RadioGroupItem value="all" id="all" />
-                      <Label htmlFor="all" className="flex-1 cursor-pointer">
-                        All meetings I'm invited to
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              )}
-
-              {!calendarConnected && (
-                <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                  Auto-join works best with a connected calendar.
-                </p>
-              )}
-
-              <p className="text-xs text-muted-foreground">
-                Participants may see a recording notice. You're responsible for obtaining consent.
-              </p>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={handleBack}>
-                Back
-              </Button>
-              <Button onClick={handleNext} size="lg">
-                Continue
-              </Button>
-            </div>
-          </>
-        )}
-
-        {/* Step 4: Choose Recap Destination */}
-        {step === "recap" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Choose recap destination</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="space-y-4">
-                <Label className="text-base font-medium">Where should recaps go?</Label>
-                <RadioGroup value={recapMethod} onValueChange={(val) => setRecapMethod(val as "email" | "slack")}>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                    <RadioGroupItem value="email" id="email" />
-                    <Label htmlFor="email" className="flex-1 cursor-pointer">
-                      Email attendees
-                      <Badge variant="secondary" className="ml-2">Default</Badge>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                    <RadioGroupItem value="slack" id="slack" />
-                    <Label htmlFor="slack" className="flex-1 cursor-pointer">
-                      Slack channel
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {recapMethod === "slack" && !slackConnected && (
-                <div className="p-4 border rounded-lg">
-                  <Button onClick={handleConnectSlack} variant="outline" className="w-full">
-                    Connect Slack
-                  </Button>
-                </div>
-              )}
-
-              {recapMethod === "slack" && slackConnected && (
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-2xl mx-auto px-6 py-8">
+            
+            {/* Step 1: Welcome & Intent */}
+            {step === "welcome" && (
+              <div className="space-y-8">
                 <div className="space-y-2">
-                  <Label>Channel</Label>
-                  <Input 
-                    value={slackChannel} 
-                    onChange={(e) => setSlackChannel(e.target.value)}
-                    placeholder="#general"
-                  />
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <Label className="text-base font-medium">Content options</Label>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="decisions" 
-                    checked={includeDecisions} 
-                    onCheckedChange={(checked) => setIncludeDecisions(checked as boolean)}
-                  />
-                  <Label htmlFor="decisions" className="cursor-pointer">
-                    Include decisions and action items
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="transcript" 
-                    checked={includeTranscript} 
-                    onCheckedChange={(checked) => setIncludeTranscript(checked as boolean)}
-                  />
-                  <Label htmlFor="transcript" className="cursor-pointer">
-                    Include link to transcript
-                  </Label>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={handleBack}>
-                Back
-              </Button>
-              <Button onClick={handleNext} size="lg">
-                Continue
-              </Button>
-            </div>
-          </>
-        )}
-
-        {/* Finish: Review & Done */}
-        {step === "finish" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Review & done</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <span className="text-sm font-medium">Calendar</span>
-                  <span className="text-sm text-muted-foreground">
-                    {calendarConnected ? `Connected (${selectedCalendar})` : "Not connected"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <span className="text-sm font-medium">Capture</span>
-                  <span className="text-sm text-muted-foreground">
-                    {autoJoinEnabled ? `Auto-join On (${captureScope === "organize" ? "Organize only" : "All meetings"})` : "Off"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <span className="text-sm font-medium">Recap</span>
-                  <span className="text-sm text-muted-foreground">
-                    {recapMethod === "email" ? "Email attendees" : slackConnected ? `Slack #${slackChannel}` : "Not set"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2 p-4 border rounded-lg">
-                <Checkbox 
-                  id="privacy" 
-                  checked={privacyAccepted} 
-                  onCheckedChange={(checked) => setPrivacyAccepted(checked as boolean)}
-                />
-                <Label htmlFor="privacy" className="text-sm cursor-pointer leading-relaxed">
-                  I understand how meeting data is captured and shared within my workspace.
-                </Label>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={handleBack}>
-                Back
-              </Button>
-              <Button 
-                onClick={handleFinish} 
-                size="lg"
-                disabled={!privacyAccepted}
-              >
-                Finish
-              </Button>
-            </div>
-          </>
-        )}
-
-        {/* Post-finish: Success & Invite */}
-        {step === "invite" && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl">You're set!</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="flex flex-col gap-3">
-                <Button onClick={() => onOpenChange(false)} size="lg">
-                  Create a test meeting
-                </Button>
-                <Button variant="outline" onClick={() => onOpenChange(false)} size="lg">
-                  View upcoming meetings
-                </Button>
-              </div>
-
-              <div className="border-t pt-6 space-y-4">
-                <Label className="text-base font-medium">Invite teammates (optional)</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    type="email"
-                    placeholder="colleague@company.com"
-                    value={currentEmail}
-                    onChange={(e) => setCurrentEmail(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addInviteEmail()}
-                  />
-                  <Button onClick={addInviteEmail} variant="outline">
-                    Add
-                  </Button>
+                  <h1 className="text-3xl font-bold">Set up your workspace in under a minute.</h1>
+                  <p className="text-muted-foreground">You can change all of this later.</p>
                 </div>
 
-                {inviteEmails.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {inviteEmails.map((email) => (
-                      <Badge key={email} variant="secondary" className="gap-1 pr-1">
-                        {email}
-                        <button 
-                          onClick={() => removeInviteEmail(email)}
-                          className="ml-1 hover:bg-background/50 rounded-full p-0.5"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">What will you use this for?</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { value: "personal", label: "Personal notes" },
+                      { value: "team", label: "Small team" },
+                      { value: "company", label: "Company rollout" }
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setIntent(option.value as IntentType)}
+                        className={`p-4 rounded-lg border-2 transition-all text-center font-medium ${
+                          intent === option.value
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "border-border hover:border-muted-foreground"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
                     ))}
                   </div>
-                )}
+                </div>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <Label htmlFor="auto-start" className="font-medium">
+                      Auto-start on calendar events
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically join and record scheduled meetings
+                    </p>
+                  </div>
+                  <Switch 
+                    id="auto-start" 
+                    checked={autoStart} 
+                    onCheckedChange={setAutoStart} 
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Language</Label>
+                    <Select value={language} onValueChange={setLanguage}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="es">Español</SelectItem>
+                        <SelectItem value="fr">Français</SelectItem>
+                        <SelectItem value="de">Deutsch</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Locale</Label>
+                    <Select value={locale} onValueChange={setLocale}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="US">United States</SelectItem>
+                        <SelectItem value="UK">United Kingdom</SelectItem>
+                        <SelectItem value="EU">Europe</SelectItem>
+                        <SelectItem value="AS">Asia</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onClick={() => onOpenChange(false)}>
-                Do this later
-              </Button>
-              <Button 
-                onClick={() => onOpenChange(false)} 
-                size="lg"
-                disabled={inviteEmails.length === 0}
+            )}
+
+            {/* Step 2: Connect Meetings */}
+            {step === "connect" && (
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">Connect meetings</h1>
+                  <p className="text-muted-foreground">
+                    Connect your calendar and conferencing tools with one tap each.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-base font-medium">Calendar</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { id: "google", name: "Google Calendar", icon: Calendar },
+                        { id: "microsoft", name: "Microsoft 365", icon: Calendar }
+                      ].map((provider) => (
+                        <button
+                          key={provider.id}
+                          onClick={() => handleConnectCalendar(provider.id)}
+                          className={`flex flex-col items-center gap-3 p-6 rounded-lg border-2 transition-all ${
+                            calendarProvider === provider.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground"
+                          }`}
+                        >
+                          <provider.icon className="h-8 w-8" />
+                          <div className="text-center">
+                            <div className="font-medium">{provider.name}</div>
+                            {calendarProvider === provider.id && (
+                              <div className="flex items-center gap-1 text-xs text-primary mt-1">
+                                <Check className="h-3 w-3" />
+                                <span>{calendarEmail}</span>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-base font-medium">Conferencing</Label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: "google-meet", name: "Google Meet", icon: Video },
+                        { id: "zoom", name: "Zoom", icon: Video },
+                        { id: "teams", name: "Microsoft Teams", icon: Video }
+                      ].map((provider) => (
+                        <button
+                          key={provider.id}
+                          onClick={() => handleConnectConferencing(provider.id)}
+                          className={`flex flex-col items-center gap-3 p-6 rounded-lg border-2 transition-all ${
+                            conferencingProvider === provider.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground"
+                          }`}
+                        >
+                          <provider.icon className="h-8 w-8" />
+                          <div className="text-center">
+                            <div className="font-medium text-sm">{provider.name}</div>
+                            {conferencingProvider === provider.id && (
+                              <div className="flex items-center gap-1 text-xs text-primary mt-1">
+                                <Check className="h-3 w-3" />
+                                <span>Connected</span>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t">
+                    <Label className="text-base font-medium">Default behavior</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="auto-join-org" className="text-sm">
+                          Auto-join when I'm the organizer
+                        </Label>
+                        <Switch 
+                          id="auto-join-org" 
+                          checked={autoJoinOrganizer} 
+                          onCheckedChange={setAutoJoinOrganizer} 
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="ask-external" className="text-sm">
+                          Ask before joining external meetings
+                        </Label>
+                        <Switch 
+                          id="ask-external" 
+                          checked={askBeforeExternal} 
+                          onCheckedChange={setAskBeforeExternal} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    Read upcoming events; only record with explicit consent.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button variant="ghost" onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button 
+                    onClick={handleNext}
+                    disabled={!calendarProvider || !conferencingProvider}
+                  >
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Workspace & Collaborators */}
+            {step === "workspace" && (
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">Workspace & collaborators</h1>
+                  <p className="text-muted-foreground">
+                    Name your workspace and optionally invite teammates.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label>Workspace name</Label>
+                    <Input
+                      value={workspaceName}
+                      onChange={(e) => setWorkspaceName(e.target.value)}
+                      placeholder="My Workspace"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label>Add teammates (optional)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="email"
+                        value={currentEmail}
+                        onChange={(e) => setCurrentEmail(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInviteEmail())}
+                        placeholder="colleague@company.com"
+                      />
+                      <Button onClick={addInviteEmail} variant="outline">
+                        Add
+                      </Button>
+                    </div>
+
+                    {inviteEmails.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {inviteEmails.map((email) => (
+                          <Badge key={email} variant="secondary" className="gap-1">
+                            {email}
+                            <button onClick={() => removeInviteEmail(email)} className="ml-1">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {inviteEmails.length > 0 && (
+                    <>
+                      <div className="space-y-3">
+                        <Label>Default role for invited users</Label>
+                        <RadioGroup value={inviteRole} onValueChange={(val) => setInviteRole(val as "member" | "admin")}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="member" id="member" />
+                            <Label htmlFor="member" className="cursor-pointer">Member</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="admin" id="admin" />
+                            <Label htmlFor="admin" className="cursor-pointer">Admin</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <Label htmlFor="require-sso" className="text-sm">
+                          Require SSO for invited users
+                        </Label>
+                        <Switch 
+                          id="require-sso" 
+                          checked={requireSSO} 
+                          onCheckedChange={setRequireSSO} 
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button variant="ghost" onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button onClick={handleNext}>
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Meeting Defaults */}
+            {step === "defaults" && (
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">Meeting defaults</h1>
+                  <p className="text-muted-foreground">
+                    Set your minimum viable capture rules.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label className="text-base font-medium">Recording & consent</Label>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="record" className="text-sm">Record meetings I organize</Label>
+                          <Switch id="record" checked={recordMeetings} onCheckedChange={setRecordMeetings} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="announce" className="text-sm">Auto-announce recording</Label>
+                          <Switch id="announce" checked={autoAnnounce} onCheckedChange={setAutoAnnounce} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-base font-medium">Transcription</Label>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label className="text-sm">Language</Label>
+                          <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="en">English</SelectItem>
+                              <SelectItem value="es">Spanish</SelectItem>
+                              <SelectItem value="fr">French</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <Label htmlFor="diarize" className="text-sm">Diarize speakers</Label>
+                            <p className="text-xs text-muted-foreground">Label speakers by name if possible</p>
+                          </div>
+                          <Switch id="diarize" checked={diarizeSpeakers} onCheckedChange={setDiarizeSpeakers} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-base font-medium">Capture scope</Label>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="main-room" checked={captureMainRoom} onCheckedChange={(c) => setCaptureMainRoom(c as boolean)} />
+                          <Label htmlFor="main-room" className="text-sm cursor-pointer">Main room</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="breakout" checked={captureBreakout} onCheckedChange={(c) => setCaptureBreakout(c as boolean)} disabled />
+                          <Label htmlFor="breakout" className="text-sm cursor-not-allowed text-muted-foreground">
+                            Breakout rooms <Badge variant="outline" className="ml-1">Coming soon</Badge>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="chat" checked={captureChat} onCheckedChange={(c) => setCaptureChat(c as boolean)} />
+                          <Label htmlFor="chat" className="text-sm cursor-pointer">Chat messages summary</Label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-base font-medium">Action items</Label>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="action-items" className="text-sm">Detect action items & owners</Label>
+                          <Switch id="action-items" checked={detectActionItems} onCheckedChange={setDetectActionItems} />
+                        </div>
+                        {detectActionItems && (
+                          <div className="space-y-2">
+                            <Label className="text-sm">Destination</Label>
+                            <div className="flex gap-2">
+                              {["tasks", "jira", "slack", "email"].map((dest) => (
+                                <button
+                                  key={dest}
+                                  onClick={() => setActionDestination(dest)}
+                                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                    actionDestination === dest
+                                      ? "bg-primary text-primary-foreground"
+                                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                                  }`}
+                                >
+                                  {dest.charAt(0).toUpperCase() + dest.slice(1)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-base font-medium">Preview</Label>
+                    <div className="p-4 border rounded-lg space-y-4 bg-muted/30">
+                      <div className="space-y-2">
+                        <div className="font-medium">Weekly Sync - Product Team</div>
+                        <div className="text-xs text-muted-foreground">Nov 15, 2024 • 45 min</div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Key Points</div>
+                        <ul className="text-xs space-y-1 text-muted-foreground">
+                          <li>• Q4 roadmap priorities discussed</li>
+                          <li>• Launch date confirmed for Dec 1</li>
+                          <li>• Budget approved for additional resources</li>
+                        </ul>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Action Items</div>
+                        <div className="space-y-2">
+                          <div className="text-xs p-2 bg-background rounded border">
+                            <div className="font-medium">Update timeline doc</div>
+                            <div className="text-muted-foreground">Sarah Chen • Due Nov 17</div>
+                          </div>
+                          <div className="text-xs p-2 bg-background rounded border">
+                            <div className="font-medium">Review design mocks</div>
+                            <div className="text-muted-foreground">Alex Kim • Due Nov 18</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t">
+                        <div className="flex items-center gap-2 text-xs">
+                          <MessageSquare className="h-3 w-3" />
+                          <span className="text-muted-foreground">Send to Slack → #project-alpha</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button variant="ghost" onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button onClick={handleNext}>
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Privacy & Data Control */}
+            {step === "privacy" && (
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">Privacy & data control</h1>
+                  <p className="text-muted-foreground">
+                    Set retention policies and control your data.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label>Data retention</Label>
+                    <Select value={retentionDays} onValueChange={setRetentionDays}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 days</SelectItem>
+                        <SelectItem value="90">90 days (recommended)</SelectItem>
+                        <SelectItem value="365">1 year</SelectItem>
+                        <SelectItem value="forever">Forever</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="font-medium">Where your data lives</Label>
+                      <Button variant="ghost" size="sm" className="gap-1">
+                        Open Data Management
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      All recordings, transcripts, and summaries are encrypted at rest and in transit.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="analytics" 
+                      checked={allowAnalytics} 
+                      onCheckedChange={(c) => setAllowAnalytics(c as boolean)} 
+                    />
+                    <Label htmlFor="analytics" className="text-sm cursor-pointer">
+                      Allow anonymized product analytics
+                    </Label>
+                  </div>
+
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      💡 You can export transcripts, summaries, and tasks anytime.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button variant="ghost" onClick={handleBack}>
+                    Back
+                  </Button>
+                  <Button onClick={handleFinish}>
+                    Finish setup
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Completion Screen */}
+            {step === "complete" && (
+              <div className="space-y-8 text-center">
+                <div className="space-y-3">
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    <Check className="h-8 w-8 text-primary" />
+                  </div>
+                  <h1 className="text-3xl font-bold">You're set.</h1>
+                  <p className="text-muted-foreground">Your workspace is ready to capture and summarize meetings.</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate("/meetings");
+                    }}
+                    className="group p-6 border-2 rounded-lg hover:border-primary transition-all text-left"
+                  >
+                    <Calendar className="h-8 w-8 text-primary mb-3" />
+                    <div className="font-semibold mb-1">Create a test meeting</div>
+                    <div className="text-sm text-muted-foreground">
+                      Schedule a meeting and see the capture flow in action
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate("/ai-chat");
+                    }}
+                    className="group p-6 border-2 rounded-lg hover:border-primary transition-all text-left"
+                  >
+                    <MessageSquare className="h-8 w-8 text-primary mb-3" />
+                    <div className="font-semibold mb-1">Try AI chat</div>
+                    <div className="text-sm text-muted-foreground">
+                      Ask questions about your meetings and get instant answers
+                    </div>
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-center gap-4 text-sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => navigate("/integrations")}
+                  >
+                    Manage integrations
+                  </Button>
+                  <span className="text-muted-foreground">•</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate("/");
+                    }}
+                  >
+                    Go to dashboard
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        {step !== "complete" && (
+          <div className="border-t px-6 py-3 bg-muted/30">
+            <p className="text-xs text-muted-foreground text-center">
+              Your privacy matters.{" "}
+              <button 
+                onClick={() => navigate("/data-management")}
+                className="underline hover:text-foreground"
               >
-                Send invites
-              </Button>
-            </div>
-          </>
+                Learn about data management
+              </button>
+            </p>
+          </div>
         )}
       </DialogContent>
     </Dialog>
