@@ -7,10 +7,11 @@ import { cogConfirmSignUp, hostedUiRedirect, signUp } from "@/lib/cognito";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
     const { theme, setTheme } = useTheme();
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -75,8 +76,16 @@ const Signup = () => {
         try {
             setLoading(true);
             await cogConfirmSignUp(email.trim(), confirmCode.trim());
-            setMsg("Email confirmed. You can log in now.");
-            // optional: navigate("/login")
+            
+            // Set flag to show onboarding wizard after login
+            localStorage.setItem("showOnboarding", "true");
+            
+            setMsg("Email confirmed! Redirecting to login...");
+            
+            // Redirect to login after a brief delay
+            setTimeout(() => {
+                navigate("/login");
+            }, 1500);
         } catch (e) {
             setErr(e?.message || "Confirmation failed.");
         } finally {

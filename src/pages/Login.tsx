@@ -45,7 +45,15 @@ const Login = () => {
             } else {
                 // Success — tokens are in memory in the helper
                 setAccessToken(res.idToken, 3500);
-                nav("/"); // or wherever your app’s home is
+                
+                // Check if we should show onboarding (after email verification)
+                const shouldShowOnboarding = localStorage.getItem("showOnboarding");
+                if (shouldShowOnboarding) {
+                    localStorage.removeItem("showOnboarding");
+                    localStorage.setItem("triggerOnboarding", "true");
+                }
+                
+                nav("/"); // or wherever your app's home is
             }
         } finally {
             setLoading(false);

@@ -23,6 +23,7 @@ import { MeetingCard } from "@/components/MeetingCard";
 import { TaskRow } from "@/components/TaskRow";
 import { mockMeetings, mockTasks } from "@/lib/mockData";
 import { CreateMeetingModal } from "@/components/CreateMeetingModal";
+import OnboardingWizard from "@/components/OnboardingWizard";
 import { Task, Meeting } from "@/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -61,6 +62,7 @@ export default function Home() {
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const todaysMeetings = mockMeetings.filter(
@@ -69,6 +71,13 @@ export default function Home() {
   const { greeting, caption } = getGreeting();
 
   useEffect(() => {
+    // Check if we should show onboarding
+    const shouldShowOnboarding = localStorage.getItem("triggerOnboarding");
+    if (shouldShowOnboarding) {
+      localStorage.removeItem("triggerOnboarding");
+      setOnboardingOpen(true);
+    }
+
     (async () => {
       try {
         const res = await apiFetch("/me");
@@ -151,6 +160,8 @@ export default function Home() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <OnboardingWizard open={onboardingOpen} onOpenChange={setOnboardingOpen} />
+      
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
