@@ -77,14 +77,11 @@ const Signup = () => {
             setLoading(true);
             await cogConfirmSignUp(email.trim(), confirmCode.trim());
             
-            // Set flag to show onboarding wizard after login
-            localStorage.setItem("showOnboarding", "true");
+            setMsg("Email confirmed! Redirecting to onboarding...");
             
-            setMsg("Email confirmed! Redirecting to login...");
-            
-            // Redirect to login after a brief delay
+            // Redirect to onboarding after a brief delay
             setTimeout(() => {
-                navigate("/login");
+                navigate("/onboarding");
             }, 1500);
         } catch (e) {
             setErr(e?.message || "Confirmation failed.");
