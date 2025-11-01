@@ -3,16 +3,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { cogConfirmSignUp, hostedUiRedirect, signUp } from "@/lib/cognito";
+import {
+    cogConfirmSignUp,
+    hostedUiRedirect,
+    resendCode,
+    signUp,
+} from "@/lib/cognito";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Signup = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [email, setEmail] = useState(searchParams.get("email") ?? "");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +27,9 @@ const Signup = () => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     // new state for Cognito flow
-    const [needsConfirm, setNeedsConfirm] = useState(false);
+    const [needsConfirm, setNeedsConfirm] = useState(
+        searchParams.get("confirmation") === "pending"
+    );
     const [confirmCode, setConfirmCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState<string>("");
@@ -48,21 +57,21 @@ const Signup = () => {
         try {
             setLoading(true);
 
-            await signUp(
+            const response = await signUp(
                 email.trim(),
                 password,
                 firstName.trim(),
                 lastName.trim()
             );
+
+            if (response.kind === "ERROR") {
+                throw new Error(response.error);
+            }
+
             setNeedsConfirm(true);
             setMsg("We’ve sent a verification code to your email.");
         } catch (e) {
-            setErr(
-                e?.name === "UsernameExistsException"
-                    ? "An account with this email already exists."
-                    : e?.message || "Signup failed."
-            );
-
+            setErr(e.message);
             console.log(e);
         } finally {
             setLoading(false);
@@ -75,20 +84,35 @@ const Signup = () => {
         setMsg("");
         try {
             setLoading(true);
-            await cogConfirmSignUp(email.trim(), confirmCode.trim());
-            
+            const response = await cogConfirmSignUp(
+                email.trim(),
+                confirmCode.trim()
+            );
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
             setMsg("Email confirmed! Redirecting to onboarding...");
-            
+
             // Redirect to onboarding after a brief delay
             setTimeout(() => {
                 navigate("/onboarding");
             }, 1500);
         } catch (e) {
-            setErr(e?.message || "Confirmation failed.");
+            setErr(e?.message);
         } finally {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        (async () => {
+            if (needsConfirm && searchParams.get("confirmation")) {
+                await resendCode(email);
+            }
+        })();
+    }, []);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">

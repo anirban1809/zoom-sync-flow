@@ -22,11 +22,38 @@ export async function signUp(
         }),
     });
 
-    if (!response.ok) {
-        console.log(response.json());
-        return { kind: "ERROR", message: "Failed to sign up" };
+    const result = await response.json();
+
+    if (!result.ok) {
+        return {
+            kind: "ERROR",
+            error: result.error,
+            message: "Failed to sign up",
+        };
     }
-    return response.json();
+    return result;
+}
+
+export async function resendCode(email: string) {
+    const response = await fetch(
+        "https://stagingapi.luminote.ai/auth/resend-code",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                email,
+            }),
+        }
+    );
+
+    const result = await response.json();
+
+    if (!result.ok) {
+        return {
+            kind: "ERROR",
+            error: result.error,
+        };
+    }
+    return result;
 }
 
 export async function cogConfirmSignUp(email: string, code: string) {
@@ -38,11 +65,15 @@ export async function cogConfirmSignUp(email: string, code: string) {
         }),
     });
 
-    if (!response.ok) {
-        console.log(response.json());
-        return { kind: "ERROR", message: "Failed to verify confirmation code" };
+    const result = await response.json();
+
+    if (!result.ok) {
+        return {
+            kind: "ERROR",
+            error: result.error,
+        };
     }
-    return response.json();
+    return result;
 }
 
 // Hosted UI redirect helper (optional social buttons)
@@ -101,12 +132,13 @@ export async function cogConfirmForgotPassword(
         }
     );
 
-    if (!response.ok) {
-        console.log(response.json());
+    const result = await response.json();
+
+    if (!result.ok) {
         return {
             kind: "ERROR",
-            message: "Failed to reset password",
+            error: result.error,
         };
     }
-    return response.json();
+    return result;
 }

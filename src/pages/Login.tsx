@@ -41,7 +41,16 @@ const Login = () => {
                 password
             );
             if (res.kind === "ERROR") {
-                setErr(res.message);
+                setErr(res.error);
+                if (res.error === "User is not confirmed.") {
+                    setTimeout(
+                        () =>
+                            nav(
+                                `/signup?confirmation=pending&email=${emailOrUsername.trim()}`
+                            ),
+                        2000
+                    );
+                }
             } else {
                 // Success — tokens are in memory in the helper
                 setAccessToken(res.idToken, 3500);

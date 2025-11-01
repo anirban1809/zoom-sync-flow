@@ -25,6 +25,7 @@ export type SignInResult = {
     accessToken?: string;
     idToken?: string | null;
     refreshToken?: string | null;
+    error?: string;
 };
 
 export async function signIn(
@@ -40,11 +41,13 @@ export async function signIn(
         credentials: "include",
     });
 
-    if (!response.ok) {
+    const result = await response.json();
+
+    if (result.error) {
         console.log(response.json());
-        return { kind: "ERROR", message: "Incorrect username or password" };
+        return { kind: "ERROR", error: result.error };
     }
-    return response.json();
+    return result;
 }
 
 export async function answerMfa(

@@ -56,23 +56,21 @@ const PasswordReset = () => {
         }
         try {
             setLoading(true);
-            await cogConfirmForgotPassword(
+            const response = await cogConfirmForgotPassword(
                 emailOrUsername.trim(),
                 code.trim(),
                 newPassword
             );
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
             setMsg("Password reset successful. You can now log in.");
             // optional: small delay, then navigate
             setTimeout(() => nav("/login"), 800);
         } catch (e) {
-            // Common: CodeMismatchException, ExpiredCodeException, InvalidPasswordException
-            const m =
-                e?.name === "CodeMismatchException"
-                    ? "Invalid verification code."
-                    : e?.name === "ExpiredCodeException"
-                    ? "The code has expired. Request a new one."
-                    : e?.message || "Failed to reset password.";
-            setErr(m);
+            setErr(e.message);
         } finally {
             setLoading(false);
         }
