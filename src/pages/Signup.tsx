@@ -21,16 +21,18 @@ const Signup = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    
+
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
-    
+
     // Mock: In production, fetch invite details from backend
-    const mockInviteData = inviteToken ? {
-        workspaceName: "Acme Design Team",
-        role: "ADMIN" as "ADMIN" | "MEMBER",
-        invitedEmail: "user@example.com"
-    } : null;
+    const mockInviteData = inviteToken
+        ? {
+              workspaceName: "Acme Design Team",
+              role: "ADMIN" as "ADMIN" | "MEMBER",
+              invitedEmail: "user@example.com",
+          }
+        : null;
 
     const [email, setEmail] = useState(mockInviteData?.invitedEmail ?? "");
     const [firstName, setFirstName] = useState("");
@@ -53,7 +55,10 @@ const Signup = () => {
     useEffect(() => {
         let timer: NodeJS.Timeout;
         if (resendCooldown > 0) {
-            timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+            timer = setTimeout(
+                () => setResendCooldown(resendCooldown - 1),
+                1000
+            );
         }
         return () => clearTimeout(timer);
     }, [resendCooldown]);
@@ -71,7 +76,7 @@ const Signup = () => {
         e?.preventDefault?.();
         setErr("");
         setMsg("");
-        
+
         if (!agreedToTerms) {
             setErr("Please agree to Terms & Privacy.");
             return;
@@ -158,7 +163,7 @@ const Signup = () => {
 
     async function handleResendCode() {
         if (resendCooldown > 0) return;
-        
+
         setErr("");
         setMsg("");
         try {
@@ -184,10 +189,13 @@ const Signup = () => {
             </Button>
 
             <div className="w-full max-w-md space-y-6">
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold">luminote.ai</h1>
+                <div className="text-center space-y-2">
+                    <h2 className="text-3xl font-bold">
+                        {isInviteFlow
+                            ? "Create your account"
+                            : "Create your workspace"}
+                    </h2>
                 </div>
-
                 {/* Step 1: Create Account */}
                 {step === "account" && (
                     <div className="space-y-6">
@@ -199,11 +207,17 @@ const Signup = () => {
                                         <p className="text-sm text-muted-foreground">
                                             Joining workspace
                                         </p>
-                                        <p className="font-semibold">
+                                        <p className="font-semibold text-lg">
                                             {mockInviteData.workspaceName}
                                         </p>
                                     </div>
-                                    <Badge variant={mockInviteData.role === "ADMIN" ? "default" : "secondary"}>
+                                    <Badge
+                                        variant={
+                                            mockInviteData.role === "ADMIN"
+                                                ? "default"
+                                                : "secondary"
+                                        }
+                                    >
                                         {mockInviteData.role}
                                     </Badge>
                                 </div>
@@ -220,13 +234,24 @@ const Signup = () => {
                                             You already own a workspace
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            The email {email} already owns a workspace. Each account can own only one workspace. Log in to manage your existing workspace or use a different email to create another workspace.
+                                            The email {email} already owns a
+                                            workspace. Each account can own only
+                                            one workspace. Log in to manage your
+                                            existing workspace or use a
+                                            different email to create another
+                                            workspace.
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     <Button
-                                        onClick={() => navigate(inviteToken ? `/login?invite=${inviteToken}` : "/login")}
+                                        onClick={() =>
+                                            navigate(
+                                                inviteToken
+                                                    ? `/login?invite=${inviteToken}`
+                                                    : "/login"
+                                            )
+                                        }
                                         className="flex-1"
                                     >
                                         Log in to existing workspace
@@ -246,23 +271,14 @@ const Signup = () => {
 
                         {!userOwnsWorkspace && (
                             <>
-                                <div className="text-center space-y-2">
-                                    <h2 className="text-2xl font-bold">
-                                        {isInviteFlow ? "Create your account" : "Create your workspace"}
-                                    </h2>
-                                    {!isInviteFlow && (
-                                        <p className="text-sm text-muted-foreground">
-                                            You'll create a Luminote account and a new workspace. Each account can own only one workspace.
-                                        </p>
-                                    )}
-                                </div>
-
                                 {/* Social Login */}
                                 <div className="space-y-3">
                                     <Button
                                         variant="outline"
                                         className="w-full h-11"
-                                        onClick={() => hostedUiRedirect("Google")}
+                                        onClick={() =>
+                                            hostedUiRedirect("Google")
+                                        }
                                     >
                                         <img
                                             src="https://www.google.com/favicon.ico"
@@ -274,7 +290,9 @@ const Signup = () => {
                                     <Button
                                         variant="outline"
                                         className="w-full h-11"
-                                        onClick={() => hostedUiRedirect("AzureAD")}
+                                        onClick={() =>
+                                            hostedUiRedirect("AzureAD")
+                                        }
                                     >
                                         <img
                                             src="https://www.microsoft.com/favicon.ico"
@@ -286,7 +304,9 @@ const Signup = () => {
                                     <Button
                                         variant="outline"
                                         className="w-full h-11"
-                                        onClick={() => hostedUiRedirect("Slack")}
+                                        onClick={() =>
+                                            hostedUiRedirect("Slack")
+                                        }
                                     >
                                         <img
                                             src="https://slack.com/favicon.ico"
@@ -299,21 +319,32 @@ const Signup = () => {
 
                                 <div className="flex items-center gap-4">
                                     <Separator className="flex-1" />
-                                    <span className="text-sm text-muted-foreground">or</span>
+                                    <span className="text-sm text-muted-foreground">
+                                        or
+                                    </span>
                                     <Separator className="flex-1" />
                                 </div>
 
                                 {/* Signup Form */}
-                                <form className="space-y-4" onSubmit={handleSignup}>
+                                <form
+                                    className="space-y-4"
+                                    onSubmit={handleSignup}
+                                >
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label className="text-sm font-medium">Your account</Label>
+                                            <Label className="text-sm font-medium">
+                                                Your account
+                                            </Label>
                                             <div className="space-y-3">
                                                 <Input
                                                     type="text"
                                                     placeholder="First name"
                                                     value={firstName}
-                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setFirstName(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="h-11"
                                                     required
                                                 />
@@ -321,7 +352,11 @@ const Signup = () => {
                                                     type="text"
                                                     placeholder="Last name"
                                                     value={lastName}
-                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setLastName(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="h-11"
                                                     required
                                                 />
@@ -329,7 +364,9 @@ const Signup = () => {
                                                     type="email"
                                                     placeholder="Work email"
                                                     value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setEmail(e.target.value)
+                                                    }
                                                     className="h-11"
                                                     required
                                                 />
@@ -337,7 +374,11 @@ const Signup = () => {
                                                     type="password"
                                                     placeholder="Password"
                                                     value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    onChange={(e) =>
+                                                        setPassword(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="h-11"
                                                     required
                                                 />
@@ -346,21 +387,33 @@ const Signup = () => {
 
                                         {!isInviteFlow && (
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium">Your workspace</Label>
+                                                <Label className="text-sm font-medium">
+                                                    Your workspace
+                                                </Label>
                                                 <div className="space-y-3">
                                                     <Input
                                                         type="text"
                                                         placeholder="Workspace name"
                                                         value={workspaceName}
-                                                        onChange={(e) => setWorkspaceName(e.target.value)}
+                                                        onChange={(e) =>
+                                                            setWorkspaceName(
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="h-11"
                                                         required
                                                     />
                                                     <Input
                                                         type="text"
                                                         placeholder="Short description (optional)"
-                                                        value={workspaceDescription}
-                                                        onChange={(e) => setWorkspaceDescription(e.target.value)}
+                                                        value={
+                                                            workspaceDescription
+                                                        }
+                                                        onChange={(e) =>
+                                                            setWorkspaceDescription(
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="h-11"
                                                     />
                                                 </div>
@@ -398,10 +451,14 @@ const Signup = () => {
                                     </div>
 
                                     {err && (
-                                        <div className="text-sm text-destructive">{err}</div>
+                                        <div className="text-sm text-destructive">
+                                            {err}
+                                        </div>
                                     )}
                                     {msg && (
-                                        <div className="text-sm text-success">{msg}</div>
+                                        <div className="text-sm text-success">
+                                            {msg}
+                                        </div>
                                     )}
 
                                     <Button
@@ -409,14 +466,22 @@ const Signup = () => {
                                         className="w-full h-11"
                                         type="submit"
                                     >
-                                        {loading ? "Creating..." : isInviteFlow ? "Create account and join workspace" : "Create workspace"}
+                                        {loading
+                                            ? "Creating..."
+                                            : isInviteFlow
+                                            ? "Create account and join workspace"
+                                            : "Create workspace"}
                                     </Button>
                                 </form>
 
                                 <div className="text-center text-sm text-muted-foreground">
                                     Already have an account?{" "}
                                     <Link
-                                        to={inviteToken ? `/login?invite=${inviteToken}` : "/login"}
+                                        to={
+                                            inviteToken
+                                                ? `/login?invite=${inviteToken}`
+                                                : "/login"
+                                        }
                                         className="text-primary hover:underline font-medium"
                                     >
                                         Log in
@@ -431,10 +496,14 @@ const Signup = () => {
                 {step === "verify" && (
                     <div className="space-y-6">
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold">Verify your email</h2>
+                            <h2 className="text-2xl font-bold">
+                                Verify your email
+                            </h2>
                             <p className="text-sm text-muted-foreground">
                                 We've sent a 6-digit verification code to{" "}
-                                <span className="font-medium text-foreground">{email}</span>
+                                <span className="font-medium text-foreground">
+                                    {email}
+                                </span>
                             </p>
                         </div>
 
@@ -447,7 +516,9 @@ const Signup = () => {
                                     inputMode="numeric"
                                     placeholder="000000"
                                     value={confirmCode}
-                                    onChange={(e) => setConfirmCode(e.target.value)}
+                                    onChange={(e) =>
+                                        setConfirmCode(e.target.value)
+                                    }
                                     className="h-11 text-center text-lg tracking-widest"
                                     maxLength={6}
                                     required
@@ -455,10 +526,14 @@ const Signup = () => {
                             </div>
 
                             {err && (
-                                <div className="text-sm text-destructive">{err}</div>
+                                <div className="text-sm text-destructive">
+                                    {err}
+                                </div>
                             )}
                             {msg && (
-                                <div className="text-sm text-success">{msg}</div>
+                                <div className="text-sm text-success">
+                                    {msg}
+                                </div>
                             )}
 
                             <Button
@@ -477,8 +552,8 @@ const Signup = () => {
                                     disabled={resendCooldown > 0}
                                     className="text-sm"
                                 >
-                                    {resendCooldown > 0 
-                                        ? `Resend code (${resendCooldown}s)` 
+                                    {resendCooldown > 0
+                                        ? `Resend code (${resendCooldown}s)`
                                         : "Resend code"}
                                 </Button>
                             </div>

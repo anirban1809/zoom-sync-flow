@@ -2,10 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { setAccessToken } from "@/lib/api/auth";
-import {
-    hostedUiRedirect,
-    signIn,
-} from "@/lib/cognito-auth";
+import { hostedUiRedirect, signIn } from "@/lib/cognito-auth";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
@@ -26,10 +23,10 @@ const Login = () => {
         e?.preventDefault?.();
         setErr("");
         setLoading(true);
-        
+
         try {
             const res = await signIn(email.trim(), password);
-            
+
             if (res.kind === "ERROR") {
                 setErr(res.error || "Invalid email or password");
                 if (res.error === "User is not confirmed.") {
@@ -44,10 +41,10 @@ const Login = () => {
             } else {
                 // Success — store tokens
                 setAccessToken(res.idToken!, 3500);
-                
+
                 // Mock: In production, fetch user's workspace memberships
                 // const memberships = await fetchUserMemberships();
-                
+
                 // Navigate to workspace selection or directly to workspace if invite
                 if (inviteToken) {
                     // Mock: Accept invite and redirect to that workspace
@@ -80,18 +77,9 @@ const Login = () => {
 
             <div className="w-full max-w-md space-y-6">
                 <div className="text-center space-y-4">
-                    <h1 className="text-3xl font-bold">luminote.ai</h1>
-                    <div className="space-y-1">
-                        <h2 className="text-2xl font-bold">Log in</h2>
-                        <p className="text-sm text-muted-foreground">
-                            <Link 
-                                to={inviteToken ? `/signup?invite=${inviteToken}` : "/signup"}
-                                className="text-primary hover:underline"
-                            >
-                                Create a new workspace
-                            </Link>
-                        </p>
-                    </div>
+                    <h1 className="text-3xl font-bold">
+                        Log in to luminote.ai
+                    </h1>
                 </div>
 
                 {/* Social Login Buttons */}
@@ -158,7 +146,7 @@ const Login = () => {
                         className="h-11"
                         required
                     />
-                    
+
                     <div className="text-right">
                         <Link
                             to="/password-reset"
@@ -167,11 +155,11 @@ const Login = () => {
                             Forgot password?
                         </Link>
                     </div>
-                    
+
                     {err && (
                         <div className="text-sm text-destructive">{err}</div>
                     )}
-                    
+
                     <Button
                         disabled={loading}
                         className="w-full h-11"
@@ -182,6 +170,10 @@ const Login = () => {
                 </form>
 
                 <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground pt-4">
+                    <Link to="/signup" className="hover:text-foreground">
+                        Create an account
+                    </Link>
+                    <span>•</span>
                     <Link to="/help-support" className="hover:text-foreground">
                         Help
                     </Link>
