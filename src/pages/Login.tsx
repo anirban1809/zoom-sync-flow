@@ -3,94 +3,63 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { setAccessToken } from "@/lib/api/auth";
 import {
-    answerMfa,
     hostedUiRedirect,
-    setNewPassword,
     signIn,
-    type SignInResult,
 } from "@/lib/cognito-auth";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
     const { theme, setTheme } = useTheme();
     const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const inviteToken = searchParams.get("invite");
 
-    const [emailOrUsername, setEmailOrUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    const [stage, setStage] = useState<"LOGIN" | "MFA" | "NEWPW">("LOGIN");
-    const [session, setSession] = useState("");
-    const [mfaCode, setMfaCode] = useState("");
-    const [newPassword, setNewPasswordValue] = useState("");
-
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState("");
-    const [msg, setMsg] = useState("");
 
     async function handleLogin(e?: React.FormEvent) {
         e?.preventDefault?.();
         setErr("");
-        setMsg("");
         setLoading(true);
+        
         try {
-            const res: SignInResult = await signIn(
-                emailOrUsername.trim(),
-                password
-            );
+            const res = await signIn(email.trim(), password);
+            
             if (res.kind === "ERROR") {
-                setErr(res.error);
+                setErr(res.error || "Invalid email or password");
                 if (res.error === "User is not confirmed.") {
                     setTimeout(
                         () =>
                             nav(
-                                `/signup?confirmation=pending&email=${emailOrUsername.trim()}`
+                                `/signup?confirmation=pending&email=${email.trim()}`
                             ),
                         2000
                     );
                 }
             } else {
-                // Success — tokens are in memory in the helper
-                setAccessToken(res.idToken, 3500);
-                nav("/"); // or wherever your app's home is
+                // Success — store tokens
+                setAccessToken(res.idToken!, 3500);
+                
+                // Mock: In production, fetch user's workspace memberships
+                // const memberships = await fetchUserMemberships();
+                
+                // Navigate to workspace selection or directly to workspace if invite
+                if (inviteToken) {
+                    // Mock: Accept invite and redirect to that workspace
+                    // await acceptInvite(inviteToken);
+                    // const workspaceId = await getWorkspaceIdFromInvite(inviteToken);
+                    nav("/onboarding"); // In production: nav(`/app/${workspaceId}`)
+                } else {
+                    nav("/login/workspaces");
+                }
             }
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleMfaSubmit(e?: React.FormEvent) {
-        e?.preventDefault?.();
-        setErr("");
-        setMsg("");
-        setLoading(true);
-        try {
-            const res = await answerMfa(session, mfaCode.trim(), "SMS_MFA"); // if you support TOTP, detect which to pass
-            if (res.kind === "NEW_PASSWORD_REQUIRED") {
-                setSession(res.session);
-                setStage("NEWPW");
-            } else {
-                nav("/");
-            }
-        } catch (e) {
-            setErr(e?.message || "Invalid MFA code.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleNewPassword(e?: React.FormEvent) {
-        e?.preventDefault?.();
-        setErr("");
-        setMsg("");
-        setLoading(true);
-        try {
-            const res = await setNewPassword(session, newPassword);
-            if (res.kind === "OK") nav("/");
-        } catch (e) {
-            setErr(e?.message || "Failed to set new password.");
+        } catch (error: any) {
+            setErr(error?.message || "An error occurred during login");
         } finally {
             setLoading(false);
         }
@@ -109,19 +78,27 @@ const Login = () => {
                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
             </Button>
 
-            <div className="w-full max-w-md space-y-8">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold mb-8">
-                        Log in to luminote.ai
-                    </h1>
+            <div className="w-full max-w-md space-y-6">
+                <div className="text-center space-y-4">
+                    <h1 className="text-3xl font-bold">luminote.ai</h1>
+                    <div className="space-y-1">
+                        <h2 className="text-2xl font-bold">Log in</h2>
+                        <p className="text-sm text-muted-foreground">
+                            <Link 
+                                to={inviteToken ? `/signup?invite=${inviteToken}` : "/signup"}
+                                className="text-primary hover:underline"
+                            >
+                                Create a new workspace
+                            </Link>
+                        </p>
+                    </div>
                 </div>
 
-                {/* Hosted UI buttons */}
+                {/* Social Login Buttons */}
                 <div className="space-y-3">
                     <Button
                         variant="outline"
-                        className="w-full h-12 text-base"
-                        size="lg"
+                        className="w-full h-11"
                         onClick={() => hostedUiRedirect("Google")}
                     >
                         <img
@@ -133,9 +110,8 @@ const Login = () => {
                     </Button>
                     <Button
                         variant="outline"
-                        className="w-full h-12 text-base"
-                        size="lg"
-                        onClick={() => hostedUiRedirect("AzureAD")} // match your IdP name in Cognito
+                        className="w-full h-11"
+                        onClick={() => hostedUiRedirect("AzureAD")}
                     >
                         <img
                             src="https://www.microsoft.com/favicon.ico"
@@ -146,8 +122,7 @@ const Login = () => {
                     </Button>
                     <Button
                         variant="outline"
-                        className="w-full h-12 text-base"
-                        size="lg"
+                        className="w-full h-11"
                         onClick={() => hostedUiRedirect("Slack")}
                     >
                         <img
@@ -159,140 +134,54 @@ const Login = () => {
                     </Button>
                 </div>
 
-                <div className="flex items-center gap-4 my-6">
+                <div className="flex items-center gap-4">
                     <Separator className="flex-1" />
                     <span className="text-sm text-muted-foreground">or</span>
                     <Separator className="flex-1" />
                 </div>
 
-                {/* Stage: LOGIN */}
-                {stage === "LOGIN" && (
-                    <form className="space-y-4" onSubmit={handleLogin}>
-                        <Input
-                            type="email"
-                            placeholder="Work email or username"
-                            value={emailOrUsername}
-                            onChange={(e) => setEmailOrUsername(e.target.value)}
-                            className="h-12 text-base"
-                            required
-                        />
-                        <Input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="h-12 text-base"
-                            required
-                        />
-                        <div className="text-right">
-                            <Link
-                                to="/password-reset"
-                                className="text-sm text-primary hover:underline"
-                            >
-                                Forgot password?
-                            </Link>
-                        </div>
-                        {err && (
-                            <div className="text-sm text-red-600">{err}</div>
-                        )}
-                        {msg && (
-                            <div className="text-sm text-green-600">{msg}</div>
-                        )}
-                        <Button
-                            disabled={loading}
-                            className="w-full h-12 text-base"
-                            size="lg"
-                            type="submit"
+                {/* Login Form */}
+                <form className="space-y-4" onSubmit={handleLogin}>
+                    <Input
+                        type="email"
+                        placeholder="Work email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="h-11"
+                        required
+                    />
+                    <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="h-11"
+                        required
+                    />
+                    
+                    <div className="text-right">
+                        <Link
+                            to="/password-reset"
+                            className="text-sm text-primary hover:underline"
                         >
-                            {loading ? "Signing in..." : "Login"}
-                        </Button>
-                    </form>
-                )}
-
-                {/* Stage: MFA */}
-                {stage === "MFA" && (
-                    <form className="space-y-4" onSubmit={handleMfaSubmit}>
-                        <Input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="MFA code"
-                            value={mfaCode}
-                            onChange={(e) => setMfaCode(e.target.value)}
-                            className="h-12 text-base"
-                            required
-                        />
-                        {err && (
-                            <div className="text-sm text-red-600">{err}</div>
-                        )}
-                        {msg && (
-                            <div className="text-sm text-green-600">{msg}</div>
-                        )}
-                        <div className="flex gap-2">
-                            <Button
-                                disabled={loading}
-                                className="w-full h-12 text-base"
-                                size="lg"
-                                type="submit"
-                            >
-                                {loading ? "Verifying..." : "Verify"}
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                type="button"
-                                className="h-12 text-base"
-                                onClick={() => setStage("LOGIN")}
-                            >
-                                Back
-                            </Button>
-                        </div>
-                    </form>
-                )}
-
-                {/* Stage: NEW PASSWORD REQUIRED */}
-                {stage === "NEWPW" && (
-                    <form className="space-y-4" onSubmit={handleNewPassword}>
-                        <Input
-                            type="password"
-                            placeholder="Set a new password"
-                            value={newPassword}
-                            onChange={(e) =>
-                                setNewPasswordValue(e.target.value)
-                            }
-                            className="h-12 text-base"
-                            required
-                        />
-                        {err && (
-                            <div className="text-sm text-red-600">{err}</div>
-                        )}
-                        {msg && (
-                            <div className="text-sm text-green-600">{msg}</div>
-                        )}
-                        <div className="flex gap-2">
-                            <Button
-                                disabled={loading}
-                                className="w-full h-12 text-base"
-                                size="lg"
-                                type="submit"
-                            >
-                                {loading ? "Updating..." : "Update password"}
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                type="button"
-                                className="h-12 text-base"
-                                onClick={() => setStage("LOGIN")}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                )}
+                            Forgot password?
+                        </Link>
+                    </div>
+                    
+                    {err && (
+                        <div className="text-sm text-destructive">{err}</div>
+                    )}
+                    
+                    <Button
+                        disabled={loading}
+                        className="w-full h-11"
+                        type="submit"
+                    >
+                        {loading ? "Signing in..." : "Continue"}
+                    </Button>
+                </form>
 
                 <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground pt-4">
-                    <Link to="/signup" className="hover:text-foreground">
-                        Create account
-                    </Link>
-                    <span>•</span>
                     <Link to="/help-support" className="hover:text-foreground">
                         Help
                     </Link>

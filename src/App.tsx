@@ -25,6 +25,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PasswordReset from "./pages/PasswordReset";
 import Onboarding from "./pages/Onboarding";
+import WorkspaceSelection from "./pages/WorkspaceSelection";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./providers/AuthProvider";
 
@@ -39,6 +40,7 @@ const App = () => (
                 <BrowserRouter>
                     <Routes>
                         <Route path="/login" element={<Login />} />
+                        <Route path="/login/workspaces" element={<WorkspaceSelection />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route
                             path="/password-reset"
