@@ -25,14 +25,23 @@ const Signup = () => {
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
 
-    // Mock: In production, fetch invite details from backend
-    const mockInviteData = inviteToken
+    // Mock: In production, fetch invite details from backend and validate status
+    // Set mockInviteStatus to 'valid', 'expired', or 'revoked' to test different states
+    const getMockInviteStatus = (): 'valid' | 'expired' | 'revoked' => {
+        // In production: return actual status from API
+        return 'valid'; // Change this to 'expired' or 'revoked' to test
+    };
+    const mockInviteStatus = getMockInviteStatus();
+    const mockInviteData = inviteToken && mockInviteStatus === 'valid'
         ? {
               workspaceName: "Acme Design Team",
               role: "ADMIN" as "ADMIN" | "MEMBER",
               invitedEmail: "user@example.com",
           }
         : null;
+
+    const inviteExpired = inviteToken && mockInviteStatus === 'expired';
+    const inviteRevoked = inviteToken && mockInviteStatus === 'revoked';
 
     const [email, setEmail] = useState(mockInviteData?.invitedEmail ?? "");
     const [firstName, setFirstName] = useState("");
@@ -199,8 +208,70 @@ const Signup = () => {
                 {/* Step 1: Create Account */}
                 {step === "account" && (
                     <div className="space-y-6">
+                        {/* Expired Invite Error */}
+                        {inviteExpired && (
+                            <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
+                                <div className="flex gap-2">
+                                    <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                                    <div className="space-y-2 flex-1">
+                                        <p className="font-semibold text-destructive">
+                                            Invite link expired
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            This invitation link has expired. Invitation links are valid for 7 days. Please contact the workspace admin to send you a new invitation.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <Button
+                                        onClick={() => navigate("/signup")}
+                                        className="flex-1"
+                                    >
+                                        Create new workspace
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => navigate("/login")}
+                                    >
+                                        Log in
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Revoked Invite Error */}
+                        {inviteRevoked && (
+                            <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
+                                <div className="flex gap-2">
+                                    <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                                    <div className="space-y-2 flex-1">
+                                        <p className="font-semibold text-destructive">
+                                            Invite link revoked
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            This invitation has been revoked by the workspace admin. If you believe this is a mistake, please contact the workspace admin for a new invitation.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <Button
+                                        onClick={() => navigate("/signup")}
+                                        className="flex-1"
+                                    >
+                                        Create new workspace
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => navigate("/login")}
+                                    >
+                                        Log in
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Invite Summary */}
-                        {isInviteFlow && mockInviteData && (
+                        {isInviteFlow && mockInviteData && !inviteExpired && !inviteRevoked && (
                             <div className="bg-accent-light border border-border rounded-lg p-4 space-y-2">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -225,7 +296,7 @@ const Signup = () => {
                         )}
 
                         {/* User Already Owns Workspace Error */}
-                        {userOwnsWorkspace && (
+                        {userOwnsWorkspace && !inviteExpired && !inviteRevoked && (
                             <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
                                 <div className="flex gap-2">
                                     <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -269,7 +340,7 @@ const Signup = () => {
                             </div>
                         )}
 
-                        {!userOwnsWorkspace && (
+                        {!userOwnsWorkspace && !inviteExpired && !inviteRevoked && (
                             <>
                                 {/* Social Login */}
                                 <div className="space-y-3">
