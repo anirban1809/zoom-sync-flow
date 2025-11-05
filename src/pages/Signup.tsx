@@ -27,21 +27,22 @@ const Signup = () => {
 
     // Mock: In production, fetch invite details from backend and validate status
     // Set mockInviteStatus to 'valid', 'expired', or 'revoked' to test different states
-    const getMockInviteStatus = (): 'valid' | 'expired' | 'revoked' => {
+    const getMockInviteStatus = (): "valid" | "expired" | "revoked" => {
         // In production: return actual status from API
-        return 'valid'; // Change this to 'expired' or 'revoked' to test
+        return "valid"; // Change this to 'expired' or 'revoked' to test
     };
     const mockInviteStatus = getMockInviteStatus();
-    const mockInviteData = inviteToken && mockInviteStatus === 'valid'
-        ? {
-              workspaceName: "Acme Design Team",
-              role: "ADMIN" as "ADMIN" | "MEMBER",
-              invitedEmail: "user@example.com",
-          }
-        : null;
+    const mockInviteData =
+        inviteToken && mockInviteStatus === "valid"
+            ? {
+                  workspaceName: "Acme Design Team",
+                  role: "ADMIN" as "ADMIN" | "MEMBER",
+                  invitedEmail: "user@example.com",
+              }
+            : null;
 
-    const inviteExpired = inviteToken && mockInviteStatus === 'expired';
-    const inviteRevoked = inviteToken && mockInviteStatus === 'revoked';
+    const inviteExpired = inviteToken && mockInviteStatus === "expired";
+    const inviteRevoked = inviteToken && mockInviteStatus === "revoked";
 
     const [email, setEmail] = useState(mockInviteData?.invitedEmail ?? "");
     const [firstName, setFirstName] = useState("");
@@ -202,7 +203,7 @@ const Signup = () => {
                     <h2 className="text-3xl font-bold">
                         {isInviteFlow
                             ? "Create your account"
-                            : "Create your workspace"}
+                            : "Create your new workspace"}
                     </h2>
                 </div>
                 {/* Step 1: Create Account */}
@@ -218,7 +219,10 @@ const Signup = () => {
                                             Invite link expired
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            This invitation link has expired. Invitation links are valid for 7 days. Please contact the workspace admin to send you a new invitation.
+                                            This invitation link has expired.
+                                            Invitation links are valid for 7
+                                            days. Please contact the workspace
+                                            admin to send you a new invitation.
                                         </p>
                                     </div>
                                 </div>
@@ -249,7 +253,11 @@ const Signup = () => {
                                             Invite link revoked
                                         </p>
                                         <p className="text-sm text-muted-foreground">
-                                            This invitation has been revoked by the workspace admin. If you believe this is a mistake, please contact the workspace admin for a new invitation.
+                                            This invitation has been revoked by
+                                            the workspace admin. If you believe
+                                            this is a mistake, please contact
+                                            the workspace admin for a new
+                                            invitation.
                                         </p>
                                     </div>
                                 </div>
@@ -271,203 +279,155 @@ const Signup = () => {
                         )}
 
                         {/* Invite Summary */}
-                        {isInviteFlow && mockInviteData && !inviteExpired && !inviteRevoked && (
-                            <div className="bg-accent-light border border-border rounded-lg p-4 space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">
-                                            Joining workspace
-                                        </p>
-                                        <p className="font-semibold text-lg">
-                                            {mockInviteData.workspaceName}
-                                        </p>
+                        {isInviteFlow &&
+                            mockInviteData &&
+                            !inviteExpired &&
+                            !inviteRevoked && (
+                                <div className="bg-accent-light border border-border rounded-lg p-4 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Joining workspace
+                                            </p>
+                                            <p className="font-semibold text-lg">
+                                                {mockInviteData.workspaceName}
+                                            </p>
+                                        </div>
+                                        <Badge
+                                            variant={
+                                                mockInviteData.role === "ADMIN"
+                                                    ? "default"
+                                                    : "secondary"
+                                            }
+                                        >
+                                            {mockInviteData.role}
+                                        </Badge>
                                     </div>
-                                    <Badge
-                                        variant={
-                                            mockInviteData.role === "ADMIN"
-                                                ? "default"
-                                                : "secondary"
-                                        }
-                                    >
-                                        {mockInviteData.role}
-                                    </Badge>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
                         {/* User Already Owns Workspace Error */}
-                        {userOwnsWorkspace && !inviteExpired && !inviteRevoked && (
-                            <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
-                                <div className="flex gap-2">
-                                    <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-                                    <div className="space-y-2 flex-1">
-                                        <p className="font-semibold text-destructive">
-                                            You already own a workspace
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            The email {email} already owns a
-                                            workspace. Each account can own only
-                                            one workspace. Log in to manage your
-                                            existing workspace or use a
-                                            different email to create another
-                                            workspace.
-                                        </p>
+                        {userOwnsWorkspace &&
+                            !inviteExpired &&
+                            !inviteRevoked && (
+                                <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
+                                    <div className="flex gap-2">
+                                        <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                                        <div className="space-y-2 flex-1">
+                                            <p className="font-semibold text-destructive">
+                                                You already own a workspace
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                The email {email} already owns a
+                                                workspace. Each account can own
+                                                only one workspace. Log in to
+                                                manage your existing workspace
+                                                or use a different email to
+                                                create another workspace.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 pt-2">
+                                        <Button
+                                            onClick={() =>
+                                                navigate(
+                                                    inviteToken
+                                                        ? `/login?invite=${inviteToken}`
+                                                        : "/login"
+                                                )
+                                            }
+                                            className="flex-1"
+                                        >
+                                            Log in to existing workspace
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setEmail("");
+                                                setUserOwnsWorkspace(false);
+                                            }}
+                                        >
+                                            Use different email
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="flex gap-2 pt-2">
-                                    <Button
-                                        onClick={() =>
-                                            navigate(
-                                                inviteToken
-                                                    ? `/login?invite=${inviteToken}`
-                                                    : "/login"
-                                            )
-                                        }
-                                        className="flex-1"
-                                    >
-                                        Log in to existing workspace
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            setEmail("");
-                                            setUserOwnsWorkspace(false);
-                                        }}
-                                    >
-                                        Use different email
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
+                            )}
 
-                        {!userOwnsWorkspace && !inviteExpired && !inviteRevoked && (
-                            <>
-                                {/* Social Login */}
-                                <div className="space-y-3">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("Google")
-                                        }
-                                    >
-                                        <img
-                                            src="https://www.google.com/favicon.ico"
-                                            alt="Google"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Google
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("AzureAD")
-                                        }
-                                    >
-                                        <img
-                                            src="https://www.microsoft.com/favicon.ico"
-                                            alt="Microsoft"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Microsoft
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("Slack")
-                                        }
-                                    >
-                                        <img
-                                            src="https://slack.com/favicon.ico"
-                                            alt="Slack"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Slack
-                                    </Button>
-                                </div>
+                        {!userOwnsWorkspace &&
+                            !inviteExpired &&
+                            !inviteRevoked && (
+                                <>
+                                    {/* Social Login */}
+                                    <div className="space-y-3">
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("Google")
+                                            }
+                                        >
+                                            <img
+                                                src="https://www.google.com/favicon.ico"
+                                                alt="Google"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Google
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("AzureAD")
+                                            }
+                                        >
+                                            <img
+                                                src="https://www.microsoft.com/favicon.ico"
+                                                alt="Microsoft"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Microsoft
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("Slack")
+                                            }
+                                        >
+                                            <img
+                                                src="https://slack.com/favicon.ico"
+                                                alt="Slack"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Slack
+                                        </Button>
+                                    </div>
 
-                                <div className="flex items-center gap-4">
-                                    <Separator className="flex-1" />
-                                    <span className="text-sm text-muted-foreground">
-                                        or
-                                    </span>
-                                    <Separator className="flex-1" />
-                                </div>
+                                    <div className="flex items-center gap-4">
+                                        <Separator className="flex-1" />
+                                        <span className="text-sm text-muted-foreground">
+                                            or
+                                        </span>
+                                        <Separator className="flex-1" />
+                                    </div>
 
-                                {/* Signup Form */}
-                                <form
-                                    className="space-y-4"
-                                    onSubmit={handleSignup}
-                                >
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">
-                                                Your account
-                                            </Label>
-                                            <div className="space-y-3">
-                                                <Input
-                                                    type="text"
-                                                    placeholder="First name"
-                                                    value={firstName}
-                                                    onChange={(e) =>
-                                                        setFirstName(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Last name"
-                                                    value={lastName}
-                                                    onChange={(e) =>
-                                                        setLastName(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="email"
-                                                    placeholder="Work email"
-                                                    value={email}
-                                                    onChange={(e) =>
-                                                        setEmail(e.target.value)
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="password"
-                                                    placeholder="Password"
-                                                    value={password}
-                                                    onChange={(e) =>
-                                                        setPassword(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {!isInviteFlow && (
+                                    {/* Signup Form */}
+                                    <form
+                                        className="space-y-4"
+                                        onSubmit={handleSignup}
+                                    >
+                                        <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">
-                                                    Your workspace
+                                                    Your account
                                                 </Label>
                                                 <div className="space-y-3">
                                                     <Input
                                                         type="text"
-                                                        placeholder="Workspace name"
-                                                        value={workspaceName}
+                                                        placeholder="First name"
+                                                        value={firstName}
                                                         onChange={(e) =>
-                                                            setWorkspaceName(
+                                                            setFirstName(
                                                                 e.target.value
                                                             )
                                                         }
@@ -476,90 +436,151 @@ const Signup = () => {
                                                     />
                                                     <Input
                                                         type="text"
-                                                        placeholder="Short description (optional)"
-                                                        value={
-                                                            workspaceDescription
-                                                        }
+                                                        placeholder="Last name"
+                                                        value={lastName}
                                                         onChange={(e) =>
-                                                            setWorkspaceDescription(
+                                                            setLastName(
                                                                 e.target.value
                                                             )
                                                         }
                                                         className="h-11"
+                                                        required
+                                                    />
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="Work email"
+                                                        value={email}
+                                                        onChange={(e) =>
+                                                            setEmail(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="h-11"
+                                                        required
+                                                    />
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="Password"
+                                                        value={password}
+                                                        onChange={(e) =>
+                                                            setPassword(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="h-11"
+                                                        required
                                                     />
                                                 </div>
                                             </div>
+
+                                            {!isInviteFlow && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium">
+                                                        Your workspace
+                                                    </Label>
+                                                    <div className="space-y-3">
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Workspace name"
+                                                            value={
+                                                                workspaceName
+                                                            }
+                                                            onChange={(e) =>
+                                                                setWorkspaceName(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-11"
+                                                            required
+                                                        />
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Short description (optional)"
+                                                            value={
+                                                                workspaceDescription
+                                                            }
+                                                            onChange={(e) =>
+                                                                setWorkspaceDescription(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-11"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-start space-x-2">
+                                            <Checkbox
+                                                id="terms"
+                                                checked={agreedToTerms}
+                                                onCheckedChange={(checked) =>
+                                                    setAgreedToTerms(!!checked)
+                                                }
+                                            />
+                                            <Label
+                                                htmlFor="terms"
+                                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                I agree to{" "}
+                                                <a
+                                                    href="#"
+                                                    className="text-primary hover:underline"
+                                                >
+                                                    Terms
+                                                </a>{" "}
+                                                and{" "}
+                                                <a
+                                                    href="#"
+                                                    className="text-primary hover:underline"
+                                                >
+                                                    Privacy Policy
+                                                </a>
+                                            </Label>
+                                        </div>
+
+                                        {err && (
+                                            <div className="text-sm text-destructive">
+                                                {err}
+                                            </div>
                                         )}
-                                    </div>
+                                        {msg && (
+                                            <div className="text-sm text-success">
+                                                {msg}
+                                            </div>
+                                        )}
 
-                                    <div className="flex items-start space-x-2">
-                                        <Checkbox
-                                            id="terms"
-                                            checked={agreedToTerms}
-                                            onCheckedChange={(checked) =>
-                                                setAgreedToTerms(!!checked)
-                                            }
-                                        />
-                                        <Label
-                                            htmlFor="terms"
-                                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        <Button
+                                            disabled={disabled}
+                                            className="w-full h-11"
+                                            type="submit"
                                         >
-                                            I agree to{" "}
-                                            <a
-                                                href="#"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Terms
-                                            </a>{" "}
-                                            and{" "}
-                                            <a
-                                                href="#"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Privacy Policy
-                                            </a>
-                                        </Label>
+                                            {loading
+                                                ? "Creating..."
+                                                : isInviteFlow
+                                                ? "Create account and join workspace"
+                                                : "Create workspace"}
+                                        </Button>
+                                    </form>
+
+                                    <div className="text-center text-sm text-muted-foreground">
+                                        Already have an account?{" "}
+                                        <Link
+                                            to={
+                                                inviteToken
+                                                    ? `/login?invite=${inviteToken}`
+                                                    : "/login"
+                                            }
+                                            className="text-primary hover:underline font-medium"
+                                        >
+                                            Log in
+                                        </Link>
                                     </div>
-
-                                    {err && (
-                                        <div className="text-sm text-destructive">
-                                            {err}
-                                        </div>
-                                    )}
-                                    {msg && (
-                                        <div className="text-sm text-success">
-                                            {msg}
-                                        </div>
-                                    )}
-
-                                    <Button
-                                        disabled={disabled}
-                                        className="w-full h-11"
-                                        type="submit"
-                                    >
-                                        {loading
-                                            ? "Creating..."
-                                            : isInviteFlow
-                                            ? "Create account and join workspace"
-                                            : "Create workspace"}
-                                    </Button>
-                                </form>
-
-                                <div className="text-center text-sm text-muted-foreground">
-                                    Already have an account?{" "}
-                                    <Link
-                                        to={
-                                            inviteToken
-                                                ? `/login?invite=${inviteToken}`
-                                                : "/login"
-                                        }
-                                        className="text-primary hover:underline font-medium"
-                                    >
-                                        Log in
-                                    </Link>
-                                </div>
-                            </>
-                        )}
+                                </>
+                            )}
                     </div>
                 )}
 
