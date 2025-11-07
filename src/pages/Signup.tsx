@@ -26,7 +26,6 @@ const Signup = () => {
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
 
-
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -43,7 +42,9 @@ const Signup = () => {
     const [resendCooldown, setResendCooldown] = useState(0);
     const [initialLoading, setInitialLoading] = useState(isInviteFlow);
     const [invitationRole, setInvitationRole] = useState("MEMBER");
-    const [invitationStatus, setInvitationStatus] = useState<"valid" | "invalid" | "expired" | "revoked">("valid");
+    const [invitationStatus, setInvitationStatus] = useState<
+        "valid" | "invalid" | "expired" | "revoked"
+    >("valid");
 
     // Mock: Check if user already owns a workspace
     const [userOwnsWorkspace, setUserOwnsWorkspace] = useState(false);
@@ -268,7 +269,9 @@ const Signup = () => {
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     <Button
-                                        onClick={() => navigate("/signup")}
+                                        onClick={() =>
+                                            (window.location.href = "/signup")
+                                        }
                                         className="flex-1"
                                     >
                                         Create new workspace
@@ -302,7 +305,9 @@ const Signup = () => {
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     <Button
-                                        onClick={() => navigate("/signup")}
+                                        onClick={() => {
+                                            window.location.href = "/signup";
+                                        }}
                                         className="flex-1"
                                     >
                                         Create new workspace
@@ -337,7 +342,9 @@ const Signup = () => {
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     <Button
-                                        onClick={() => navigate("/signup")}
+                                        onClick={() => {
+                                            window.location.href = "/signup";
+                                        }}
                                         className="flex-1"
                                     >
                                         Create new workspace
@@ -437,134 +444,78 @@ const Signup = () => {
                         {!initialLoading &&
                             !userOwnsWorkspace &&
                             invitationStatus === "valid" && (
-                            <>
-                                {/* Social Login */}
-                                <div className="space-y-3">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("Google")
-                                        }
-                                    >
-                                        <img
-                                            src="https://www.google.com/favicon.ico"
-                                            alt="Google"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Google
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("AzureAD")
-                                        }
-                                    >
-                                        <img
-                                            src="https://www.microsoft.com/favicon.ico"
-                                            alt="Microsoft"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Microsoft
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-11"
-                                        onClick={() =>
-                                            hostedUiRedirect("Slack")
-                                        }
-                                    >
-                                        <img
-                                            src="https://slack.com/favicon.ico"
-                                            alt="Slack"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Continue with Slack
-                                    </Button>
-                                </div>
+                                <>
+                                    {/* Social Login */}
+                                    <div className="space-y-3">
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("Google")
+                                            }
+                                        >
+                                            <img
+                                                src="https://www.google.com/favicon.ico"
+                                                alt="Google"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Google
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("AzureAD")
+                                            }
+                                        >
+                                            <img
+                                                src="https://www.microsoft.com/favicon.ico"
+                                                alt="Microsoft"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Microsoft
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-11"
+                                            onClick={() =>
+                                                hostedUiRedirect("Slack")
+                                            }
+                                        >
+                                            <img
+                                                src="https://slack.com/favicon.ico"
+                                                alt="Slack"
+                                                className="w-5 h-5 mr-2"
+                                            />
+                                            Continue with Slack
+                                        </Button>
+                                    </div>
 
-                                <div className="flex items-center gap-4">
-                                    <Separator className="flex-1" />
-                                    <span className="text-sm text-muted-foreground">
-                                        or
-                                    </span>
-                                    <Separator className="flex-1" />
-                                </div>
+                                    <div className="flex items-center gap-4">
+                                        <Separator className="flex-1" />
+                                        <span className="text-sm text-muted-foreground">
+                                            or
+                                        </span>
+                                        <Separator className="flex-1" />
+                                    </div>
 
-                                {/* Signup Form */}
-                                <form
-                                    className="space-y-4"
-                                    onSubmit={handleSignup}
-                                >
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">
-                                                Your account
-                                            </Label>
-                                            <div className="space-y-3">
-                                                <Input
-                                                    type="text"
-                                                    placeholder="First name"
-                                                    value={firstName}
-                                                    onChange={(e) =>
-                                                        setFirstName(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Last name"
-                                                    value={lastName}
-                                                    onChange={(e) =>
-                                                        setLastName(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="email"
-                                                    readOnly
-                                                    placeholder="Work email"
-                                                    value={email}
-                                                    onChange={(e) =>
-                                                        setEmail(e.target.value)
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                                <Input
-                                                    type="password"
-                                                    placeholder="Password"
-                                                    value={password}
-                                                    onChange={(e) =>
-                                                        setPassword(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-11"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {!isInviteFlow && (
+                                    {/* Signup Form */}
+                                    <form
+                                        className="space-y-4"
+                                        onSubmit={handleSignup}
+                                    >
+                                        <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium">
-                                                    Your workspace
+                                                    Your account
                                                 </Label>
                                                 <div className="space-y-3">
                                                     <Input
                                                         type="text"
-                                                        placeholder="Workspace name"
-                                                        value={workspaceName}
+                                                        placeholder="First name"
+                                                        value={firstName}
                                                         onChange={(e) =>
-                                                            setWorkspaceName(
+                                                            setFirstName(
                                                                 e.target.value
                                                             )
                                                         }
@@ -573,90 +524,152 @@ const Signup = () => {
                                                     />
                                                     <Input
                                                         type="text"
-                                                        placeholder="Short description (optional)"
-                                                        value={
-                                                            workspaceDescription
-                                                        }
+                                                        placeholder="Last name"
+                                                        value={lastName}
                                                         onChange={(e) =>
-                                                            setWorkspaceDescription(
+                                                            setLastName(
                                                                 e.target.value
                                                             )
                                                         }
                                                         className="h-11"
+                                                        required
+                                                    />
+                                                    <Input
+                                                        type="email"
+                                                        readOnly
+                                                        placeholder="Work email"
+                                                        value={email}
+                                                        onChange={(e) =>
+                                                            setEmail(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="h-11"
+                                                        required
+                                                    />
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="Password"
+                                                        value={password}
+                                                        onChange={(e) =>
+                                                            setPassword(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="h-11"
+                                                        required
                                                     />
                                                 </div>
                                             </div>
+
+                                            {!isInviteFlow && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium">
+                                                        Your workspace
+                                                    </Label>
+                                                    <div className="space-y-3">
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Workspace name"
+                                                            value={
+                                                                workspaceName
+                                                            }
+                                                            onChange={(e) =>
+                                                                setWorkspaceName(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-11"
+                                                            required
+                                                        />
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Short description (optional)"
+                                                            value={
+                                                                workspaceDescription
+                                                            }
+                                                            onChange={(e) =>
+                                                                setWorkspaceDescription(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-11"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-start space-x-2">
+                                            <Checkbox
+                                                id="terms"
+                                                checked={agreedToTerms}
+                                                onCheckedChange={(checked) =>
+                                                    setAgreedToTerms(!!checked)
+                                                }
+                                            />
+                                            <Label
+                                                htmlFor="terms"
+                                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                I agree to{" "}
+                                                <a
+                                                    href="#"
+                                                    className="text-primary hover:underline"
+                                                >
+                                                    Terms
+                                                </a>{" "}
+                                                and{" "}
+                                                <a
+                                                    href="#"
+                                                    className="text-primary hover:underline"
+                                                >
+                                                    Privacy Policy
+                                                </a>
+                                            </Label>
+                                        </div>
+
+                                        {err && (
+                                            <div className="text-sm text-destructive">
+                                                {err}
+                                            </div>
                                         )}
-                                    </div>
+                                        {msg && (
+                                            <div className="text-sm text-success">
+                                                {msg}
+                                            </div>
+                                        )}
 
-                                    <div className="flex items-start space-x-2">
-                                        <Checkbox
-                                            id="terms"
-                                            checked={agreedToTerms}
-                                            onCheckedChange={(checked) =>
-                                                setAgreedToTerms(!!checked)
-                                            }
-                                        />
-                                        <Label
-                                            htmlFor="terms"
-                                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        <Button
+                                            disabled={disabled}
+                                            className="w-full h-11"
+                                            type="submit"
                                         >
-                                            I agree to{" "}
-                                            <a
-                                                href="#"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Terms
-                                            </a>{" "}
-                                            and{" "}
-                                            <a
-                                                href="#"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Privacy Policy
-                                            </a>
-                                        </Label>
+                                            {loading
+                                                ? "Creating..."
+                                                : isInviteFlow
+                                                ? "Create account and join workspace"
+                                                : "Create workspace"}
+                                        </Button>
+                                    </form>
+
+                                    <div className="text-center text-sm text-muted-foreground">
+                                        Already have an account?{" "}
+                                        <Link
+                                            to={
+                                                inviteToken
+                                                    ? `/login?invite=${inviteToken}`
+                                                    : "/login"
+                                            }
+                                            className="text-primary hover:underline font-medium"
+                                        >
+                                            Log in
+                                        </Link>
                                     </div>
-
-                                    {err && (
-                                        <div className="text-sm text-destructive">
-                                            {err}
-                                        </div>
-                                    )}
-                                    {msg && (
-                                        <div className="text-sm text-success">
-                                            {msg}
-                                        </div>
-                                    )}
-
-                                    <Button
-                                        disabled={disabled}
-                                        className="w-full h-11"
-                                        type="submit"
-                                    >
-                                        {loading
-                                            ? "Creating..."
-                                            : isInviteFlow
-                                            ? "Create account and join workspace"
-                                            : "Create workspace"}
-                                    </Button>
-                                </form>
-
-                                <div className="text-center text-sm text-muted-foreground">
-                                    Already have an account?{" "}
-                                    <Link
-                                        to={
-                                            inviteToken
-                                                ? `/login?invite=${inviteToken}`
-                                                : "/login"
-                                        }
-                                        className="text-primary hover:underline font-medium"
-                                    >
-                                        Log in
-                                    </Link>
-                                </div>
-                            </>
-                        )}
+                                </>
+                            )}
                     </div>
                 )}
 
