@@ -26,29 +26,6 @@ const Signup = () => {
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
 
-    // Mock: In production, fetch invite details from backend and validate status
-    // Set mockInviteStatus to 'valid', 'expired', or 'revoked' to test different states
-    const getMockInviteStatus = ():
-        | "valid"
-        | "expired"
-        | "revoked"
-        | "invalid" => {
-        // In production: return actual status from API
-        return "revoked"; // Change this to 'expired' or 'revoked' to test
-    };
-    const mockInviteStatus = getMockInviteStatus();
-    const mockInviteData =
-        inviteToken && mockInviteStatus === "valid"
-            ? {
-                  workspaceName: "Acme Design Team",
-                  role: "ADMIN" as "ADMIN" | "MEMBER",
-                  invitedEmail: "user@example.com",
-              }
-            : null;
-
-    const inviteExpired = inviteToken && mockInviteStatus === "expired";
-    const inviteRevoked = inviteToken && mockInviteStatus === "revoked";
-    const inviteInvalid = inviteToken && mockInviteStatus === "invalid";
 
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -64,9 +41,9 @@ const Signup = () => {
     const [msg, setMsg] = useState<string>("");
     const [err, setErr] = useState<string>("");
     const [resendCooldown, setResendCooldown] = useState(0);
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(isInviteFlow);
     const [invitationRole, setInvitationRole] = useState("MEMBER");
-    const [invitationStatus, setInvitationStatus] = useState("valid");
+    const [invitationStatus, setInvitationStatus] = useState<"valid" | "invalid" | "expired" | "revoked">("valid");
 
     // Mock: Check if user already owns a workspace
     const [userOwnsWorkspace, setUserOwnsWorkspace] = useState(false);
@@ -88,21 +65,42 @@ const Signup = () => {
         }
 
         (async () => {
-            const res = await fetch(
-                `https://stagingapi.luminote.ai/auth/invitations?inviteId=${inviteToken}`,
-                {
-                    method: "GET",
+            try {
+                const res = await fetch(
+                    `https://stagingapi.luminote.ai/auth/invitations?inviteId=${inviteToken}`,
+                    {
+                        method: "GET",
+                    }
+                );
+
+                const result = await res.json();
+
+                // Check for error responses
+                if (result.error) {
+                    if (result.error === "TOKEN_NOT_FOUND") {
+                        setInvitationStatus("invalid");
+                    } else if (result.error === "TOKEN_EXPIRED") {
+                        setInvitationStatus("expired");
+                    } else if (result.error === "TOKEN_REVOKED") {
+                        setInvitationStatus("revoked");
+                    } else {
+                        setInvitationStatus("invalid");
+                    }
+                } else {
+                    // Valid invite
+                    setWorkspaceName(result.workspace_name);
+                    setInvitationRole(result.role);
+                    setEmail(result.email);
+                    setInvitationStatus("valid");
                 }
-            );
-
-            const result = await res.json();
-
-            setWorkspaceName(result.workspace_name);
-            setInvitationRole(result.role);
-            setEmail(result.email);
-            setInitialLoading(false);
+            } catch (error) {
+                // Network error or invalid response
+                setInvitationStatus("invalid");
+            } finally {
+                setInitialLoading(false);
+            }
         })();
-    }, []);
+    }, [inviteToken, isInviteFlow]);
 
     const disabled =
         loading ||
@@ -241,8 +239,18 @@ const Signup = () => {
                 {/* Step 1: Create Account */}
                 {step === "account" && (
                     <div className="space-y-6">
+                        {/* Loading state while checking invite */}
+                        {isInviteFlow && initialLoading && (
+                            <div className="space-y-4">
+                                <Skeleton className="h-20 w-full" />
+                                <Skeleton className="h-11 w-full" />
+                                <Skeleton className="h-11 w-full" />
+                                <Skeleton className="h-11 w-full" />
+                            </div>
+                        )}
+
                         {/* Expired Invite Error */}
-                        {invitationStatus === "expired" && (
+                        {!initialLoading && invitationStatus === "expired" && (
                             <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
                                 <div className="flex gap-2">
                                     <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -380,9 +388,9 @@ const Signup = () => {
                         )}
 
                         {/* User Already Owns Workspace Error */}
-                        {userOwnsWorkspace &&
-                            !inviteExpired &&
-                            !inviteRevoked && (
+                        {!initialLoading &&
+                            userOwnsWorkspace &&
+                            invitationStatus === "valid" && (
                                 <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
                                     <div className="flex gap-2">
                                         <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -426,7 +434,9 @@ const Signup = () => {
                                 </div>
                             )}
 
-                        {!userOwnsWorkspace && invitationStatus === "valid" && (
+                        {!initialLoading &&
+                            !userOwnsWorkspace &&
+                            invitationStatus === "valid" && (
                             <>
                                 {/* Social Login */}
                                 <div className="space-y-3">
