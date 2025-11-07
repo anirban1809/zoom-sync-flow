@@ -56,10 +56,15 @@ export async function resendCode(email: string) {
     return result;
 }
 
-export async function cogConfirmSignUp(email: string, code: string) {
+export async function cogConfirmSignUp(
+    workspaceName: string,
+    email: string,
+    code: string
+) {
     const response = await fetch("https://stagingapi.luminote.ai/auth/verify", {
         method: "POST",
         body: JSON.stringify({
+            workspaceName,
             email,
             code,
         }),
