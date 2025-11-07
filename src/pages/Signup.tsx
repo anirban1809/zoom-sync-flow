@@ -172,7 +172,9 @@ const Signup = () => {
             const response = await cogConfirmSignUp(
                 workspaceName,
                 email.trim(),
-                confirmCode.trim()
+                confirmCode.trim(),
+                firstName.trim(),
+                lastName.trim()
             );
 
             if (response.error) {
