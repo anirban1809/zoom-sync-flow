@@ -144,6 +144,12 @@ const Signup = () => {
             );
 
             if (response.kind === "ERROR") {
+                // Check for specific error: user already owns a workspace
+                if (response.error === "WORKSPACE_OWNER_ALREADY_EXISTS") {
+                    setUserOwnsWorkspace(true);
+                    setLoading(false);
+                    return;
+                }
                 throw new Error(response.error);
             }
 
@@ -397,9 +403,7 @@ const Signup = () => {
                         )}
 
                         {/* User Already Owns Workspace Error */}
-                        {!initialLoading &&
-                            userOwnsWorkspace &&
-                            invitationStatus === "valid" && (
+                        {!initialLoading && userOwnsWorkspace && (
                                 <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
                                     <div className="flex gap-2">
                                         <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
