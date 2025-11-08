@@ -49,13 +49,18 @@ const Signup = () => {
 
     // Mock: Check if user already owns a workspace
     const [userOwnsWorkspace, setUserOwnsWorkspace] = useState(false);
+    const [authCheckLoading, setAuthCheckLoading] = useState(true);
 
     // Redirect if user is already logged in
     useEffect(() => {
         const checkAuth = async () => {
-            const token = await refreshAccessToken();
-            if (token) {
-                navigate("/");
+            try {
+                const token = await refreshAccessToken();
+                if (token) {
+                    navigate("/");
+                }
+            } finally {
+                setAuthCheckLoading(false);
             }
         };
         checkAuth();
@@ -249,7 +254,20 @@ const Signup = () => {
                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
             </Button>
 
-            <div className="w-full max-w-md space-y-6">
+            {authCheckLoading ? (
+                <div className="w-full max-w-md space-y-6">
+                    <div className="text-center space-y-2">
+                        <Skeleton className="h-9 w-64 mx-auto" />
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-11 w-full" />
+                        <Skeleton className="h-11 w-full" />
+                        <Skeleton className="h-11 w-full" />
+                        <Skeleton className="h-11 w-full" />
+                    </div>
+                </div>
+            ) : (
+                <div className="w-full max-w-md space-y-6">
                 <div className="text-center space-y-2">
                     <h2 className="text-3xl font-bold">
                         {isInviteFlow
@@ -760,6 +778,7 @@ const Signup = () => {
                     </div>
                 )}
             </div>
+            )}
         </div>
     );
 };
