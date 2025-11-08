@@ -22,8 +22,8 @@ export async function refreshAccessToken(): Promise<string | null> {
         credentials: "include",
     });
     if (!res.ok) {
-        // Only redirect if not already on login page
-        if (window.location.pathname !== "/login") {
+        // Only redirect if not already on login or signup page
+        if (window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
             window.location.href = "/login";
         }
         return null;
