@@ -17,13 +17,12 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthToken } from "@/hooks/use-auth";
+import { refreshAccessToken } from "@/lib/api/auth";
 
 const Signup = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { token, ensureToken } = useAuthToken();
 
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
@@ -54,13 +53,13 @@ const Signup = () => {
     // Redirect if user is already logged in
     useEffect(() => {
         const checkAuth = async () => {
+            const token = await refreshAccessToken();
             if (token) {
-                await ensureToken();
                 navigate("/");
             }
         };
         checkAuth();
-    }, [token, ensureToken, navigate]);
+    }, [navigate]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
