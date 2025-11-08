@@ -17,11 +17,13 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthToken } from "@/hooks/use-auth";
 
 const Signup = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { token, ensureToken } = useAuthToken();
 
     const inviteToken = searchParams.get("invite");
     const isInviteFlow = !!inviteToken;
@@ -48,6 +50,17 @@ const Signup = () => {
 
     // Mock: Check if user already owns a workspace
     const [userOwnsWorkspace, setUserOwnsWorkspace] = useState(false);
+
+    // Redirect if user is already logged in
+    useEffect(() => {
+        const checkAuth = async () => {
+            if (token) {
+                await ensureToken();
+                navigate("/");
+            }
+        };
+        checkAuth();
+    }, [token, ensureToken, navigate]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
