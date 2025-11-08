@@ -23,7 +23,11 @@ const Login = () => {
 
     // Redirect if user is already logged in
     useEffect(() => {
+        let hasChecked = false;
         const checkAuth = async () => {
+            if (hasChecked) return;
+            hasChecked = true;
+            
             try {
                 const token = await refreshAccessToken();
                 if (token) {

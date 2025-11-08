@@ -22,7 +22,10 @@ export async function refreshAccessToken(): Promise<string | null> {
         credentials: "include",
     });
     if (!res.ok) {
-        window.location.href = "/login";
+        // Only redirect if not already on login page
+        if (window.location.pathname !== "/login") {
+            window.location.href = "/login";
+        }
         return null;
     }
     const data = await res.json();
