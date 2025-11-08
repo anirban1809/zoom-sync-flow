@@ -538,7 +538,7 @@ const Signup = () => {
                                                     />
                                                     <Input
                                                         type="email"
-                                                        readOnly
+                                                        readOnly={isInviteFlow}
                                                         placeholder="Work email"
                                                         value={email}
                                                         onChange={(e) =>
