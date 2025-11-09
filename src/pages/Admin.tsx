@@ -145,7 +145,11 @@ export default function Admin() {
           <TabsList>
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
-              Users & Roles
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="permissions">
+              <Key className="h-4 w-4 mr-2" />
+              Permissions
             </TabsTrigger>
             <TabsTrigger value="workspace">
               <Database className="h-4 w-4 mr-2" />
@@ -157,7 +161,7 @@ export default function Admin() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Users & Roles Tab */}
+          {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader>
@@ -242,7 +246,10 @@ export default function Admin() {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          {/* Permissions Tab */}
+          <TabsContent value="permissions" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Role Permissions</CardTitle>
