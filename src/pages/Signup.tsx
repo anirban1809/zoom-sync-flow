@@ -50,8 +50,10 @@ const Signup = () => {
     // Mock: Check if user already owns a workspace
     const [userOwnsWorkspace, setUserOwnsWorkspace] = useState(false);
     const [authCheckLoading, setAuthCheckLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [acceptingInvite, setAcceptingInvite] = useState(false);
 
-    // Redirect if user is already logged in
+    // Redirect if user is already logged in (unless they have an invite)
     useEffect(() => {
         let hasChecked = false;
         const checkAuth = async () => {
@@ -61,14 +63,18 @@ const Signup = () => {
             try {
                 const token = await refreshAccessToken();
                 if (token) {
-                    navigate("/");
+                    setIsLoggedIn(true);
+                    // Only redirect if no invite token
+                    if (!isInviteFlow) {
+                        navigate("/");
+                    }
                 }
             } finally {
                 setAuthCheckLoading(false);
             }
         };
         checkAuth();
-    }, [navigate]);
+    }, [navigate, isInviteFlow]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -245,6 +251,34 @@ const Signup = () => {
         }
     }
 
+    async function handleAcceptInvite() {
+        setAcceptingInvite(true);
+        try {
+            // Mock: In production, call API to accept invite
+            // await acceptInvite(inviteToken);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setMsg("Successfully joined workspace!");
+            setTimeout(() => navigate("/"), 1500);
+        } catch (e: any) {
+            setErr(e?.message || "Failed to accept invite.");
+        } finally {
+            setAcceptingInvite(false);
+        }
+    }
+
+    async function handleDenyInvite() {
+        setAcceptingInvite(true);
+        try {
+            // Mock: In production, call API to deny invite
+            // await denyInvite(inviteToken);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            navigate("/");
+        } catch (e: any) {
+            setErr(e?.message || "Failed to deny invite.");
+            setAcceptingInvite(false);
+        }
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
             <Button
@@ -268,6 +302,81 @@ const Signup = () => {
                         <Skeleton className="h-11 w-full" />
                         <Skeleton className="h-11 w-full" />
                         <Skeleton className="h-11 w-full" />
+                    </div>
+                </div>
+            ) : isLoggedIn && isInviteFlow ? (
+                <div className="w-full max-w-md space-y-6">
+                    <div className="text-center space-y-2">
+                        <h2 className="text-3xl font-bold">Join Workspace</h2>
+                        <p className="text-muted-foreground">
+                            You've been invited to join a workspace
+                        </p>
+                    </div>
+
+                    <div className="bg-accent border border-border rounded-lg p-6 space-y-4">
+                        <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                                Workspace
+                            </p>
+                            <p className="text-2xl font-bold">
+                                Acme Corporation
+                            </p>
+                        </div>
+                        <Separator />
+                        <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                                Your role
+                            </p>
+                            <Badge variant="secondary" className="text-sm">
+                                {invitationRole || "Member"}
+                            </Badge>
+                        </div>
+                        <Separator />
+                        <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                                Invited by
+                            </p>
+                            <p className="font-medium">John Smith</p>
+                        </div>
+                    </div>
+
+                    {msg && (
+                        <div className="bg-primary/10 border border-primary rounded-lg p-3 text-sm text-primary">
+                            {msg}
+                        </div>
+                    )}
+
+                    {err && (
+                        <div className="bg-destructive/10 border border-destructive rounded-lg p-3 text-sm text-destructive">
+                            {err}
+                        </div>
+                    )}
+
+                    <div className="flex gap-3">
+                        <Button
+                            onClick={handleAcceptInvite}
+                            className="flex-1"
+                            disabled={acceptingInvite}
+                        >
+                            {acceptingInvite ? "Accepting..." : "Accept Invitation"}
+                        </Button>
+                        <Button
+                            onClick={handleDenyInvite}
+                            variant="outline"
+                            className="flex-1"
+                            disabled={acceptingInvite}
+                        >
+                            Decline
+                        </Button>
+                    </div>
+
+                    <div className="text-center">
+                        <Link
+                            to="/"
+                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            Return to home
+                        </Link>
                     </div>
                 </div>
             ) : (
