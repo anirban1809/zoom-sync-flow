@@ -31,14 +31,19 @@ const Login = () => {
             try {
                 const token = await refreshAccessToken();
                 if (token) {
-                    nav("/");
+                    // If has invite token, redirect to signup page to show join workspace screen
+                    if (inviteToken) {
+                        nav(`/signup?invite=${inviteToken}`);
+                    } else {
+                        nav("/");
+                    }
                 }
             } finally {
                 setAuthCheckLoading(false);
             }
         };
         checkAuth();
-    }, [nav]);
+    }, [nav, inviteToken]);
 
     async function handleLogin(e?: React.FormEvent) {
         e?.preventDefault?.();
@@ -68,10 +73,8 @@ const Login = () => {
 
                 // Navigate to workspace selection or directly to workspace if invite
                 if (inviteToken) {
-                    // Mock: Accept invite and redirect to that workspace
-                    // await acceptInvite(inviteToken);
-                    // const workspaceId = await getWorkspaceIdFromInvite(inviteToken);
-                    nav("/onboarding"); // In production: nav(`/app/${workspaceId}`)
+                    // Redirect to signup page to show join workspace screen
+                    nav(`/signup?invite=${inviteToken}`);
                 } else {
                     nav("/login/workspaces");
                 }

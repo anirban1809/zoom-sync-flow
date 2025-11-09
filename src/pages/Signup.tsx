@@ -68,13 +68,20 @@ const Signup = () => {
                     if (!isInviteFlow) {
                         navigate("/");
                     }
+                } else {
+                    // User is not logged in
+                    setIsLoggedIn(false);
+                    // If they have an invite token, redirect to login
+                    if (isInviteFlow) {
+                        navigate(`/login?invite=${inviteToken}`);
+                    }
                 }
             } finally {
                 setAuthCheckLoading(false);
             }
         };
         checkAuth();
-    }, [navigate, isInviteFlow]);
+    }, [navigate, isInviteFlow, inviteToken]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
