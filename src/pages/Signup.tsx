@@ -313,18 +313,18 @@ const Signup = () => {
                         </p>
                     </div>
 
-                    <div className="bg-accent border border-border rounded-lg p-6 space-y-4">
+                    <div className="bg-card border border-border rounded-lg p-6 space-y-4 shadow-sm">
                         <div className="space-y-2">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                 Workspace
                             </p>
-                            <p className="text-2xl font-bold">
+                            <p className="text-2xl font-bold text-foreground">
                                 Acme Corporation
                             </p>
                         </div>
                         <Separator />
                         <div className="space-y-2">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                 Your role
                             </p>
                             <Badge variant="secondary" className="text-sm">
@@ -333,10 +333,10 @@ const Signup = () => {
                         </div>
                         <Separator />
                         <div className="space-y-2">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                 Invited by
                             </p>
-                            <p className="font-medium">John Smith</p>
+                            <p className="text-base font-medium text-foreground">John Smith</p>
                         </div>
                     </div>
 
