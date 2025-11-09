@@ -13,6 +13,7 @@ import {
     HelpCircle,
     MessageSquare,
     CheckSquare,
+    User,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -43,6 +44,7 @@ const workflowNav = [
 ];
 
 const settingsNav = [
+    { title: "Profile", url: "/profile", icon: User },
     { title: "Admin", url: "/admin", icon: Settings },
     { title: "Billing", url: "/billing", icon: CreditCard },
     // { title: "Compliance", url: "/compliance", icon: Shield },

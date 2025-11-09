@@ -17,6 +17,7 @@ import Integrations from "./pages/Integrations";
 import Insights from "./pages/Insights";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
 import Billing from "./pages/Billing";
 import Compliance from "./pages/Compliance";
 import DataManagement from "./pages/DataManagement";
@@ -144,6 +145,14 @@ const App = () => (
                             element={
                                 <AppShell>
                                     <Admin />
+                                </AppShell>
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <AppShell>
+                                    <Profile />
                                 </AppShell>
                             }
                         />
