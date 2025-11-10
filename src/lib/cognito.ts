@@ -10,7 +10,10 @@ export async function signUp(
     email: string,
     password: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    workspaceName: string,
+    flow: "invite" | "signup",
+    inviteCode?: string
 ) {
     const response = await fetch("https://stagingapi.luminote.ai/auth/signup", {
         method: "POST",
@@ -19,6 +22,9 @@ export async function signUp(
             password,
             firstName,
             lastName,
+            workspaceName,
+            flow,
+            inviteCode,
         }),
     });
 
