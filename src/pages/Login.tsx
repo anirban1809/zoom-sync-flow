@@ -14,12 +14,16 @@ const Login = () => {
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
     const inviteToken = searchParams.get("invite");
+    const createWorkspaceIntent = searchParams.get("intent") === "create_workspace";
+    const emailParam = searchParams.get("email");
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState(emailParam || "");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState("");
     const [authCheckLoading, setAuthCheckLoading] = useState(true);
+    const [showCreateWorkspace, setShowCreateWorkspace] = useState(false);
+    const [workspaceName, setWorkspaceName] = useState("");
 
     // Redirect if user is already logged in
     useEffect(() => {
@@ -75,6 +79,9 @@ const Login = () => {
                 if (inviteToken) {
                     // Redirect to signup page to show join workspace screen
                     nav(`/signup?invite=${inviteToken}`);
+                } else if (createWorkspaceIntent) {
+                    // Show create workspace screen
+                    setShowCreateWorkspace(true);
                 } else {
                     nav("/login/workspaces");
                 }
@@ -84,6 +91,67 @@ const Login = () => {
         } finally {
             setLoading(false);
         }
+    }
+
+    async function handleCreateWorkspace(e?: React.FormEvent) {
+        e?.preventDefault?.();
+        if (!workspaceName.trim()) {
+            setErr("Please enter a workspace name");
+            return;
+        }
+        
+        setLoading(true);
+        setErr("");
+        
+        // TODO: Call backend API to create workspace
+        // For now, just redirect to home
+        setTimeout(() => {
+            nav("/");
+        }, 500);
+    }
+
+    if (showCreateWorkspace) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
+                <div className="w-full max-w-md space-y-6">
+                    <div className="text-center space-y-2">
+                        <h1 className="text-3xl font-bold">Welcome to luminote.ai</h1>
+                        <p className="text-muted-foreground">
+                            Let's create your workspace to get started
+                        </p>
+                    </div>
+
+                    <form className="space-y-4" onSubmit={handleCreateWorkspace}>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-foreground">
+                                Workspace Name
+                            </label>
+                            <Input
+                                type="text"
+                                placeholder="e.g., Acme Inc"
+                                value={workspaceName}
+                                onChange={(e) => setWorkspaceName(e.target.value)}
+                                className="h-11"
+                                required
+                                autoFocus
+                            />
+                        </div>
+
+                        {err && (
+                            <div className="text-sm text-destructive">{err}</div>
+                        )}
+
+                        <Button
+                            disabled={loading}
+                            className="w-full h-11"
+                            type="submit"
+                        >
+                            {loading ? "Creating..." : "Create Workspace"}
+                        </Button>
+                    </form>
+                </div>
+            </div>
+        );
     }
 
     return (

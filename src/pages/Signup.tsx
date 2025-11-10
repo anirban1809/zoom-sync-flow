@@ -185,6 +185,10 @@ const Signup = () => {
                     return;
                 }
                 throw new Error(response.error);
+            } else if (response.intent === "create_workspace" && response.user_exists) {
+                // User exists, redirect to login to create workspace
+                navigate(`/login?intent=create_workspace&email=${email.trim()}`);
+                return;
             }
 
             // Mock: In production, create workspace or attach invite membership here
