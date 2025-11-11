@@ -83,6 +83,7 @@ export default function Home() {
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [showWorkspaceSelector, setShowWorkspaceSelector] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
+  const [loadingWorkspaces, setLoadingWorkspaces] = useState(false);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
@@ -94,8 +95,14 @@ export default function Home() {
     if (storedWorkspace) {
       setSelectedWorkspace(storedWorkspace);
     } else {
-      // No workspace selected, show selector
+      // No workspace selected, show selector with loading
       setShowWorkspaceSelector(true);
+      setLoadingWorkspaces(true);
+      
+      // Simulate loading workspaces
+      setTimeout(() => {
+        setLoadingWorkspaces(false);
+      }, 800);
     }
 
     (async () => {
@@ -221,30 +228,52 @@ export default function Home() {
           </DialogHeader>
           
           <div className="mt-6 space-y-3">
-            {mockWorkspaces.map((workspace) => (
-              <button
-                key={workspace.id}
-                onClick={() => handleWorkspaceSelect(workspace.id)}
-                className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Building2 className="h-5 w-5 text-primary" />
+            {loadingWorkspaces ? (
+              // Loading skeletons
+              <>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="w-full flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <Skeleton className="h-10 w-10 rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-5 w-16 rounded-full" />
                   </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{workspace.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {workspace.role === "OWNER" ? "You own this workspace" : 
-                       workspace.role === "ADMIN" ? "Admin access" : 
-                       "Member access"}
-                    </p>
+                ))}
+              </>
+            ) : (
+              // Actual workspace list
+              mockWorkspaces.map((workspace) => (
+                <button
+                  key={workspace.id}
+                  onClick={() => handleWorkspaceSelect(workspace.id)}
+                  className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{workspace.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {workspace.role === "OWNER" ? "You own this workspace" : 
+                         workspace.role === "ADMIN" ? "Admin access" : 
+                         "Member access"}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <Badge variant={getRoleBadgeVariant(workspace.role)}>
-                  {workspace.role}
-                </Badge>
-              </button>
-            ))}
+                  <Badge variant={getRoleBadgeVariant(workspace.role)}>
+                    {workspace.role}
+                  </Badge>
+                </button>
+              ))
+            )}
           </div>
         </DialogContent>
       </Dialog>
