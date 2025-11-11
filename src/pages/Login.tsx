@@ -14,7 +14,9 @@ const Login = () => {
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
     const inviteToken = searchParams.get("invite");
-    const createWorkspaceIntent = searchParams.get("intent") === "create_workspace";
+    const createWorkspaceIntent =
+        searchParams.get("intent") === "create_workspace";
+    const intentToken = searchParams.get("intent_token");
     const emailParam = searchParams.get("email");
 
     const [email, setEmail] = useState(emailParam || "");
@@ -31,7 +33,7 @@ const Login = () => {
         const checkAuth = async () => {
             if (hasChecked) return;
             hasChecked = true;
-            
+
             try {
                 const token = await refreshAccessToken();
                 if (token) {
@@ -99,14 +101,26 @@ const Login = () => {
             setErr("Please enter a workspace name");
             return;
         }
-        
+
         setLoading(true);
         setErr("");
-        
-        // TODO: Call backend API to create workspace
-        // For now, just redirect to home
+
+        const response = await fetch(
+            `https://stagingapi.luminote.ai/auth/workspace?intent_token=${intentToken}`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    workspaceName: workspaceName.trim(),
+                    email: email.trim(),
+                    intent_token: intentToken,
+                }),
+            }
+        );
+
+        const result = await response.json();
+
         setTimeout(() => {
-            nav("/");
+            nav(`/?workspace_id=${result.workspaceId}`);
         }, 500);
     }
 
@@ -115,13 +129,18 @@ const Login = () => {
             <div className="min-h-screen flex items-center justify-center bg-background p-4">
                 <div className="w-full max-w-md space-y-6">
                     <div className="text-center space-y-2">
-                        <h1 className="text-3xl font-bold">Welcome to luminote.ai</h1>
+                        <h1 className="text-3xl font-bold">
+                            Welcome to luminote.ai
+                        </h1>
                         <p className="text-muted-foreground">
                             Let's create your workspace to get started
                         </p>
                     </div>
 
-                    <form className="space-y-4" onSubmit={handleCreateWorkspace}>
+                    <form
+                        className="space-y-4"
+                        onSubmit={handleCreateWorkspace}
+                    >
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-foreground">
                                 Workspace Name
@@ -130,7 +149,9 @@ const Login = () => {
                                 type="text"
                                 placeholder="e.g., Acme Inc"
                                 value={workspaceName}
-                                onChange={(e) => setWorkspaceName(e.target.value)}
+                                onChange={(e) =>
+                                    setWorkspaceName(e.target.value)
+                                }
                                 className="h-11"
                                 required
                                 autoFocus
@@ -138,7 +159,9 @@ const Login = () => {
                         </div>
 
                         {err && (
-                            <div className="text-sm text-destructive">{err}</div>
+                            <div className="text-sm text-destructive">
+                                {err}
+                            </div>
                         )}
 
                         <Button
@@ -234,7 +257,9 @@ const Login = () => {
 
                     <div className="flex items-center gap-4">
                         <Separator className="flex-1" />
-                        <span className="text-sm text-muted-foreground">or</span>
+                        <span className="text-sm text-muted-foreground">
+                            or
+                        </span>
                         <Separator className="flex-1" />
                     </div>
 
@@ -267,7 +292,9 @@ const Login = () => {
                         </div>
 
                         {err && (
-                            <div className="text-sm text-destructive">{err}</div>
+                            <div className="text-sm text-destructive">
+                                {err}
+                            </div>
                         )}
 
                         <Button
@@ -284,7 +311,10 @@ const Login = () => {
                             Create an account
                         </Link>
                         <span>•</span>
-                        <Link to="/help-support" className="hover:text-foreground">
+                        <Link
+                            to="/help-support"
+                            className="hover:text-foreground"
+                        >
                             Help
                         </Link>
                         <span>•</span>

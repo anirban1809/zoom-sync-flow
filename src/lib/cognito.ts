@@ -30,6 +30,10 @@ export async function signUp(
 
     const result = await response.json();
 
+    if (result.intent) {
+        return result;
+    }
+
     if (!result.ok) {
         return {
             kind: "ERROR",

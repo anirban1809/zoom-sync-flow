@@ -185,9 +185,17 @@ const Signup = () => {
                     return;
                 }
                 throw new Error(response.error);
-            } else if (response.intent === "create_workspace" && response.user_exists) {
+            } else if (
+                response.intent === "create_workspace" &&
+                response.user_exists
+            ) {
+                console.log("user exists");
                 // User exists, redirect to login to create workspace
-                navigate(`/login?intent=create_workspace&email=${email.trim()}`);
+                navigate(
+                    `/login?intent=create_workspace&email=${email.trim()}&intent_token=${
+                        response.intent_token
+                    }`
+                );
                 return;
             }
 

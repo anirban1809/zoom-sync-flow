@@ -23,7 +23,10 @@ export async function refreshAccessToken(): Promise<string | null> {
     });
     if (!res.ok) {
         // Only redirect if not already on login or signup page
-        if (window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+        if (
+            window.location.pathname !== "/login" &&
+            window.location.pathname !== "/signup"
+        ) {
             window.location.href = "/login";
         }
         return null;
