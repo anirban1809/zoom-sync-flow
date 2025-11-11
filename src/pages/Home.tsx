@@ -116,9 +116,6 @@ export default function Home() {
       setTimeout(() => {
         setLoadingWorkspaces(false);
       }, 800);
-      
-      // Don't show loading skeleton when workspace selector is shown
-      setLoading(false);
     }
   }, []);
 
