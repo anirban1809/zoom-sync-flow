@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, Video, User, Flag, Clock, MapPin } from "lucide-react";
+import { Calendar, Video, User, Flag, Clock, MapPin, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,6 +36,13 @@ const statusColors = {
   cancelled: "bg-muted text-muted-foreground",
 } as const;
 
+// Mock workspace data
+const mockWorkspaces = [
+  { id: "ws1", name: "Acme Corp", role: "OWNER" as const },
+  { id: "ws2", name: "Design Team", role: "ADMIN" as const },
+  { id: "ws3", name: "Project Phoenix", role: "MEMBER" as const },
+];
+
 const getGreeting = () => {
   const hour = new Date().getHours();
   
@@ -57,18 +64,40 @@ const getGreeting = () => {
   }
 };
 
+const getRoleBadgeVariant = (role: "OWNER" | "ADMIN" | "MEMBER") => {
+  switch (role) {
+    case "OWNER":
+      return "default";
+    case "ADMIN":
+      return "secondary";
+    case "MEMBER":
+      return "outline";
+  }
+};
+
 export default function Home() {
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [showWorkspaceSelector, setShowWorkspaceSelector] = useState(false);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
   const { greeting, caption } = getGreeting();
 
   useEffect(() => {
+    // Check for selected workspace in sessionStorage
+    const storedWorkspace = sessionStorage.getItem("selected_workspace");
+    if (storedWorkspace) {
+      setSelectedWorkspace(storedWorkspace);
+    } else {
+      // No workspace selected, show selector
+      setShowWorkspaceSelector(true);
+    }
+
     (async () => {
       try {
         const res = await apiFetch("/me");
@@ -80,6 +109,12 @@ export default function Home() {
       }
     })();
   }, []);
+
+  const handleWorkspaceSelect = (workspaceId: string) => {
+    sessionStorage.setItem("selected_workspace", workspaceId);
+    setSelectedWorkspace(workspaceId);
+    setShowWorkspaceSelector(false);
+  };
 
   const upcomingTasks = mockTasks
     .filter((t) => t.status !== "done")
@@ -177,6 +212,42 @@ export default function Home() {
         open={createMeetingOpen}
         onOpenChange={setCreateMeetingOpen}
       />
+
+      {/* Workspace Selector Modal */}
+      <Dialog open={showWorkspaceSelector} onOpenChange={setShowWorkspaceSelector}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Select Workspace</DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-6 space-y-3">
+            {mockWorkspaces.map((workspace) => (
+              <button
+                key={workspace.id}
+                onClick={() => handleWorkspaceSelect(workspace.id)}
+                className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Building2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{workspace.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {workspace.role === "OWNER" ? "You own this workspace" : 
+                       workspace.role === "ADMIN" ? "Admin access" : 
+                       "Member access"}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant={getRoleBadgeVariant(workspace.role)}>
+                  {workspace.role}
+                </Badge>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
