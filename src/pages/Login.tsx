@@ -85,7 +85,7 @@ const Login = () => {
                     // Show create workspace screen
                     setShowCreateWorkspace(true);
                 } else {
-                    nav("/login/workspaces");
+                    nav("/workspace-selection");
                 }
             }
         } catch (error: any) {

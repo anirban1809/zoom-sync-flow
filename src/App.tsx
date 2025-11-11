@@ -41,7 +41,14 @@ const App = () => (
                 <BrowserRouter>
                     <Routes>
                         <Route path="/login" element={<Login />} />
-                        <Route path="/workspace-selection" element={<WorkspaceSelection />} />
+                        <Route
+                            path="/workspace-selection"
+                            element={
+                                <AuthProvider>
+                                    <WorkspaceSelection />
+                                </AuthProvider>
+                            }
+                        />
                         <Route path="/signup" element={<Signup />} />
                         <Route
                             path="/password-reset"
