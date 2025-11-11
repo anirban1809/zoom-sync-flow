@@ -107,16 +107,17 @@ export default function Home() {
       setSelectedWorkspace(storedWorkspace);
       // Workspace already selected, fetch user info
       fetchUserInfo();
-    } else {
-      // No workspace selected, show selector with loading
-      setShowWorkspaceSelector(true);
-      setLoadingWorkspaces(true);
-      
-      // Simulate loading workspaces
-      setTimeout(() => {
-        setLoadingWorkspaces(false);
-      }, 800);
-    }
+  } else {
+    // No workspace selected, show selector with loading
+    setShowWorkspaceSelector(true);
+    setLoadingWorkspaces(true);
+    setLoading(false); // Allow workspace selector to be visible
+    
+    // Simulate loading workspaces
+    setTimeout(() => {
+      setLoadingWorkspaces(false);
+    }, 800);
+  }
   }, []);
 
   const handleWorkspaceSelect = async (workspaceId: string) => {
