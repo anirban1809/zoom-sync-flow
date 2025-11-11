@@ -69,12 +69,13 @@ const WorkspaceSelection = () => {
     }, []);
 
     const handleContinue = () => {
-        if (workspaces.length === 1) {
-            // Navigate directly for single workspace
-            navigate("/onboarding"); // In production: navigate(`/app/${workspaces[0].id}`)
-        } else if (selectedWorkspace) {
-            // Navigate to selected workspace
-            navigate("/onboarding"); // In production: navigate(`/app/${selectedWorkspace}`)
+        const workspaceId = workspaces.length === 1 ? workspaces[0].id : selectedWorkspace;
+        
+        if (workspaceId) {
+            // Store selected workspace in sessionStorage
+            sessionStorage.setItem("selected_workspace", workspaceId);
+            // Navigate to home page
+            navigate("/");
         }
     };
 

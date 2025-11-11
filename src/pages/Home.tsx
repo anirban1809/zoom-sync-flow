@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Calendar, Video, User, Flag, Clock, MapPin, Building2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Video, User, Flag, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,13 +37,6 @@ const statusColors = {
   cancelled: "bg-muted text-muted-foreground",
 } as const;
 
-// Mock workspace data
-const mockWorkspaces = [
-  { id: "ws1", name: "Acme Corp", role: "OWNER" as const },
-  { id: "ws2", name: "Design Team", role: "ADMIN" as const },
-  { id: "ws3", name: "Project Phoenix", role: "MEMBER" as const },
-];
-
 const getGreeting = () => {
   const hour = new Date().getHours();
   
@@ -64,26 +58,13 @@ const getGreeting = () => {
   }
 };
 
-const getRoleBadgeVariant = (role: "OWNER" | "ADMIN" | "MEMBER") => {
-  switch (role) {
-    case "OWNER":
-      return "default";
-    case "ADMIN":
-      return "secondary";
-    case "MEMBER":
-      return "outline";
-  }
-};
-
 export default function Home() {
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
-  const [showWorkspaceSelector, setShowWorkspaceSelector] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
-  const [loadingWorkspaces, setLoadingWorkspaces] = useState(false);
   const todaysMeetings = mockMeetings.filter(
     (m) => m.start.toDateString() === new Date().toDateString()
   );
@@ -104,31 +85,13 @@ export default function Home() {
     // Check for selected workspace in sessionStorage
     const storedWorkspace = sessionStorage.getItem("selected_workspace");
     if (storedWorkspace) {
-      setSelectedWorkspace(storedWorkspace);
       // Workspace already selected, fetch user info
       fetchUserInfo();
-  } else {
-    // No workspace selected, show selector with loading
-    setShowWorkspaceSelector(true);
-    setLoadingWorkspaces(true);
-    setLoading(false); // Allow workspace selector to be visible
-    
-    // Simulate loading workspaces
-    setTimeout(() => {
-      setLoadingWorkspaces(false);
-    }, 800);
-  }
-  }, []);
-
-  const handleWorkspaceSelect = async (workspaceId: string) => {
-    sessionStorage.setItem("selected_workspace", workspaceId);
-    setSelectedWorkspace(workspaceId);
-    setShowWorkspaceSelector(false);
-    
-    // Fetch user info after workspace selection
-    setLoading(true);
-    await fetchUserInfo();
-  };
+    } else {
+      // No workspace selected, redirect to workspace selection
+      navigate("/workspace-selection");
+    }
+  }, [navigate]);
 
   const upcomingTasks = mockTasks
     .filter((t) => t.status !== "done")
@@ -226,64 +189,6 @@ export default function Home() {
         open={createMeetingOpen}
         onOpenChange={setCreateMeetingOpen}
       />
-
-      {/* Workspace Selector Modal */}
-      <Dialog open={showWorkspaceSelector} onOpenChange={setShowWorkspaceSelector}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Select Workspace</DialogTitle>
-          </DialogHeader>
-          
-          <div className="mt-6 space-y-3">
-            {loadingWorkspaces ? (
-              // Loading skeletons
-              <>
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-full flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      <Skeleton className="h-10 w-10 rounded-lg" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-24" />
-                      </div>
-                    </div>
-                    <Skeleton className="h-5 w-16 rounded-full" />
-                  </div>
-                ))}
-              </>
-            ) : (
-              // Actual workspace list
-              mockWorkspaces.map((workspace) => (
-                <button
-                  key={workspace.id}
-                  onClick={() => handleWorkspaceSelect(workspace.id)}
-                  className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Building2 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-foreground">{workspace.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {workspace.role === "OWNER" ? "You own this workspace" : 
-                         workspace.role === "ADMIN" ? "Admin access" : 
-                         "Member access"}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant={getRoleBadgeVariant(workspace.role)}>
-                    {workspace.role}
-                  </Badge>
-                </button>
-              ))
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
