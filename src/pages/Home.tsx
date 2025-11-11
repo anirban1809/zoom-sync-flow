@@ -89,11 +89,24 @@ export default function Home() {
   );
   const { greeting, caption } = getGreeting();
 
+  const fetchUserInfo = async () => {
+    try {
+      const res = await apiFetch("/me");
+      setUserInfo(await res.json());
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Check for selected workspace in sessionStorage
     const storedWorkspace = sessionStorage.getItem("selected_workspace");
     if (storedWorkspace) {
       setSelectedWorkspace(storedWorkspace);
+      // Workspace already selected, fetch user info
+      fetchUserInfo();
     } else {
       // No workspace selected, show selector with loading
       setShowWorkspaceSelector(true);
@@ -103,24 +116,20 @@ export default function Home() {
       setTimeout(() => {
         setLoadingWorkspaces(false);
       }, 800);
+      
+      // Don't show loading skeleton when workspace selector is shown
+      setLoading(false);
     }
-
-    (async () => {
-      try {
-        const res = await apiFetch("/me");
-        setUserInfo(await res.json());
-      } catch (error) {
-        console.error("Failed to fetch user info:", error);
-      } finally {
-        setLoading(false);
-      }
-    })();
   }, []);
 
-  const handleWorkspaceSelect = (workspaceId: string) => {
+  const handleWorkspaceSelect = async (workspaceId: string) => {
     sessionStorage.setItem("selected_workspace", workspaceId);
     setSelectedWorkspace(workspaceId);
     setShowWorkspaceSelector(false);
+    
+    // Fetch user info after workspace selection
+    setLoading(true);
+    await fetchUserInfo();
   };
 
   const upcomingTasks = mockTasks
