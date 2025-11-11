@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Moon, Sun, Building2, AlertCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
@@ -56,9 +57,11 @@ const WorkspaceSelection = () => {
                 
                 setWorkspaces(mockWorkspaces);
                 
-                // Auto-select if only one workspace
+                // Auto-select and navigate if only one workspace
                 if (mockWorkspaces.length === 1) {
-                    setSelectedWorkspace(mockWorkspaces[0].id);
+                    sessionStorage.setItem("selected_workspace", mockWorkspaces[0].id);
+                    navigate("/");
+                    return;
                 }
                 
                 setLoading(false);
@@ -92,10 +95,43 @@ const WorkspaceSelection = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                    <p className="text-muted-foreground">Loading workspaces...</p>
+            <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="absolute top-4 right-4"
+                    aria-label="Toggle theme"
+                >
+                    <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+                </Button>
+
+                <div className="w-full max-w-2xl space-y-6">
+                    <div className="text-center space-y-2">
+                        <Skeleton className="h-9 w-48 mx-auto" />
+                        <Skeleton className="h-8 w-64 mx-auto" />
+                        <Skeleton className="h-5 w-56 mx-auto" />
+                    </div>
+
+                    <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                            <Card key={i} className="p-4">
+                                <div className="flex items-start gap-4">
+                                    <Skeleton className="h-12 w-12 rounded-lg flex-shrink-0" />
+                                    <div className="flex-1 space-y-2">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <Skeleton className="h-6 w-40" />
+                                            <Skeleton className="h-5 w-16" />
+                                        </div>
+                                        <Skeleton className="h-4 w-full" />
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+
+                    <Skeleton className="h-11 w-full" />
                 </div>
             </div>
         );
