@@ -6,12 +6,13 @@ import { Moon, Sun, Building2, AlertCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { apiFetch } from "@/lib/api/api";
 
 type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
 
 interface Workspace {
-    id: string;
-    name: string;
+    SK: string;
+    workspace_name: string;
     description?: string;
     role: WorkspaceRole;
 }
@@ -19,61 +20,43 @@ interface Workspace {
 const WorkspaceSelection = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
-    
+
     // Mock user email - in production, get from auth context
     const userEmail = "user@example.com";
-    
+
     // Mock workspaces - in production, fetch from API
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
+    const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(
+        null
+    );
 
     useEffect(() => {
-        // Mock: Fetch user's workspace memberships
-        const fetchWorkspaces = async () => {
-            setLoading(true);
-            // Simulate API call
-            setTimeout(() => {
-                // Mock data - change array to test different scenarios
-                const mockWorkspaces: Workspace[] = [
-                    {
-                        id: "ws-1",
-                        name: "Acme Design Team",
-                        description: "Main design workspace",
-                        role: "OWNER"
-                    },
-                    {
-                        id: "ws-2",
-                        name: "Marketing Department",
-                        role: "ADMIN"
-                    },
-                    {
-                        id: "ws-3",
-                        name: "Engineering Hub",
-                        description: "Product development",
-                        role: "MEMBER"
-                    }
-                ];
-                
-                setWorkspaces(mockWorkspaces);
-                
-                // Auto-select and navigate if only one workspace
-                if (mockWorkspaces.length === 1) {
-                    sessionStorage.setItem("selected_workspace", mockWorkspaces[0].id);
-                    navigate("/");
-                    return;
-                }
-                
-                setLoading(false);
-            }, 500);
-        };
+        setLoading(true);
+        (async () => {
+            const result = await apiFetch("/me/workspaces");
+            const allWorkspaces = await result.json();
 
-        fetchWorkspaces();
+            if (allWorkspaces.length === 1) {
+                sessionStorage.setItem(
+                    "selected_workspace",
+                    allWorkspaces[0].SK
+                );
+                navigate("/");
+                return;
+            }
+
+            setWorkspaces(allWorkspaces);
+            setLoading(false);
+        })();
+
+        // Auto-select and navigate if only one workspace
     }, []);
 
     const handleContinue = () => {
-        const workspaceId = workspaces.length === 1 ? workspaces[0].id : selectedWorkspace;
-        
+        const workspaceId =
+            workspaces.length === 1 ? workspaces[0].SK : selectedWorkspace;
+
         if (workspaceId) {
             // Store selected workspace in sessionStorage
             sessionStorage.setItem("selected_workspace", workspaceId);
@@ -99,7 +82,9 @@ const WorkspaceSelection = () => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    onClick={() =>
+                        setTheme(theme === "dark" ? "light" : "dark")
+                    }
                     className="absolute top-4 right-4"
                     aria-label="Toggle theme"
                 >
@@ -155,7 +140,10 @@ const WorkspaceSelection = () => {
                     <h1 className="text-3xl font-bold">luminote.ai</h1>
                     <h2 className="text-2xl font-bold">Choose a workspace</h2>
                     <p className="text-sm text-muted-foreground">
-                        Signed in as <span className="font-medium text-foreground">{userEmail}</span>
+                        Signed in as{" "}
+                        <span className="font-medium text-foreground">
+                            {userEmail}
+                        </span>
                     </p>
                 </div>
 
@@ -172,7 +160,8 @@ const WorkspaceSelection = () => {
                                 This account is not a member of any workspace
                             </h3>
                             <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                                If you expected to see a workspace, ask an owner or admin to invite you.
+                                If you expected to see a workspace, ask an owner
+                                or admin to invite you.
                             </p>
                         </div>
                         <div className="pt-4">
@@ -197,9 +186,13 @@ const WorkspaceSelection = () => {
                                 <div className="flex-1 space-y-1">
                                     <div className="flex items-center justify-between gap-4">
                                         <h3 className="text-lg font-semibold">
-                                            {workspaces[0].name}
+                                            {workspaces[0].workspace_name}
                                         </h3>
-                                        <Badge variant={getRoleBadgeVariant(workspaces[0].role)}>
+                                        <Badge
+                                            variant={getRoleBadgeVariant(
+                                                workspaces[0].role
+                                            )}
+                                        >
                                             {workspaces[0].role}
                                         </Badge>
                                     </div>
@@ -227,28 +220,37 @@ const WorkspaceSelection = () => {
                         <div className="space-y-3">
                             {workspaces.map((workspace) => (
                                 <Card
-                                    key={workspace.id}
+                                    key={workspace.SK}
                                     className={`p-4 cursor-pointer transition-all hover:border-primary/50 ${
-                                        selectedWorkspace === workspace.id
+                                        selectedWorkspace === workspace.SK
                                             ? "border-2 border-primary bg-accent-light"
                                             : "border"
                                     }`}
-                                    onClick={() => setSelectedWorkspace(workspace.id)}
+                                    onClick={() =>
+                                        setSelectedWorkspace(workspace.SK)
+                                    }
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className={`h-12 w-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                                            selectedWorkspace === workspace.id
-                                                ? "bg-primary text-primary-foreground"
-                                                : "bg-muted"
-                                        }`}>
+                                        <div
+                                            className={`h-12 w-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                                selectedWorkspace ===
+                                                workspace.SK
+                                                    ? "bg-primary text-primary-foreground"
+                                                    : "bg-muted"
+                                            }`}
+                                        >
                                             <Building2 className="h-6 w-6" />
                                         </div>
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center justify-between gap-4">
                                                 <h3 className="font-semibold">
-                                                    {workspace.name}
+                                                    {workspace.workspace_name}
                                                 </h3>
-                                                <Badge variant={getRoleBadgeVariant(workspace.role)}>
+                                                <Badge
+                                                    variant={getRoleBadgeVariant(
+                                                        workspace.role
+                                                    )}
+                                                >
                                                     {workspace.role}
                                                 </Badge>
                                             </div>
@@ -273,7 +275,8 @@ const WorkspaceSelection = () => {
                                 Continue
                             </Button>
                             <p className="text-center text-xs text-muted-foreground">
-                                You can switch workspaces later from inside the app
+                                You can switch workspaces later from inside the
+                                app
                             </p>
                         </div>
                     </div>

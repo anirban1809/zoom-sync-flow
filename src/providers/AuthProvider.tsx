@@ -16,7 +16,6 @@ export function AuthProvider({ children }: any) {
 
             try {
                 const t = await ensureToken();
-                console.log({ t });
                 if (!t) {
                     await refreshAccessToken();
                 }
