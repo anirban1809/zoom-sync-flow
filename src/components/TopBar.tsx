@@ -1,21 +1,14 @@
-import {
-    Search,
-    Plus,
-    Bell,
-    ChevronDown,
-    Moon,
-    Sun,
-    CheckCircle2,
-    AlertCircle,
-    Info,
-    Building2,
-    Check,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,16 +17,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
     Popover,
     PopoverContent,
@@ -41,7 +25,24 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiFetch } from "@/lib/api/api";
+import {
+    AlertCircle,
+    Bell,
+    Building2,
+    Check,
+    CheckCircle2,
+    ChevronDown,
+    Info,
+    Moon,
+    Plus,
+    Search,
+    Sun,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const mockNotifications = [
     {
@@ -112,6 +113,8 @@ export function TopBar() {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
+    const [userInfo, setUserInfo] = useState<any>({});
+    const [workspaceName, setWorkspaceName] = useState("");
     const unreadCount = mockNotifications.filter((n) => !n.read).length;
 
     const getNotificationIcon = (type: string) => {
@@ -124,6 +127,13 @@ export function TopBar() {
                 return <Info className="h-4 w-4 text-blue-500" />;
         }
     };
+
+    useEffect(() => {
+        const sessionStorageUserInfo = sessionStorage.getItem("user_info");
+        setUserInfo(JSON.parse(sessionStorageUserInfo));
+
+        setWorkspaceName(sessionStorage.getItem("selected_workspace_name"));
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-6">
@@ -279,7 +289,8 @@ export function TopBar() {
                                 <AvatarFallback>AK</AvatarFallback>
                             </Avatar>
                             <span className="hidden sm:inline">
-                                Alex Kim | Acme Corp
+                                {userInfo.first_name} {userInfo.last_name} |
+                                {workspaceName}
                             </span>
                             <ChevronDown className="h-4 w-4" />
                         </Button>
@@ -288,10 +299,10 @@ export function TopBar() {
                         <DropdownMenuLabel>
                             <div className="flex flex-col">
                                 <span className="text-sm font-medium">
-                                    Alex Kim
+                                    {userInfo.first_name} {userInfo.last_name}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                    alex@acme.com
+                                    {userInfo.email}
                                 </span>
                             </div>
                         </DropdownMenuLabel>
@@ -311,7 +322,12 @@ export function TopBar() {
                                     body: JSON.stringify({}),
                                 });
                                 sessionStorage.removeItem("access_token");
-                                sessionStorage.removeItem("selected_workspace");
+                                sessionStorage.removeItem(
+                                    "selected_workspace_id"
+                                );
+                                sessionStorage.removeItem(
+                                    "selected_workspace_name"
+                                );
                                 navigate("/login");
                             }}
                         >

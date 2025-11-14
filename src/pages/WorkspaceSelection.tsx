@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Moon, Sun, Building2, AlertCircle } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "@/lib/api/api";
+import { AlertCircle, Building2, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
 
@@ -21,8 +21,7 @@ const WorkspaceSelection = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
 
-    // Mock user email - in production, get from auth context
-    const userEmail = "user@example.com";
+    const [userEmail, setUserEmail] = useState("");
 
     // Mock workspaces - in production, fetch from API
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -34,13 +33,26 @@ const WorkspaceSelection = () => {
     useEffect(() => {
         setLoading(true);
         (async () => {
+            apiFetch("/me").then(async (res) => {
+                const userDetails = await res.json();
+                setUserEmail(userDetails.email);
+                sessionStorage.setItem(
+                    "user_info",
+                    JSON.stringify(userDetails)
+                );
+            });
+
             const result = await apiFetch("/me/workspaces");
             const allWorkspaces = await result.json();
 
             if (allWorkspaces.length === 1) {
                 sessionStorage.setItem(
-                    "selected_workspace",
+                    "selected_workspace_id",
                     allWorkspaces[0].SK
+                );
+                sessionStorage.setItem(
+                    "selected_workspace_name",
+                    allWorkspaces[0].workspace_name
                 );
                 navigate("/");
                 return;
@@ -51,7 +63,7 @@ const WorkspaceSelection = () => {
         })();
 
         // Auto-select and navigate if only one workspace
-    }, []);
+    }, [navigate]);
 
     const handleContinue = () => {
         const workspaceId =
@@ -59,7 +71,11 @@ const WorkspaceSelection = () => {
 
         if (workspaceId) {
             // Store selected workspace in sessionStorage
-            sessionStorage.setItem("selected_workspace", workspaceId);
+            sessionStorage.setItem("selected_workspace_id", workspaceId);
+            sessionStorage.setItem(
+                "selected_workspace_name",
+                workspaces[0].workspace_name
+            );
             // Navigate to home page
             navigate("/");
         }
