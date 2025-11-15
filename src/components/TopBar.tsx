@@ -289,7 +289,7 @@ export function TopBar() {
                                 <AvatarFallback>AK</AvatarFallback>
                             </Avatar>
                             <span className="hidden sm:inline">
-                                {userInfo.first_name} {userInfo.last_name} |
+                                {userInfo.first_name} {userInfo.last_name} -{" "}
                                 {workspaceName}
                             </span>
                             <ChevronDown className="h-4 w-4" />
