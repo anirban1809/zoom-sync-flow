@@ -14,7 +14,7 @@ interface Workspace {
     SK: string;
     workspace_name: string;
     description?: string;
-    role: WorkspaceRole;
+    users: { [x: string]: WorkspaceRole };
 }
 
 const WorkspaceSelection = () => {
@@ -33,17 +33,16 @@ const WorkspaceSelection = () => {
     useEffect(() => {
         setLoading(true);
         (async () => {
-            apiFetch("/me").then(async (res) => {
-                const userDetails = await res.json();
-                setUserEmail(userDetails.email);
-                sessionStorage.setItem(
-                    "user_info",
-                    JSON.stringify(userDetails)
-                );
-            });
+            const res = await apiFetch("/me");
+            const userDetails = await res.json();
+            setUserEmail(userDetails.email);
+
+            sessionStorage.setItem("user_info", JSON.stringify(userDetails));
 
             const result = await apiFetch("/me/workspaces");
             const allWorkspaces = await result.json();
+
+            console.log(allWorkspaces, userDetails.email);
 
             if (allWorkspaces.length === 1) {
                 sessionStorage.setItem(
@@ -54,9 +53,26 @@ const WorkspaceSelection = () => {
                     "selected_workspace_name",
                     allWorkspaces[0].workspace_name
                 );
+                sessionStorage.setItem(
+                    "selected_workspace_role",
+                    allWorkspaces[0].users[userDetails.email]
+                );
+
+                await apiFetch("/set-workspace", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        workspaceId: sessionStorage.getItem(
+                            "selected_workspace_id"
+                        ),
+                    }),
+                });
+
                 navigate("/");
+
                 return;
             }
+
+            console.log("calling set workspace");
 
             setWorkspaces(allWorkspaces);
             setLoading(false);
@@ -70,11 +86,17 @@ const WorkspaceSelection = () => {
             workspaces.length === 1 ? workspaces[0].SK : selectedWorkspace;
 
         if (workspaceId) {
+            console.log(workspaces);
+
             // Store selected workspace in sessionStorage
             sessionStorage.setItem("selected_workspace_id", workspaceId);
             sessionStorage.setItem(
                 "selected_workspace_name",
                 workspaces[0].workspace_name
+            );
+            sessionStorage.setItem(
+                "selected_workspace_role",
+                workspaces[0].users[userEmail]
             );
             // Navigate to home page
             navigate("/");
@@ -206,10 +228,10 @@ const WorkspaceSelection = () => {
                                         </h3>
                                         <Badge
                                             variant={getRoleBadgeVariant(
-                                                workspaces[0].role
+                                                workspaces[0].users[userEmail]
                                             )}
                                         >
-                                            {workspaces[0].role}
+                                            {workspaces[0].users[userEmail]}
                                         </Badge>
                                     </div>
                                     {workspaces[0].description && (
@@ -264,10 +286,12 @@ const WorkspaceSelection = () => {
                                                 </h3>
                                                 <Badge
                                                     variant={getRoleBadgeVariant(
-                                                        workspace.role
+                                                        workspace.users[
+                                                            userEmail
+                                                        ]
                                                     )}
                                                 >
-                                                    {workspace.role}
+                                                    {workspace.users[userEmail]}
                                                 </Badge>
                                             </div>
                                             {workspace.description && (

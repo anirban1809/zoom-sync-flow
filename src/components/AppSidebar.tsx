@@ -58,6 +58,9 @@ export function AppSidebar() {
     const collapsed = state === "collapsed";
 
     const isActive = (url: string) => location.pathname === url;
+    const role = sessionStorage.getItem("selected_workspace_role");
+
+    console.log({ role });
 
     return (
         <Sidebar collapsible="icon" className="border-r">
@@ -131,23 +134,34 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Settings</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {settingsNav.map((item) => (
-                                <SidebarMenuItem key={item.url}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={isActive(item.url)}
-                                    >
-                                        <NavLink to={item.url}>
-                                            <item.icon className="h-5 w-5" />
-                                            {!collapsed && (
-                                                <span className="text-base">
-                                                    {item.title}
-                                                </span>
-                                            )}
-                                        </NavLink>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            {settingsNav.map((item) => {
+                                if (
+                                    (item.title === "Admin" ||
+                                        item.title === "Billing" ||
+                                        item.title === "Data Management") &&
+                                    !(role === "OWNER" || role === "ADMIN")
+                                ) {
+                                    return null;
+                                }
+
+                                return (
+                                    <SidebarMenuItem key={item.url}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={isActive(item.url)}
+                                        >
+                                            <NavLink to={item.url}>
+                                                <item.icon className="h-5 w-5" />
+                                                {!collapsed && (
+                                                    <span className="text-base">
+                                                        {item.title}
+                                                    </span>
+                                                )}
+                                            </NavLink>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                );
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

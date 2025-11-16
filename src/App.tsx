@@ -58,11 +58,11 @@ const App = () => (
                         <Route
                             path="/"
                             element={
-                                <AuthProvider>
-                                    <AppShell>
+                                <AppShell>
+                                    <AuthProvider>
                                         <Home />
-                                    </AppShell>
-                                </AuthProvider>
+                                    </AuthProvider>
+                                </AppShell>
                             }
                         />
                         <Route
@@ -100,11 +100,11 @@ const App = () => (
                         <Route
                             path="/calendars"
                             element={
-                                <AuthProvider>
-                                    <AppShell>
+                                <AppShell>
+                                    <AuthProvider>
                                         <Calendars />
-                                    </AppShell>
-                                </AuthProvider>
+                                    </AuthProvider>
+                                </AppShell>
                             }
                         />
                         <Route
@@ -151,7 +151,9 @@ const App = () => (
                             path="/admin"
                             element={
                                 <AppShell>
-                                    <Admin />
+                                    <AuthProvider>
+                                        <Admin />
+                                    </AuthProvider>
                                 </AppShell>
                             }
                         />
@@ -159,7 +161,9 @@ const App = () => (
                             path="/profile"
                             element={
                                 <AppShell>
-                                    <Profile />
+                                    <AuthProvider>
+                                        <Profile />
+                                    </AuthProvider>
                                 </AppShell>
                             }
                         />
@@ -167,7 +171,9 @@ const App = () => (
                             path="/billing"
                             element={
                                 <AppShell>
-                                    <Billing />
+                                    <AuthProvider>
+                                        <Billing />
+                                    </AuthProvider>
                                 </AppShell>
                             }
                         />
@@ -184,7 +190,9 @@ const App = () => (
                             path="/data-management"
                             element={
                                 <AppShell>
-                                    <DataManagement />
+                                    <AuthProvider>
+                                        <DataManagement />
+                                    </AuthProvider>
                                 </AppShell>
                             }
                         />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import {
     Dialog,
@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { apiFetch } from "@/lib/api/api";
 
 interface InviteUserModalProps {
     open: boolean;
@@ -35,11 +36,15 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
     const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true);
     const [isSending, setIsSending] = useState(false);
 
+    useEffect(() => {
+        setUsers([]);
+    }, []);
+
     const handleAddEmail = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && emailInput.trim()) {
             e.preventDefault();
             const trimmedEmail = emailInput.trim();
-            if (!users.some(u => u.email === trimmedEmail)) {
+            if (!users.some((u) => u.email === trimmedEmail)) {
                 setUsers([...users, { email: trimmedEmail, role: "member" }]);
                 setEmailInput("");
             }
@@ -53,8 +58,8 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
             .map((email) => email.trim())
             .filter((email) => email);
         const newUsers = emailList
-            .filter((email) => !users.some(u => u.email === email))
-            .map(email => ({ email, role: "member" }));
+            .filter((email) => !users.some((u) => u.email === email))
+            .map((email) => ({ email, role: "member" }));
         if (newUsers.length > 0) {
             setUsers([...users, ...newUsers]);
             setEmailInput("");
@@ -67,15 +72,21 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
     };
 
     const handleRoleChange = (email: string, role: string) => {
-        setUsers(users.map(u => u.email === email ? { ...u, role } : u));
+        setUsers(users.map((u) => (u.email === email ? { ...u, role } : u)));
     };
 
     const handleSendInvites = () => {
         setIsSending(true);
-        setTimeout(() => {
-            setIsSending(false);
-            onOpenChange(false);
-        }, 1500);
+        apiFetch("/invite", {
+            method: "POST",
+            body: JSON.stringify({
+                workspaceId: sessionStorage.getItem("selected_workspace_id"),
+                workspaceName: sessionStorage.getItem(
+                    "selected_workspace_name"
+                ),
+                invites: users,
+            }),
+        }).then((res) => setIsSending(false));
     };
 
     return (
@@ -125,7 +136,10 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
                                                 <Select
                                                     value={user.role}
                                                     onValueChange={(role) =>
-                                                        handleRoleChange(user.email, role)
+                                                        handleRoleChange(
+                                                            user.email,
+                                                            role
+                                                        )
                                                     }
                                                 >
                                                     <SelectTrigger className="w-32">
@@ -147,7 +161,9 @@ export function InviteUserModal({ open, onOpenChange }: InviteUserModalProps) {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() =>
-                                                        handleRemoveUser(user.email)
+                                                        handleRemoveUser(
+                                                            user.email
+                                                        )
                                                     }
                                                 >
                                                     <X className="h-4 w-4" />

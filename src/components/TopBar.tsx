@@ -328,6 +328,9 @@ export function TopBar() {
                                 sessionStorage.removeItem(
                                     "selected_workspace_name"
                                 );
+                                sessionStorage.removeItem(
+                                    "selected_workspace_role"
+                                );
                                 navigate("/login");
                             }}
                         >

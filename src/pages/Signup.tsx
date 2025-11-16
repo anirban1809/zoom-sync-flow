@@ -44,7 +44,7 @@ const Signup = () => {
     const [initialLoading, setInitialLoading] = useState(isInviteFlow);
     const [invitationRole, setInvitationRole] = useState("MEMBER");
     const [invitationStatus, setInvitationStatus] = useState<
-        "valid" | "invalid" | "expired" | "revoked"
+        "valid" | "invalid" | "expired" | "revoked" | "accepted"
     >("valid");
 
     // Mock: Check if user already owns a workspace
@@ -111,6 +111,8 @@ const Signup = () => {
                         setInvitationStatus("expired");
                     } else if (result.error === "TOKEN_REVOKED") {
                         setInvitationStatus("revoked");
+                    } else if (result.error === "TOKEN_ACCEPTED") {
+                        setInvitationStatus("accepted");
                     } else {
                         setInvitationStatus("invalid");
                     }
@@ -120,7 +122,7 @@ const Signup = () => {
                     }
 
                     // Valid invite
-                    setWorkspaceName(result.workspace_name);
+                    setWorkspaceName(result.workspaceName);
                     setInvitationRole(result.role);
                     setEmail(result.to);
                     setInvitationStatus("valid");
@@ -518,6 +520,44 @@ const Signup = () => {
                                                 believe this is a mistake,
                                                 please contact the workspace
                                                 admin for a new invitation.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 pt-2">
+                                        <Button
+                                            onClick={() => {
+                                                window.location.href =
+                                                    "/signup";
+                                            }}
+                                            className="flex-1"
+                                        >
+                                            Create new workspace
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => navigate("/login")}
+                                        >
+                                            Log in
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Accepted Invite Error */}
+                            {invitationStatus === "accepted" && (
+                                <div className="bg-destructive/10 border border-destructive rounded-lg p-4 space-y-3">
+                                    <div className="flex gap-2">
+                                        <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                                        <div className="space-y-2 flex-1">
+                                            <p className="font-semibold text-destructive">
+                                                Invite link accepted
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                This invitation has already been
+                                                accepted. If you believe this is
+                                                a mistake, please contact the
+                                                workspace admin for a new
+                                                invitation.
                                             </p>
                                         </div>
                                     </div>
