@@ -60,7 +60,7 @@ export function AuthProvider({ children }: any) {
     }, [navigate]);
 
     return loading ? (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+        <div className="min-h-screen flex items-center justify-center p-4 relative">
             <div className="w-full max-w-2xl space-y-6">
                 <Skeleton className="h-11 w-full" />
                 <Skeleton className="h-11 w-full" />
