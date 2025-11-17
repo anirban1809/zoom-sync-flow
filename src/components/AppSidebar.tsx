@@ -59,9 +59,6 @@ export function AppSidebar() {
 
     const isActive = (url: string) => location.pathname === url;
     const role = sessionStorage.getItem("selected_workspace_role");
-
-    console.log({ role });
-
     return (
         <Sidebar collapsible="icon" className="border-r">
             <SidebarContent>
