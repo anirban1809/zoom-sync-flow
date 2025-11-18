@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 
 interface ConnectCalendarModalProps {
@@ -37,13 +37,18 @@ export default function ConnectCalendarModal({
   const [step, setStep] = useState<"provider" | "calendars">("provider");
   const [selectedProvider, setSelectedProvider] = useState<"google" | "microsoft" | null>(null);
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
+  const [isLoadingCalendars, setIsLoadingCalendars] = useState(false);
 
   const handleProviderSelect = (provider: "google" | "microsoft") => {
     setSelectedProvider(provider);
     setStep("calendars");
-    // Auto-select all calendars by default
-    const calendars = provider === "google" ? mockGoogleCalendars : mockMicrosoftCalendars;
-    setSelectedCalendars(calendars.map(cal => cal.id));
+    setIsLoadingCalendars(true);
+    // Simulate loading calendars
+    setTimeout(() => {
+      const calendars = provider === "google" ? mockGoogleCalendars : mockMicrosoftCalendars;
+      setSelectedCalendars(calendars.map(cal => cal.id));
+      setIsLoadingCalendars(false);
+    }, 1500);
   };
 
   const handleCalendarToggle = (calendarId: string) => {
@@ -70,6 +75,7 @@ export default function ConnectCalendarModal({
       setStep("provider");
       setSelectedProvider(null);
       setSelectedCalendars([]);
+      setIsLoadingCalendars(false);
     }, 300);
   };
 
@@ -142,52 +148,68 @@ export default function ConnectCalendarModal({
 
         {step === "calendars" && (
           <div className="space-y-4 py-4">
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="space-y-4">
-                {calendars.map((calendar) => (
-                  <div
-                    key={calendar.id}
-                    className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors"
-                  >
-                    <Checkbox
-                      id={calendar.id}
-                      checked={selectedCalendars.includes(calendar.id)}
-                      onCheckedChange={() => handleCalendarToggle(calendar.id)}
-                    />
-                    <div className="flex-1 space-y-1">
-                      <Label
-                        htmlFor={calendar.id}
-                        className="flex items-center gap-2 cursor-pointer font-medium"
-                      >
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: calendar.color }}
-                        />
-                        {calendar.name}
-                      </Label>
-                      <p className="text-sm text-muted-foreground">{calendar.email}</p>
-                    </div>
-                  </div>
-                ))}
+            {isLoadingCalendars ? (
+              <div className="space-y-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
               </div>
-            </ScrollArea>
+            ) : (
+              <>
+                <div className="border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12"></TableHead>
+                        <TableHead className="w-8"></TableHead>
+                        <TableHead>Calendar Name</TableHead>
+                        <TableHead>Email</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {calendars.map((calendar) => (
+                        <TableRow key={calendar.id}>
+                          <TableCell>
+                            <Checkbox
+                              id={calendar.id}
+                              checked={selectedCalendars.includes(calendar.id)}
+                              onCheckedChange={() => handleCalendarToggle(calendar.id)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: calendar.color }}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{calendar.name}</TableCell>
+                          <TableCell className="text-muted-foreground">{calendar.email}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
 
-            <div className="flex items-center justify-between pt-4 border-t">
-              <Button variant="ghost" onClick={() => setStep("provider")}>
-                Back
-              </Button>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleClose}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleConnect}
-                  disabled={selectedCalendars.length === 0}
-                >
-                  Connect {selectedCalendars.length} Calendar{selectedCalendars.length !== 1 ? "s" : ""}
-                </Button>
-              </div>
-            </div>
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button variant="ghost" onClick={() => setStep("provider")}>
+                    Back
+                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={handleClose}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleConnect}
+                      disabled={selectedCalendars.length === 0}
+                    >
+                      Connect {selectedCalendars.length} Calendar{selectedCalendars.length !== 1 ? "s" : ""}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
       </DialogContent>
