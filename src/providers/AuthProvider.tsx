@@ -37,18 +37,27 @@ export function AuthProvider({ children }: any) {
                 }
             } finally {
                 const path = location.pathname;
-                const res = await apiFetch("/me/role");
-                const role = await res.json();
+                
+                try {
+                    const res = await apiFetch("/me/role");
+                    if (!res.ok) {
+                        setLoading(false);
+                        return;
+                    }
+                    const role = await res.json();
 
-                const allowed = routes[path];
+                    const allowed = routes[path];
 
-                if (!allowed) {
-                    setLoading(false);
-                    return;
-                }
+                    if (!allowed) {
+                        setLoading(false);
+                        return;
+                    }
 
-                if (!allowed.roles.includes(role.role)) {
-                    navigate("/");
+                    if (!allowed.roles.includes(role.role)) {
+                        navigate("/");
+                    }
+                } catch (error) {
+                    console.error("Failed to check role:", error);
                 }
 
                 setLoading(false);
