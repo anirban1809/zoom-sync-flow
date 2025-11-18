@@ -130,9 +130,9 @@ export function TopBar() {
 
     useEffect(() => {
         const sessionStorageUserInfo = sessionStorage.getItem("user_info");
-        setUserInfo(JSON.parse(sessionStorageUserInfo));
+        setUserInfo(sessionStorageUserInfo ? JSON.parse(sessionStorageUserInfo) : null);
 
-        setWorkspaceName(sessionStorage.getItem("selected_workspace_name"));
+        setWorkspaceName(sessionStorage.getItem("selected_workspace_name") || "");
     }, []);
 
     return (
@@ -289,7 +289,7 @@ export function TopBar() {
                                 <AvatarFallback>AK</AvatarFallback>
                             </Avatar>
                             <span className="hidden sm:inline">
-                                {userInfo.first_name} {userInfo.last_name} -{" "}
+                                {userInfo?.first_name} {userInfo?.last_name} -{" "}
                                 {workspaceName}
                             </span>
                             <ChevronDown className="h-4 w-4" />
@@ -299,10 +299,10 @@ export function TopBar() {
                         <DropdownMenuLabel>
                             <div className="flex flex-col">
                                 <span className="text-sm font-medium">
-                                    {userInfo.first_name} {userInfo.last_name}
+                                    {userInfo?.first_name} {userInfo?.last_name}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                    {userInfo.email}
+                                    {userInfo?.email}
                                 </span>
                             </div>
                         </DropdownMenuLabel>
