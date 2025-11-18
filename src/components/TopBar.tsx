@@ -113,7 +113,7 @@ export function TopBar() {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [showWorkspaceSwitcher, setShowWorkspaceSwitcher] = useState(false);
-    const [userInfo, setUserInfo] = useState<any>({});
+    const [userInfo, setUserInfo] = useState<any>(null);
     const [workspaceName, setWorkspaceName] = useState("");
     const unreadCount = mockNotifications.filter((n) => !n.read).length;
 
@@ -130,8 +130,14 @@ export function TopBar() {
 
     useEffect(() => {
         const sessionStorageUserInfo = sessionStorage.getItem("user_info");
-        setUserInfo(sessionStorageUserInfo ? JSON.parse(sessionStorageUserInfo) : null);
-
+        if (sessionStorageUserInfo && sessionStorageUserInfo !== "null") {
+            try {
+                setUserInfo(JSON.parse(sessionStorageUserInfo));
+            } catch (e) {
+                console.error("Failed to parse user info:", e);
+                setUserInfo(null);
+            }
+        }
         setWorkspaceName(sessionStorage.getItem("selected_workspace_name") || "");
     }, []);
 

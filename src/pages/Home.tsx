@@ -59,7 +59,7 @@ const getGreeting = () => {
 
 export default function Home() {
     const navigate = useNavigate();
-    const [userInfo, setUserInfo] = useState<any>({});
+    const [userInfo, setUserInfo] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
