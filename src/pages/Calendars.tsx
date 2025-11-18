@@ -10,6 +10,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import ConnectCalendarModal from "@/components/ConnectCalendarModal";
 import {
   Card,
   CardContent,
@@ -91,6 +92,7 @@ export default function Calendars() {
   const [selectedCalendar, setSelectedCalendar] = useState<
     (typeof connectedCalendars)[0] | null
   >(null);
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   if (selectedCalendar) {
     return (
@@ -104,6 +106,10 @@ export default function Calendars() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <ConnectCalendarModal
+        open={connectModalOpen}
+        onOpenChange={setConnectModalOpen}
+      />
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Calendars</h1>
         <p className="text-muted-foreground mt-2">
@@ -128,7 +134,7 @@ export default function Calendars() {
                     Manage calendar connections and sync settings
                   </CardDescription>
                 </div>
-                <Button>
+                <Button onClick={() => setConnectModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Connect Calendar
                 </Button>
