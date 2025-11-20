@@ -27,6 +27,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
+import { Logo } from "./Logo";
 
 const mainNav = [
     { title: "Home", url: "/", icon: Home },
@@ -63,18 +64,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" className="border-r">
             <SidebarContent>
                 <div className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                            <span className="text-sm font-bold text-primary-foreground">
-                                R
-                            </span>
-                        </div>
-                        {!collapsed && (
-                            <span className="font-semibold text-foreground">
-                                luminote .ai
-                            </span>
-                        )}
-                    </div>
+                    <Logo showText={!collapsed} size="sm" />
                 </div>
 
                 <SidebarGroup>
