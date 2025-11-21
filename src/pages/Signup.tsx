@@ -302,7 +302,10 @@ const Signup = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+        <div className="min-h-screen bg-background p-4">
+            <div className="absolute top-4 left-4">
+                <Logo showText={true} size="lg" />
+            </div>
             <Button
                 variant="ghost"
                 size="icon"
@@ -313,6 +316,7 @@ const Signup = () => {
                 <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
             </Button>
+            <div className="min-h-screen flex items-center justify-center">
 
             {authCheckLoading ? (
                 <div className="w-full max-w-md space-y-6">
@@ -328,16 +332,11 @@ const Signup = () => {
                 </div>
             ) : isLoggedIn && isInviteFlow ? (
                 <div className="w-full max-w-md space-y-6">
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center">
-                            <Logo showText={true} size="lg" />
-                        </div>
-                        <div className="space-y-2">
-                            <h2 className="text-3xl font-bold">Join Workspace</h2>
-                            <p className="text-muted-foreground">
-                                You've been invited to join a workspace
-                            </p>
-                        </div>
+                    <div className="text-center space-y-2">
+                        <h2 className="text-3xl font-bold">Join Workspace</h2>
+                        <p className="text-muted-foreground">
+                            You've been invited to join a workspace
+                        </p>
                     </div>
 
                     <div className="bg-card border border-border rounded-lg p-6 space-y-4 shadow-sm">
@@ -412,10 +411,7 @@ const Signup = () => {
                 </div>
             ) : (
                 <div className="w-full max-w-md space-y-6">
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center">
-                            <Logo showText={true} size="lg" />
-                        </div>
+                    <div className="text-center space-y-2">
                         <h2 className="text-3xl font-bold">
                             {isInviteFlow
                                 ? "Create your account"
@@ -990,6 +986,7 @@ const Signup = () => {
                     )}
                 </div>
             )}
+            </div>
         </div>
     );
 };
