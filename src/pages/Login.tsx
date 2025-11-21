@@ -127,21 +127,20 @@ const Login = () => {
 
     if (showCreateWorkspace) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <div className="w-full max-w-md space-y-6">
-                <div className="text-center space-y-4">
-                    <div className="flex justify-center">
-                        <Logo showText={true} size="lg" />
-                    </div>
-                    <div className="space-y-2">
-                        <h1 className="text-3xl font-bold">
-                            Welcome to luminote.ai
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Let's create your workspace to get started
-                        </p>
-                    </div>
+            <div className="min-h-screen bg-background p-4">
+                <div className="absolute top-4 left-4">
+                    <Logo showText={true} size="lg" />
                 </div>
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="w-full max-w-md space-y-6">
+                        <div className="text-center space-y-2">
+                            <h1 className="text-3xl font-bold">
+                                Welcome to luminote.ai
+                            </h1>
+                            <p className="text-muted-foreground">
+                                Let's create your workspace to get started
+                            </p>
+                        </div>
 
                     <form
                         className="space-y-4"
@@ -178,13 +177,17 @@ const Login = () => {
                             {loading ? "Creating..." : "Create Workspace"}
                         </Button>
                     </form>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+        <div className="min-h-screen bg-background p-4">
+            <div className="absolute top-4 left-4">
+                <Logo showText={true} size="lg" />
+            </div>
             <Button
                 variant="ghost"
                 size="icon"
@@ -195,6 +198,7 @@ const Login = () => {
                 <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
             </Button>
+            <div className="min-h-screen flex items-center justify-center">
 
             {authCheckLoading ? (
                 <div className="w-full max-w-md space-y-6">
@@ -215,10 +219,7 @@ const Login = () => {
                 </div>
             ) : (
                 <div className="w-full max-w-md space-y-6">
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center">
-                            <Logo showText={true} size="lg" />
-                        </div>
+                    <div className="text-center space-y-2">
                         <h1 className="text-3xl font-bold">
                             Log in to luminote.ai
                         </h1>
@@ -333,6 +334,7 @@ const Login = () => {
                     </div>
                 </div>
             )}
+            </div>
         </div>
     );
 };
