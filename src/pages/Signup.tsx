@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { refreshAccessToken } from "@/lib/api/auth";
+import { Logo } from "@/components/Logo";
 
 const Signup = () => {
     const { theme, setTheme } = useTheme();
@@ -327,11 +328,16 @@ const Signup = () => {
                 </div>
             ) : isLoggedIn && isInviteFlow ? (
                 <div className="w-full max-w-md space-y-6">
-                    <div className="text-center space-y-2">
-                        <h2 className="text-3xl font-bold">Join Workspace</h2>
-                        <p className="text-muted-foreground">
-                            You've been invited to join a workspace
-                        </p>
+                    <div className="text-center space-y-4">
+                        <div className="flex justify-center">
+                            <Logo showText={true} size="lg" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-bold">Join Workspace</h2>
+                            <p className="text-muted-foreground">
+                                You've been invited to join a workspace
+                            </p>
+                        </div>
                     </div>
 
                     <div className="bg-card border border-border rounded-lg p-6 space-y-4 shadow-sm">
@@ -406,7 +412,10 @@ const Signup = () => {
                 </div>
             ) : (
                 <div className="w-full max-w-md space-y-6">
-                    <div className="text-center space-y-2">
+                    <div className="text-center space-y-4">
+                        <div className="flex justify-center">
+                            <Logo showText={true} size="lg" />
+                        </div>
                         <h2 className="text-3xl font-bold">
                             {isInviteFlow
                                 ? "Create your account"
