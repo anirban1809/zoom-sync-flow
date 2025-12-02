@@ -276,8 +276,7 @@ export default function MeetingDetail() {
           </CardHeader>
           <CardContent>
             <MediaPlayer
-              src="/video/meeting-recording.mp4"
-              poster="/images/meeting-poster.jpg"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
               type="video"
             />
           </CardContent>

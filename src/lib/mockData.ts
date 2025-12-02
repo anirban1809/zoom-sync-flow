@@ -4,8 +4,8 @@ export const mockMeetings: Meeting[] = [
   {
     id: "1",
     title: "Q4 Product Planning",
-    start: new Date(2025, 9, 19, 10, 0),
-    end: new Date(2025, 9, 19, 11, 0),
+    start: new Date(2025, 9, 15, 10, 0),
+    end: new Date(2025, 9, 15, 11, 0),
     provider: "zoom",
     participants: [
       {
@@ -28,7 +28,7 @@ export const mockMeetings: Meeting[] = [
       },
     ],
     tags: ["product", "planning"],
-    status: "scheduled",
+    status: "completed",
     transcriptId: "1",
     summaryId: "1",
   },
