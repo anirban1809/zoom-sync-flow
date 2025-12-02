@@ -13,9 +13,6 @@ import {
   AlertTriangle,
   HelpCircle,
   MessageSquare,
-  Volume2,
-  SkipBack,
-  SkipForward,
   Link2,
   Mail,
   FileText,
@@ -80,11 +77,11 @@ import {
 import { format } from "date-fns";
 import { TaskRow } from "@/components/TaskRow";
 import { cn } from "@/lib/utils";
+import { MediaPlayer } from "@/components/MediaPlayer";
 
 export default function MeetingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement>(null);
   const transcriptRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -107,12 +104,6 @@ export default function MeetingDetail() {
     ? mockTranscripts[meeting.transcriptId]
     : null;
   const tasks = mockTasks.filter((t) => t.meetingId === id);
-
-  const skipTime = (seconds: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime += seconds;
-    }
-  };
 
   const handleViewEvidence = (segmentId: string) => {
     setHighlightedSegmentId(segmentId);
@@ -279,45 +270,16 @@ export default function MeetingDetail() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Volume2 className="h-5 w-5" />
+              <Video className="h-5 w-5" />
               Meeting Recording
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <audio
-                ref={audioRef}
-                controls
-                className="w-full"
-                style={{
-                  height: "40px",
-                  accentColor: "hsl(var(--primary))",
-                }}
-              >
-                <source src="/audio/meeting-recording.mp3" type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-              <div className="flex justify-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => skipTime(-10)}
-                  className="gap-2"
-                >
-                  <SkipBack className="h-4 w-4" />
-                  10s
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => skipTime(10)}
-                  className="gap-2"
-                >
-                  10s
-                  <SkipForward className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <MediaPlayer
+              src="/video/meeting-recording.mp4"
+              poster="/images/meeting-poster.jpg"
+              type="video"
+            />
           </CardContent>
         </Card>
       )}
