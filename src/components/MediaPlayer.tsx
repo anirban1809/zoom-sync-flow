@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -11,7 +11,6 @@ import {
   Minimize,
   SkipBack,
   SkipForward,
-  Settings,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,11 +19,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+export interface MediaPlayerHandle {
+  seekTo: (time: number) => void;
+  getCurrentTime: () => number;
+}
+
 interface MediaPlayerProps {
   src?: string;
   poster?: string;
   type?: "video" | "audio";
   className?: string;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
 const formatTime = (seconds: number): string => {
@@ -34,12 +39,13 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-export function MediaPlayer({
+export const MediaPlayer = forwardRef<MediaPlayerHandle, MediaPlayerProps>(({
   src,
   poster,
   type = "video",
   className,
-}: MediaPlayerProps) {
+  onTimeUpdate,
+}, ref) => {
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -52,11 +58,25 @@ export function MediaPlayer({
   const [playbackRate, setPlaybackRate] = useState(1);
   const hideControlsTimeout = useRef<NodeJS.Timeout>();
 
+  useImperativeHandle(ref, () => ({
+    seekTo: (time: number) => {
+      const media = mediaRef.current;
+      if (media) {
+        media.currentTime = time;
+        setCurrentTime(time);
+      }
+    },
+    getCurrentTime: () => mediaRef.current?.currentTime ?? 0,
+  }));
+
   useEffect(() => {
     const media = mediaRef.current;
     if (!media) return;
 
-    const handleTimeUpdate = () => setCurrentTime(media.currentTime);
+    const handleTimeUpdate = () => {
+      setCurrentTime(media.currentTime);
+      onTimeUpdate?.(media.currentTime);
+    };
     const handleLoadedMetadata = () => setDuration(media.duration);
     const handleEnded = () => setIsPlaying(false);
     const handlePlay = () => setIsPlaying(true);
@@ -75,7 +95,7 @@ export function MediaPlayer({
       media.removeEventListener("play", handlePlay);
       media.removeEventListener("pause", handlePause);
     };
-  }, []);
+  }, [onTimeUpdate]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -333,4 +353,6 @@ export function MediaPlayer({
       )}
     </div>
   );
-}
+});
+
+MediaPlayer.displayName = "MediaPlayer";

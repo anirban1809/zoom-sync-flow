@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import {
     Calendar,
     Users,
@@ -77,18 +77,22 @@ import {
 import { format } from "date-fns";
 import { TaskRow } from "@/components/TaskRow";
 import { cn } from "@/lib/utils";
-import { MediaPlayer } from "@/components/MediaPlayer";
+import { MediaPlayer, MediaPlayerHandle } from "@/components/MediaPlayer";
 
 export default function MeetingDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const transcriptRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const transcriptScrollRef = useRef<HTMLDivElement>(null);
+    const mediaPlayerRef = useRef<MediaPlayerHandle>(null);
     const [shareModalOpen, setShareModalOpen] = useState(false);
     const [exportModalOpen, setExportModalOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const [highlightedSegmentId, setHighlightedSegmentId] = useState<
         string | null
     >(null);
+    const [currentMediaTime, setCurrentMediaTime] = useState(0);
+    const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
 
     // Share modal state
     const [linkExists, setLinkExists] = useState(true);
@@ -108,6 +112,37 @@ export default function MeetingDetail() {
         ? mockTranscripts[meeting.transcriptId]
         : null;
     const tasks = mockTasks.filter((t) => t.meetingId === id);
+
+    // Find active transcript segment based on current media time
+    const findActiveSegment = useCallback((time: number) => {
+        if (!transcript) return null;
+        const segment = transcript.segments.find(
+            (seg) => time >= seg.tStart && time < seg.tEnd
+        );
+        return segment?.id ?? null;
+    }, [transcript]);
+
+    // Handle media time updates
+    const handleMediaTimeUpdate = useCallback((time: number) => {
+        setCurrentMediaTime(time);
+        const newActiveId = findActiveSegment(time);
+        if (newActiveId !== activeSegmentId) {
+            setActiveSegmentId(newActiveId);
+        }
+    }, [findActiveSegment, activeSegmentId]);
+
+    // Auto-scroll to active segment
+    useEffect(() => {
+        if (activeSegmentId && transcriptRefs.current[activeSegmentId]) {
+            const element = transcriptRefs.current[activeSegmentId];
+            element?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }, [activeSegmentId]);
+
+    // Handle click on transcript segment to seek
+    const handleTranscriptClick = useCallback((tStart: number) => {
+        mediaPlayerRef.current?.seekTo(tStart);
+    }, []);
 
     const handleViewEvidence = (segmentId: string) => {
         setHighlightedSegmentId(segmentId);
@@ -280,12 +315,14 @@ export default function MeetingDetail() {
             {meeting.status === "completed" && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2"></CardTitle>
+                        <CardTitle className="text-base flex items-center gap-2">Recording</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <MediaPlayer
+                            ref={mediaPlayerRef}
                             src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                             type="video"
+                            onTimeUpdate={handleMediaTimeUpdate}
                         />
                     </CardContent>
                 </Card>
@@ -593,51 +630,64 @@ export default function MeetingDetail() {
                     </Card>
 
                     {/* Transcript Card */}
-                    <Card className="flex flex-col h-full">
+                    <Card className="flex flex-col h-[500px]">
                         <CardHeader>
                             <CardTitle>Transcript</CardTitle>
                             <CardDescription>
-                                Full conversation recording
+                                Full conversation recording • Click any line to jump to that moment
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 overflow-hidden">
                             {transcript ? (
-                                <ScrollArea className="h-full pr-4">
-                                    <div className="space-y-4">
-                                        {transcript.segments.map((segment) => (
-                                            <div
-                                                key={segment.id}
-                                                ref={(el) =>
-                                                    (transcriptRefs.current[
-                                                        segment.id
-                                                    ] = el)
-                                                }
-                                                className={cn(
-                                                    "flex gap-3 rounded-lg p-3 transition-all duration-300",
-                                                    highlightedSegmentId ===
-                                                        segment.id &&
-                                                        "bg-primary/10 ring-2 ring-primary"
-                                                )}
-                                            >
-                                                <span className="text-xs text-muted-foreground min-w-[48px] mt-0.5">
-                                                    {Math.floor(
-                                                        segment.tStart / 60
+                                <ScrollArea className="h-full pr-4" ref={transcriptScrollRef}>
+                                    <div className="space-y-2">
+                                        {transcript.segments.map((segment) => {
+                                            const isActive = activeSegmentId === segment.id;
+                                            const isHighlighted = highlightedSegmentId === segment.id;
+                                            return (
+                                                <div
+                                                    key={segment.id}
+                                                    ref={(el) =>
+                                                        (transcriptRefs.current[
+                                                            segment.id
+                                                        ] = el)
+                                                    }
+                                                    onClick={() => handleTranscriptClick(segment.tStart)}
+                                                    className={cn(
+                                                        "flex gap-3 rounded-lg p-3 transition-all duration-300 cursor-pointer hover:bg-muted/50",
+                                                        isActive && "bg-primary/15 ring-2 ring-primary shadow-sm",
+                                                        isHighlighted && !isActive && "bg-accent/20 ring-2 ring-accent"
                                                     )}
-                                                    :
-                                                    {(segment.tStart % 60)
-                                                        .toString()
-                                                        .padStart(2, "0")}
-                                                </span>
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-medium mb-1">
-                                                        {segment.speaker}
-                                                    </p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {segment.text}
-                                                    </p>
+                                                >
+                                                    <span className={cn(
+                                                        "text-xs min-w-[48px] mt-0.5 font-mono",
+                                                        isActive ? "text-primary font-semibold" : "text-muted-foreground"
+                                                    )}>
+                                                        {Math.floor(
+                                                            segment.tStart / 60
+                                                        )}
+                                                        :
+                                                        {(segment.tStart % 60)
+                                                            .toString()
+                                                            .padStart(2, "0")}
+                                                    </span>
+                                                    <div className="flex-1">
+                                                        <p className={cn(
+                                                            "text-sm font-medium mb-1",
+                                                            isActive && "text-primary"
+                                                        )}>
+                                                            {segment.speaker}
+                                                        </p>
+                                                        <p className={cn(
+                                                            "text-sm",
+                                                            isActive ? "text-foreground" : "text-muted-foreground"
+                                                        )}>
+                                                            {segment.text}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </ScrollArea>
                             ) : (
