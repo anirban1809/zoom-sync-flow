@@ -31,6 +31,7 @@ export const mockMeetings: Meeting[] = [
         status: "completed",
         transcriptId: "1",
         summaryId: "1",
+        recordingUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     },
     {
         id: "2",
@@ -53,8 +54,10 @@ export const mockMeetings: Meeting[] = [
             },
         ],
         tags: ["sales", "enterprise"],
-        status: "scheduled",
+        status: "completed",
         transcriptId: "2",
+        summaryId: "2",
+        // No recordingUrl - recording not available
     },
     {
         id: "3",
@@ -89,9 +92,59 @@ export const mockMeetings: Meeting[] = [
             },
         ],
         tags: ["standup", "team"],
-        status: "scheduled",
+        status: "completed",
         transcriptId: "3",
         summaryId: "3",
+        recordingUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    },
+    {
+        id: "4",
+        title: "Design Review Session",
+        start: new Date(2025, 9, 20, 9, 0),
+        end: new Date(2025, 9, 20, 10, 30),
+        provider: "zoom",
+        participants: [
+            {
+                id: "3",
+                name: "Emma Wilson",
+                email: "emma@acme.com",
+                role: "Designer",
+            },
+            {
+                id: "1",
+                name: "Sarah Chen",
+                email: "sarah@acme.com",
+                role: "Product Manager",
+            },
+        ],
+        tags: ["design", "review"],
+        status: "completed",
+        transcriptId: "1",
+        summaryId: "1",
+        // No recordingUrl - participant opted out of recording
+    },
+    {
+        id: "5",
+        title: "Sprint Planning",
+        start: new Date(2025, 9, 22, 14, 0),
+        end: new Date(2025, 9, 22, 15, 30),
+        provider: "teams",
+        participants: [
+            {
+                id: "2",
+                name: "Mike Torres",
+                email: "mike@acme.com",
+                role: "Engineering Lead",
+            },
+            {
+                id: "5",
+                name: "Lisa Zhang",
+                email: "lisa@acme.com",
+                role: "QA Lead",
+            },
+        ],
+        tags: ["sprint", "planning"],
+        status: "scheduled",
     },
 ];
 
@@ -209,6 +262,65 @@ export const mockSummaries: Record<string, Summary> = {
         ],
         sentiment: "neutral",
         confidence: 0.87,
+    },
+    "2": {
+        id: "2",
+        meetingId: "2",
+        bullets: [
+            {
+                text: "Enterprise customer expressed strong interest in advanced analytics features",
+                evidence: [
+                    {
+                        transcriptSegmentId: "2-1",
+                        timestamp: 120,
+                        speaker: "David Park",
+                        text: "Our team has been looking for a solution that provides deeper analytics and custom reporting capabilities.",
+                    },
+                ],
+            },
+            {
+                text: "Security and compliance are top priorities for enterprise adoption",
+                evidence: [
+                    {
+                        transcriptSegmentId: "2-2",
+                        timestamp: 300,
+                        speaker: "David Park",
+                        text: "We need SOC 2 compliance and single sign-on integration before we can move forward.",
+                    },
+                ],
+            },
+        ],
+        decisions: [
+            {
+                text: "Schedule follow-up demo with their security team",
+                owner: "Sarah Chen",
+                evidence: [
+                    {
+                        transcriptSegmentId: "2-3",
+                        timestamp: 480,
+                        speaker: "Sarah Chen",
+                        text: "I'll coordinate with our security team and set up a dedicated session to walk through our compliance documentation.",
+                    },
+                ],
+            },
+        ],
+        risks: [
+            {
+                text: "Timeline may not align with their Q1 deployment goals",
+                severity: "medium",
+                evidence: [
+                    {
+                        transcriptSegmentId: "2-4",
+                        timestamp: 600,
+                        speaker: "David Park",
+                        text: "We're hoping to have something in place by early Q1. Is that realistic on your end?",
+                    },
+                ],
+            },
+        ],
+        questions: [],
+        sentiment: "positive",
+        confidence: 0.89,
     },
     "3": {
         id: "3",
@@ -408,6 +520,98 @@ export const mockTranscripts: Record<string, Transcript> = {
                 tEnd: 198,
                 speaker: "Emma Wilson",
                 text: "Sounds good! I'll schedule a design review for early next week.",
+                confidence: 0.92,
+            },
+        ],
+    },
+    "2": {
+        id: "2",
+        meetingId: "2",
+        segments: [
+            {
+                id: "2-1",
+                tStart: 0,
+                tEnd: 10,
+                speaker: "Sarah Chen",
+                text: "Thanks for taking the time to meet with us today, David. We're excited to learn more about your needs.",
+                confidence: 0.94,
+            },
+            {
+                id: "2-2",
+                tStart: 10,
+                tEnd: 20,
+                speaker: "David Park",
+                text: "Of course. We've been evaluating several solutions and your platform caught our attention.",
+                confidence: 0.93,
+            },
+            {
+                id: "2-3",
+                tStart: 20,
+                tEnd: 30,
+                speaker: "David Park",
+                text: "Our team has been looking for a solution that provides deeper analytics and custom reporting capabilities.",
+                confidence: 0.92,
+            },
+            {
+                id: "2-4",
+                tStart: 30,
+                tEnd: 40,
+                speaker: "Sarah Chen",
+                text: "That's great to hear. Analytics is one of our strongest areas. What specific metrics are you most interested in?",
+                confidence: 0.95,
+            },
+            {
+                id: "2-5",
+                tStart: 40,
+                tEnd: 50,
+                speaker: "David Park",
+                text: "We need SOC 2 compliance and single sign-on integration before we can move forward.",
+                confidence: 0.93,
+            },
+            {
+                id: "2-6",
+                tStart: 50,
+                tEnd: 60,
+                speaker: "Sarah Chen",
+                text: "I'll coordinate with our security team and set up a dedicated session to walk through our compliance documentation.",
+                confidence: 0.94,
+            },
+        ],
+    },
+    "3": {
+        id: "3",
+        meetingId: "3",
+        segments: [
+            {
+                id: "3-1",
+                tStart: 0,
+                tEnd: 10,
+                speaker: "Sarah Chen",
+                text: "Let's get started with our weekly standup. Lisa, do you want to kick us off?",
+                confidence: 0.95,
+            },
+            {
+                id: "3-2",
+                tStart: 10,
+                tEnd: 20,
+                speaker: "Lisa Zhang",
+                text: "Good news - we closed out all the P0 bugs from last week. The build is stable.",
+                confidence: 0.94,
+            },
+            {
+                id: "3-3",
+                tStart: 20,
+                tEnd: 30,
+                speaker: "Mike Torres",
+                text: "The feature flag system is done and tested. We can start using it this week.",
+                confidence: 0.93,
+            },
+            {
+                id: "3-4",
+                tStart: 30,
+                tEnd: 40,
+                speaker: "Emma Wilson",
+                text: "I finished the mockups for the new dashboard. Ready for review whenever you are.",
                 confidence: 0.92,
             },
         ],
