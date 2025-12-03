@@ -51,9 +51,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
     SelectContent,
@@ -61,11 +58,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -114,22 +106,28 @@ export default function MeetingDetail() {
     const tasks = mockTasks.filter((t) => t.meetingId === id);
 
     // Find active transcript segment based on current media time
-    const findActiveSegment = useCallback((time: number) => {
-        if (!transcript) return null;
-        const segment = transcript.segments.find(
-            (seg) => time >= seg.tStart && time < seg.tEnd
-        );
-        return segment?.id ?? null;
-    }, [transcript]);
+    const findActiveSegment = useCallback(
+        (time: number) => {
+            if (!transcript) return null;
+            const segment = transcript.segments.find(
+                (seg) => time >= seg.tStart && time < seg.tEnd
+            );
+            return segment?.id ?? null;
+        },
+        [transcript]
+    );
 
     // Handle media time updates
-    const handleMediaTimeUpdate = useCallback((time: number) => {
-        setCurrentMediaTime(time);
-        const newActiveId = findActiveSegment(time);
-        if (newActiveId !== activeSegmentId) {
-            setActiveSegmentId(newActiveId);
-        }
-    }, [findActiveSegment, activeSegmentId]);
+    const handleMediaTimeUpdate = useCallback(
+        (time: number) => {
+            setCurrentMediaTime(time);
+            const newActiveId = findActiveSegment(time);
+            if (newActiveId !== activeSegmentId) {
+                setActiveSegmentId(newActiveId);
+            }
+        },
+        [findActiveSegment, activeSegmentId]
+    );
 
     // Auto-scroll to active segment
     useEffect(() => {
@@ -315,7 +313,9 @@ export default function MeetingDetail() {
             {meeting.status === "completed" && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">Recording</CardTitle>
+                        <CardTitle className="text-base flex items-center gap-2">
+                            Recording
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <MediaPlayer
@@ -630,20 +630,27 @@ export default function MeetingDetail() {
                     </Card>
 
                     {/* Transcript Card */}
-                    <Card className="flex flex-col h-[500px]">
+                    <Card className="flex flex-col h-full">
                         <CardHeader>
                             <CardTitle>Transcript</CardTitle>
                             <CardDescription>
-                                Full conversation recording • Click any line to jump to that moment
+                                Full conversation recording • Click any line to
+                                jump to that moment
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 overflow-hidden">
                             {transcript ? (
-                                <ScrollArea className="h-full pr-4" ref={transcriptScrollRef}>
+                                <ScrollArea
+                                    className="h-full pr-4"
+                                    ref={transcriptScrollRef}
+                                >
                                     <div className="space-y-2">
                                         {transcript.segments.map((segment) => {
-                                            const isActive = activeSegmentId === segment.id;
-                                            const isHighlighted = highlightedSegmentId === segment.id;
+                                            const isActive =
+                                                activeSegmentId === segment.id;
+                                            const isHighlighted =
+                                                highlightedSegmentId ===
+                                                segment.id;
                                             return (
                                                 <div
                                                     key={segment.id}
@@ -652,17 +659,28 @@ export default function MeetingDetail() {
                                                             segment.id
                                                         ] = el)
                                                     }
-                                                    onClick={() => handleTranscriptClick(segment.tStart)}
+                                                    onClick={() =>
+                                                        handleTranscriptClick(
+                                                            segment.tStart
+                                                        )
+                                                    }
                                                     className={cn(
-                                                        "flex gap-3 rounded-lg p-3 transition-all duration-300 cursor-pointer hover:bg-muted/50",
-                                                        isActive && "bg-primary/15 ring-2 ring-primary shadow-sm",
-                                                        isHighlighted && !isActive && "bg-accent/20 ring-2 ring-accent"
+                                                        "flex gap-3 m-3 rounded-lg p-3 transition-all duration-300 cursor-pointer hover:bg-muted/50",
+                                                        isActive &&
+                                                            "bg-primary/15 ring-2 ring-primary shadow-sm",
+                                                        isHighlighted &&
+                                                            !isActive &&
+                                                            "bg-accent/20 ring-2 ring-accent"
                                                     )}
                                                 >
-                                                    <span className={cn(
-                                                        "text-xs min-w-[48px] mt-0.5 font-mono",
-                                                        isActive ? "text-primary font-semibold" : "text-muted-foreground"
-                                                    )}>
+                                                    <span
+                                                        className={cn(
+                                                            "text-xs min-w-[48px] mt-0.5 font-mono",
+                                                            isActive
+                                                                ? "text-primary font-semibold"
+                                                                : "text-muted-foreground"
+                                                        )}
+                                                    >
                                                         {Math.floor(
                                                             segment.tStart / 60
                                                         )}
@@ -672,16 +690,23 @@ export default function MeetingDetail() {
                                                             .padStart(2, "0")}
                                                     </span>
                                                     <div className="flex-1">
-                                                        <p className={cn(
-                                                            "text-sm font-medium mb-1",
-                                                            isActive && "text-primary"
-                                                        )}>
+                                                        <p
+                                                            className={cn(
+                                                                "text-sm font-medium mb-1",
+                                                                isActive &&
+                                                                    "text-primary"
+                                                            )}
+                                                        >
                                                             {segment.speaker}
                                                         </p>
-                                                        <p className={cn(
-                                                            "text-sm",
-                                                            isActive ? "text-foreground" : "text-muted-foreground"
-                                                        )}>
+                                                        <p
+                                                            className={cn(
+                                                                "text-sm",
+                                                                isActive
+                                                                    ? "text-foreground"
+                                                                    : "text-muted-foreground"
+                                                            )}
+                                                        >
                                                             {segment.text}
                                                         </p>
                                                     </div>
