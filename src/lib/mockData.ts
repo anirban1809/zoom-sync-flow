@@ -57,7 +57,8 @@ export const mockMeetings: Meeting[] = [
         status: "completed",
         transcriptId: "2",
         summaryId: "2",
-        // No recordingUrl - recording not available
+        // Audio only - video not available
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     },
     {
         id: "3",
@@ -121,7 +122,8 @@ export const mockMeetings: Meeting[] = [
         status: "completed",
         transcriptId: "1",
         summaryId: "1",
-        // No recordingUrl - participant opted out of recording
+        // Audio only - participant opted out of video recording
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
     },
     {
         id: "5",

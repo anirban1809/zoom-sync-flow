@@ -4,7 +4,7 @@ import {
     Calendar,
     Users,
     Video,
-    VideoOff,
+    Mic,
     ExternalLink,
     Download,
     Share2,
@@ -311,11 +311,21 @@ export default function MeetingDetail() {
                 </div>
             </div>
 
-            {meeting.status === "completed" && (
+            {meeting.status === "completed" && (meeting.recordingUrl || meeting.audioUrl) && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
-                            Recording
+                            {meeting.recordingUrl ? (
+                                <>
+                                    <Video className="h-4 w-4" />
+                                    Video Recording
+                                </>
+                            ) : (
+                                <>
+                                    <Mic className="h-4 w-4" />
+                                    Audio Recording
+                                </>
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -326,20 +336,27 @@ export default function MeetingDetail() {
                                 type="video"
                                 onTimeUpdate={handleMediaTimeUpdate}
                             />
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-16 px-4 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/20">
-                                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                                    <VideoOff className="h-8 w-8 text-muted-foreground" />
+                        ) : meeting.audioUrl ? (
+                            <div className="bg-muted/30 rounded-lg p-6 border border-border">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <Mic className="h-8 w-8 text-primary" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-foreground">Audio Only</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            Video was not recorded for this meeting
+                                        </p>
+                                    </div>
                                 </div>
-                                <h3 className="text-lg font-semibold text-foreground mb-2">
-                                    Recording not available
-                                </h3>
-                                <p className="text-sm text-muted-foreground text-center max-w-md">
-                                    This meeting was not recorded, or the recording has been removed. 
-                                    The transcript and summary are still available below.
-                                </p>
+                                <MediaPlayer
+                                    ref={mediaPlayerRef}
+                                    src={meeting.audioUrl}
+                                    type="audio"
+                                    onTimeUpdate={handleMediaTimeUpdate}
+                                />
                             </div>
-                        )}
+                        ) : null}
                     </CardContent>
                 </Card>
             )}
