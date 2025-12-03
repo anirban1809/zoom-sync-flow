@@ -130,8 +130,8 @@ export default function MeetingDetail() {
         [findActiveSegment, activeSegmentId]
     );
 
-    // Auto-scroll to active segment
-    useEffect(() => {
+    // Manual sync to active segment
+    const handleSyncWithAudio = useCallback(() => {
         if (activeSegmentId && transcriptRefs.current[activeSegmentId]) {
             const element = transcriptRefs.current[activeSegmentId];
             element?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -663,7 +663,7 @@ export default function MeetingDetail() {
                     </Card>
 
                     {/* Transcript Card */}
-                    <Card className="flex flex-col h-full">
+                    <Card className="flex flex-col h-full relative">
                         <CardHeader>
                             <CardTitle>Transcript</CardTitle>
                             <CardDescription>
@@ -671,13 +671,14 @@ export default function MeetingDetail() {
                                 jump to that moment
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="flex-1 overflow-hidden">
+                        <CardContent className="flex-1 overflow-hidden relative">
                             {transcript ? (
-                                <ScrollArea
-                                    className="h-full pr-4"
-                                    ref={transcriptScrollRef}
-                                >
-                                    <div className="space-y-2">
+                                <>
+                                    <ScrollArea
+                                        className="h-full pr-4"
+                                        ref={transcriptScrollRef}
+                                    >
+                                        <div className="space-y-2">
                                         {transcript.segments.map((segment) => {
                                             const isActive =
                                                 activeSegmentId === segment.id;
@@ -746,8 +747,20 @@ export default function MeetingDetail() {
                                                 </div>
                                             );
                                         })}
-                                    </div>
-                                </ScrollArea>
+                                        </div>
+                                    </ScrollArea>
+                                    {activeSegmentId && (
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            className="absolute bottom-4 right-4 shadow-lg gap-2"
+                                            onClick={handleSyncWithAudio}
+                                        >
+                                            <Mic className="h-4 w-4" />
+                                            Sync with audio
+                                        </Button>
+                                    )}
+                                </>
                             ) : (
                                 <div className="text-center py-8 text-muted-foreground">
                                     <p>
