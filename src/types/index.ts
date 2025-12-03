@@ -10,6 +10,7 @@ export interface Meeting {
   transcriptId?: string;
   summaryId?: string;
   recordingUrl?: string;
+  audioUrl?: string;
 }
 
 export interface Participant {
