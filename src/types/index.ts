@@ -9,6 +9,7 @@ export interface Meeting {
   status: 'scheduled' | 'live' | 'completed' | 'cancelled';
   transcriptId?: string;
   summaryId?: string;
+  recordingUrl?: string;
 }
 
 export interface Participant {

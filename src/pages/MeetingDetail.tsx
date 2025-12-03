@@ -4,6 +4,7 @@ import {
     Calendar,
     Users,
     Video,
+    VideoOff,
     ExternalLink,
     Download,
     Share2,
@@ -318,12 +319,27 @@ export default function MeetingDetail() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <MediaPlayer
-                            ref={mediaPlayerRef}
-                            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                            type="video"
-                            onTimeUpdate={handleMediaTimeUpdate}
-                        />
+                        {meeting.recordingUrl ? (
+                            <MediaPlayer
+                                ref={mediaPlayerRef}
+                                src={meeting.recordingUrl}
+                                type="video"
+                                onTimeUpdate={handleMediaTimeUpdate}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-16 px-4 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/20">
+                                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                                    <VideoOff className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-foreground mb-2">
+                                    Recording not available
+                                </h3>
+                                <p className="text-sm text-muted-foreground text-center max-w-md">
+                                    This meeting was not recorded, or the recording has been removed. 
+                                    The transcript and summary are still available below.
+                                </p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}
