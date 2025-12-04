@@ -227,11 +227,11 @@ export default function MeetingDetail() {
             <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate("/meetings")}
-                className="gap-2 -ml-2"
+                onClick={() => navigate(-1)}
+                className="gap-1.5 w-fit"
             >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Meetings
+                Back
             </Button>
 
             <div className="flex items-start justify-between">
