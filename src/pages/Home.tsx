@@ -25,7 +25,7 @@ import { mockMeetings, mockTasks } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { Meeting, Task } from "@/types";
 import { format } from "date-fns";
-import { Calendar, Clock, User, Video } from "lucide-react";
+import { Calendar, ChevronRight, Clock, User, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -66,9 +66,7 @@ export default function Home() {
     const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(
         null
     );
-    const todaysMeetings = mockMeetings.filter(
-        (m) => m.start.toDateString() === new Date().toDateString()
-    );
+    const todaysMeetings = mockMeetings.slice(0, 3);
     const { greeting, caption } = getGreeting();
 
     const fetchUserInfo = async () => {
@@ -197,11 +195,22 @@ export default function Home() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Today's Meetings</CardTitle>
-                        <CardDescription>
-                            Scheduled for October 7, 2025
-                        </CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>Today's Meetings</CardTitle>
+                            <CardDescription>
+                                Scheduled for {format(new Date(), "MMMM d, yyyy")}
+                            </CardDescription>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1 text-muted-foreground hover:text-foreground"
+                            onClick={() => navigate("/calendars")}
+                        >
+                            View all
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {todaysMeetings.length > 0 ? (
