@@ -7,6 +7,8 @@ import {
   Clock,
   Video,
   FileText,
+  Users,
+  ExternalLink,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +23,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { mockMeetings } from "@/lib/mockData";
+import { Meeting } from "@/types";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
@@ -34,6 +43,7 @@ const providerColors = {
 export default function Meetings() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
 
   const recordedMeetings = mockMeetings.filter(
     (meeting) => meeting.status === "completed"
@@ -236,7 +246,7 @@ export default function Meetings() {
                   <TableRow
                     key={meeting.id}
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => navigate(`/meetings/${meeting.id}`)}
+                    onClick={() => setSelectedMeeting(meeting)}
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -333,6 +343,77 @@ export default function Meetings() {
           )}
         </CardContent>
       </Card>
+
+      {/* Upcoming Meeting Details Modal */}
+      <Dialog open={!!selectedMeeting} onOpenChange={() => setSelectedMeeting(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div
+                className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${
+                  selectedMeeting ? providerColors[selectedMeeting.provider] : ""
+                }`}
+              />
+              {selectedMeeting?.title}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedMeeting && (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span>{format(selectedMeeting.start, "EEEE, MMMM d, yyyy")}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {format(selectedMeeting.start, "h:mm a")} - {format(selectedMeeting.end, "h:mm a")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {selectedMeeting.participants.slice(0, 4).map((participant) => (
+                        <Avatar
+                          key={participant.id}
+                          className="h-6 w-6 border-2 border-background"
+                        >
+                          <AvatarImage src={participant.avatarUrl} />
+                          <AvatarFallback className="text-xs">
+                            {participant.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
+                    </div>
+                    <span className="text-muted-foreground">
+                      {selectedMeeting.participants.length} participant{selectedMeeting.participants.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {selectedMeeting.tags.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap">
+                  {selectedMeeting.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <Button className="w-full gap-2" size="lg">
+                <ExternalLink className="h-4 w-4" />
+                Join Meeting
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
