@@ -77,7 +77,9 @@ const App = () => (
                             path="/meetings"
                             element={
                                 <AppShell>
-                                    <Meetings />
+                                    <AuthProvider>
+                                        <Meetings />
+                                    </AuthProvider>
                                 </AppShell>
                             }
                         />
