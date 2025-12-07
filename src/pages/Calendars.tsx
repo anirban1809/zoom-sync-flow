@@ -28,6 +28,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Empty array to show empty state - replace with actual data
 const connectedCalendars: {
@@ -61,6 +71,13 @@ const connectedCalendars: {
 
 export default function Calendars() {
   const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [calendarToDisconnect, setCalendarToDisconnect] = useState<typeof connectedCalendars[0] | null>(null);
+
+  const handleDisconnect = () => {
+    // Handle disconnect logic here
+    console.log("Disconnecting calendar:", calendarToDisconnect?.provider);
+    setCalendarToDisconnect(null);
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -179,6 +196,7 @@ export default function Calendars() {
                           variant="ghost"
                           size="sm"
                           className="text-destructive"
+                          onClick={() => setCalendarToDisconnect(calendar)}
                         >
                           Disconnect
                         </Button>
@@ -191,6 +209,27 @@ export default function Calendars() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!calendarToDisconnect} onOpenChange={(open) => !open && setCalendarToDisconnect(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disconnect Calendar</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to disconnect <span className="font-medium text-foreground">{calendarToDisconnect?.provider}</span> ({calendarToDisconnect?.email})? 
+              This will stop syncing meetings from this calendar and disable auto-join for its events.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDisconnect}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Disconnect
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
