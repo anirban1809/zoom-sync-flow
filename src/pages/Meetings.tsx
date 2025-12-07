@@ -22,7 +22,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Dialog,
     DialogContent,
@@ -86,16 +87,176 @@ export default function Meetings() {
                 </div>
             </div>
 
-            {/* Recorded Meetings Section */}
-            <Card>
-                <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Video className="h-5 w-5 text-primary" />
-                        Recorded Meetings
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {filteredRecorded.length > 0 ? (
+            <Tabs defaultValue="upcoming" className="w-full">
+                <TabsList className="mb-4">
+                    <TabsTrigger value="upcoming" className="gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Upcoming
+                    </TabsTrigger>
+                    <TabsTrigger value="recorded" className="gap-2">
+                        <Video className="h-4 w-4" />
+                        Recorded
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="upcoming">
+                    <Card>
+                        <CardContent className="p-0">
+                            {filteredUpcoming.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Meeting</TableHead>
+                                            <TableHead>Date & Time</TableHead>
+                                            <TableHead>Participants</TableHead>
+                                            <TableHead>Tags</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {filteredUpcoming.map((meeting) => (
+                                            <TableRow
+                                                key={meeting.id}
+                                                className="cursor-pointer hover:bg-muted/50"
+                                                onClick={() =>
+                                                    setSelectedMeeting(meeting)
+                                                }
+                                            >
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <div
+                                                            className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                                                                providerColors[
+                                                                    meeting.provider
+                                                                ]
+                                                            }`}
+                                                        />
+                                                        <span className="font-medium">
+                                                            {meeting.title}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-1.5 text-sm">
+                                                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                                                            <span>
+                                                                {format(
+                                                                    meeting.start,
+                                                                    "MMM d, yyyy"
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                                            <Clock className="h-3.5 w-3.5" />
+                                                            <span>
+                                                                {format(
+                                                                    meeting.start,
+                                                                    "h:mm a"
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex -space-x-2">
+                                                            {meeting.participants
+                                                                .slice(0, 3)
+                                                                .map((participant) => (
+                                                                    <Avatar
+                                                                        key={
+                                                                            participant.id
+                                                                        }
+                                                                        className="h-6 w-6 border-2 border-background"
+                                                                    >
+                                                                        <AvatarImage
+                                                                            src={
+                                                                                participant.avatarUrl
+                                                                            }
+                                                                        />
+                                                                        <AvatarFallback className="text-xs">
+                                                                            {participant.name
+                                                                                .split(
+                                                                                    " "
+                                                                                )
+                                                                                .map(
+                                                                                    (
+                                                                                        n
+                                                                                    ) =>
+                                                                                        n[0]
+                                                                                )
+                                                                                .join(
+                                                                                    ""
+                                                                                )}
+                                                                        </AvatarFallback>
+                                                                    </Avatar>
+                                                                ))}
+                                                            {meeting.participants
+                                                                .length > 3 && (
+                                                                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
+                                                                    +
+                                                                    {meeting
+                                                                        .participants
+                                                                        .length - 3}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <span className="text-sm text-muted-foreground">
+                                                            {
+                                                                meeting.participants
+                                                                    .length
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex gap-1 flex-wrap">
+                                                        {meeting.tags
+                                                            .slice(0, 2)
+                                                            .map((tag) => (
+                                                                <Badge
+                                                                    key={tag}
+                                                                    variant="secondary"
+                                                                    className="text-xs"
+                                                                >
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                        {meeting.tags.length > 2 && (
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="text-xs"
+                                                            >
+                                                                +
+                                                                {meeting.tags.length -
+                                                                    2}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                                    <p className="text-muted-foreground font-medium">
+                                        No upcoming meetings
+                                    </p>
+                                    <p className="text-sm text-muted-foreground/80 mt-1">
+                                        Connect your calendar to see scheduled meetings
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="recorded">
+                    <Card>
+                        <CardContent className="p-0">
+                            {filteredRecorded.length > 0 ? (
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -232,178 +393,21 @@ export default function Meetings() {
                             </TableBody>
                         </Table>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <Video className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                            <p className="text-muted-foreground font-medium">
-                                No recorded meetings yet
-                            </p>
-                            <p className="text-sm text-muted-foreground/80 mt-1">
-                                Your recorded and transcribed meetings will
-                                appear here
-                            </p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Upcoming Meetings Section */}
-            <Card>
-                <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Calendar className="h-5 w-5 text-primary" />
-                        Upcoming Meetings
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {filteredUpcoming.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Meeting</TableHead>
-                                    <TableHead>Date & Time</TableHead>
-                                    <TableHead>Participants</TableHead>
-                                    <TableHead>Tags</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredUpcoming.map((meeting) => (
-                                    <TableRow
-                                        key={meeting.id}
-                                        className="cursor-pointer hover:bg-muted/50"
-                                        onClick={() =>
-                                            setSelectedMeeting(meeting)
-                                        }
-                                    >
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <div
-                                                    className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                                                        providerColors[
-                                                            meeting.provider
-                                                        ]
-                                                    }`}
-                                                />
-                                                <span className="font-medium">
-                                                    {meeting.title}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-1.5 text-sm">
-                                                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                                                    <span>
-                                                        {format(
-                                                            meeting.start,
-                                                            "MMM d, yyyy"
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                                    <Clock className="h-3.5 w-3.5" />
-                                                    <span>
-                                                        {format(
-                                                            meeting.start,
-                                                            "h:mm a"
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex -space-x-2">
-                                                    {meeting.participants
-                                                        .slice(0, 3)
-                                                        .map((participant) => (
-                                                            <Avatar
-                                                                key={
-                                                                    participant.id
-                                                                }
-                                                                className="h-6 w-6 border-2 border-background"
-                                                            >
-                                                                <AvatarImage
-                                                                    src={
-                                                                        participant.avatarUrl
-                                                                    }
-                                                                />
-                                                                <AvatarFallback className="text-xs">
-                                                                    {participant.name
-                                                                        .split(
-                                                                            " "
-                                                                        )
-                                                                        .map(
-                                                                            (
-                                                                                n
-                                                                            ) =>
-                                                                                n[0]
-                                                                        )
-                                                                        .join(
-                                                                            ""
-                                                                        )}
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                        ))}
-                                                    {meeting.participants
-                                                        .length > 3 && (
-                                                        <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
-                                                            +
-                                                            {meeting
-                                                                .participants
-                                                                .length - 3}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {
-                                                        meeting.participants
-                                                            .length
-                                                    }
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-1 flex-wrap">
-                                                {meeting.tags
-                                                    .slice(0, 2)
-                                                    .map((tag) => (
-                                                        <Badge
-                                                            key={tag}
-                                                            variant="secondary"
-                                                            className="text-xs"
-                                                        >
-                                                            {tag}
-                                                        </Badge>
-                                                    ))}
-                                                {meeting.tags.length > 2 && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className="text-xs"
-                                                    >
-                                                        +
-                                                        {meeting.tags.length -
-                                                            2}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                            <p className="text-muted-foreground font-medium">
-                                No upcoming meetings
-                            </p>
-                            <p className="text-sm text-muted-foreground/80 mt-1">
-                                Connect your calendar to see scheduled meetings
-                            </p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <Video className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                                    <p className="text-muted-foreground font-medium">
+                                        No recorded meetings yet
+                                    </p>
+                                    <p className="text-sm text-muted-foreground/80 mt-1">
+                                        Your recorded and transcribed meetings will
+                                        appear here
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
 
             {/* Upcoming Meeting Details Modal */}
             <Dialog
