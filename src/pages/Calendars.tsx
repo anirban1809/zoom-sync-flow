@@ -98,7 +98,26 @@ export default function Calendars() {
                     </div>
                 </CardHeader>
                 {loading ? (
-                    <>{/*add skeleton here*/}</>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="flex items-center justify-between py-3">
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="h-8 w-8 rounded" />
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-32" />
+                                            <Skeleton className="h-3 w-48" />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                        <Skeleton className="h-5 w-20 rounded-full" />
+                                        <Skeleton className="h-5 w-10 rounded-full" />
+                                        <Skeleton className="h-8 w-24" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
                 ) : (
                     <CardContent>
                         {calendars.length === 0 ? (
