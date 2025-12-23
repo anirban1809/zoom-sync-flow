@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
+import { apiFetch } from "@/lib/api/api";
 
 interface ConnectCalendarModalProps {
     open: boolean;
@@ -80,7 +81,15 @@ export default function ConnectCalendarModal({
         flow: "auth-code", // this is the “offline” style flow
         scope: "openid email profile https://www.googleapis.com/auth/calendar.readonly",
         onSuccess: async (codeResponse) => {
-            console.log({ codeResponse });
+            const res = await apiFetch("/connect/google", {
+                method: "POST",
+                body: JSON.stringify(codeResponse),
+            });
+
+            const result = await res.json();
+
+            if (result.ok) {
+            }
         },
         onError: (err) => {
             console.error("Google login error", err);

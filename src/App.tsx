@@ -66,7 +66,7 @@ const App = () => (
                             }
                         />
                         <Route
-                            path="/ai-chat"
+                            path="/chat"
                             element={
                                 <AppShell>
                                     <AIChat />

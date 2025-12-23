@@ -37,19 +37,31 @@ import { Separator } from "@/components/ui/separator";
 // Platform icons as simple SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        <path
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            fill="#4285F4"
+        />
+        <path
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            fill="#34A853"
+        />
+        <path
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            fill="#FBBC05"
+        />
+        <path
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            fill="#EA4335"
+        />
     </svg>
 );
 
 const MicrosoftIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none">
-        <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
-        <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
-        <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
-        <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+        <rect x="1" y="1" width="10" height="10" fill="#F25022" />
+        <rect x="13" y="1" width="10" height="10" fill="#7FBA00" />
+        <rect x="1" y="13" width="10" height="10" fill="#00A4EF" />
+        <rect x="13" y="13" width="10" height="10" fill="#FFB900" />
     </svg>
 );
 
@@ -73,31 +85,102 @@ interface ConnectedAccount {
 
 // Mock data for demonstration
 const mockConnectedAccounts: ConnectedAccount[] = [
-    { id: "g1", email: "personal@gmail.com", provider: "google", lastSync: "5 minutes ago" },
-    { id: "g2", email: "work@company.com", provider: "google", lastSync: "10 minutes ago" },
-    { id: "m1", email: "user@outlook.com", provider: "microsoft", lastSync: "2 minutes ago" },
+    {
+        id: "g1",
+        email: "personal@gmail.com",
+        provider: "google",
+        lastSync: "5 minutes ago",
+    },
+    {
+        id: "g2",
+        email: "work@company.com",
+        provider: "google",
+        lastSync: "10 minutes ago",
+    },
+    {
+        id: "m1",
+        email: "user@outlook.com",
+        provider: "microsoft",
+        lastSync: "2 minutes ago",
+    },
 ];
 
 const mockConnectedCalendars: CalendarData[] = [
-    { id: "1", name: "Personal Calendar", email: "personal@gmail.com", provider: "google", accountId: "g1", status: "CONNECTED", auto_join: true },
-    { id: "2", name: "Work Calendar", email: "work@company.com", provider: "google", accountId: "g2", status: "SYNCING", auto_join: false },
-    { id: "3", name: "Outlook Calendar", email: "user@outlook.com", provider: "microsoft", accountId: "m1", status: "CONNECTED", auto_join: true },
+    {
+        id: "1",
+        name: "Personal Calendar",
+        email: "personal@gmail.com",
+        provider: "google",
+        accountId: "g1",
+        status: "CONNECTED",
+        auto_join: true,
+    },
+    {
+        id: "2",
+        name: "Work Calendar",
+        email: "work@company.com",
+        provider: "google",
+        accountId: "g2",
+        status: "SYNCING",
+        auto_join: false,
+    },
+    {
+        id: "3",
+        name: "Outlook Calendar",
+        email: "user@outlook.com",
+        provider: "microsoft",
+        accountId: "m1",
+        status: "CONNECTED",
+        auto_join: true,
+    },
 ];
 
 const mockAvailableCalendars: CalendarData[] = [
-    { id: "4", name: "Holidays", email: "personal@gmail.com", provider: "google", accountId: "g1", status: "NOT_CONNECTED", auto_join: false },
-    { id: "5", name: "Team Events", email: "work@company.com", provider: "google", accountId: "g2", status: "NOT_CONNECTED", auto_join: false },
-    { id: "6", name: "Shared Calendar", email: "user@outlook.com", provider: "microsoft", accountId: "m1", status: "NOT_CONNECTED", auto_join: false },
+    {
+        id: "4",
+        name: "Holidays",
+        email: "personal@gmail.com",
+        provider: "google",
+        accountId: "g1",
+        status: "NOT_CONNECTED",
+        auto_join: false,
+    },
+    {
+        id: "5",
+        name: "Team Events",
+        email: "work@company.com",
+        provider: "google",
+        accountId: "g2",
+        status: "NOT_CONNECTED",
+        auto_join: false,
+    },
+    {
+        id: "6",
+        name: "Shared Calendar",
+        email: "user@outlook.com",
+        provider: "microsoft",
+        accountId: "m1",
+        status: "NOT_CONNECTED",
+        auto_join: false,
+    },
 ];
 
 export default function Calendars() {
     const [connectModalOpen, setConnectModalOpen] = useState(false);
-    const [calendarToDisconnect, setCalendarToDisconnect] = useState<CalendarData | null>(null);
-    const [accountToRemove, setAccountToRemove] = useState<ConnectedAccount | null>(null);
+    const [calendarToDisconnect, setCalendarToDisconnect] =
+        useState<CalendarData | null>(null);
+    const [accountToRemove, setAccountToRemove] =
+        useState<ConnectedAccount | null>(null);
     const [loading, setLoading] = useState(true);
-    const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([]);
-    const [connectedCalendars, setConnectedCalendars] = useState<CalendarData[]>([]);
-    const [availableCalendars, setAvailableCalendars] = useState<CalendarData[]>([]);
+    const [connectedAccounts, setConnectedAccounts] = useState<
+        ConnectedAccount[]
+    >([]);
+    const [connectedCalendars, setConnectedCalendars] = useState<
+        CalendarData[]
+    >([]);
+    const [availableCalendars, setAvailableCalendars] = useState<
+        CalendarData[]
+    >([]);
 
     const handleDisconnectCalendar = () => {
         console.log("Disconnecting calendar:", calendarToDisconnect?.name);
@@ -122,7 +205,9 @@ export default function Calendars() {
         (async () => {
             const workspaceId = sessionStorage.getItem("selected_workspace_id");
             try {
-                const response = await apiFetch(`/calendars?workspaceId=${workspaceId}`);
+                const response = await apiFetch(
+                    `/calendars?workspaceId=${workspaceId}`
+                );
                 const result = await response.json();
                 console.log(result);
                 // For now, use mock data
@@ -209,7 +294,9 @@ export default function Calendars() {
                                     <div className="flex items-center gap-3">
                                         <CalendarIcon className="h-4 w-4 text-primary" />
                                         <div>
-                                            <p className="text-sm font-medium">{calendar.name}</p>
+                                            <p className="text-sm font-medium">
+                                                {calendar.name}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -226,10 +313,14 @@ export default function Calendars() {
                                             ) : (
                                                 <Check className="h-3 w-3 mr-1" />
                                             )}
-                                            {calendar.status === "SYNCING" ? "Syncing" : "Connected"}
+                                            {calendar.status === "SYNCING"
+                                                ? "Syncing"
+                                                : "Connected"}
                                         </Badge>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Auto-Join</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                Auto-Join
+                                            </span>
                                             <Switch
                                                 checked={calendar.auto_join}
                                                 onCheckedChange={() => {}}
@@ -239,7 +330,11 @@ export default function Calendars() {
                                             variant="ghost"
                                             size="sm"
                                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                            onClick={() => setCalendarToDisconnect(calendar)}
+                                            onClick={() =>
+                                                setCalendarToDisconnect(
+                                                    calendar
+                                                )
+                                            }
                                         >
                                             Disconnect
                                         </Button>
@@ -256,7 +351,9 @@ export default function Calendars() {
                                     <div className="flex items-center gap-3">
                                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                         <div>
-                                            <p className="text-sm font-medium">{calendar.name}</p>
+                                            <p className="text-sm font-medium">
+                                                {calendar.name}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -266,7 +363,9 @@ export default function Calendars() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleConnectCalendar(calendar)}
+                                            onClick={() =>
+                                                handleConnectCalendar(calendar)
+                                            }
                                         >
                                             Connect
                                         </Button>
@@ -294,17 +393,10 @@ export default function Calendars() {
                         <Icon className="h-5 w-5" />
                         <h3 className="font-semibold">{platformName}</h3>
                         <Badge variant="secondary" className="text-xs">
-                            {accounts.length} {accounts.length === 1 ? "account" : "accounts"}
+                            {accounts.length}{" "}
+                            {accounts.length === 1 ? "account" : "accounts"}
                         </Badge>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleAddAccount(platform)}
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Account
-                    </Button>
                 </div>
 
                 {accounts.length > 0 && (
@@ -326,7 +418,9 @@ export default function Calendars() {
             {/* Page Header */}
             <div className="flex items-start justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Calendars</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Calendars
+                    </h1>
                     <p className="text-muted-foreground mt-2">
                         Manage your calendar connections and sync settings
                     </p>
@@ -359,7 +453,10 @@ export default function Calendars() {
                                             </div>
                                         </div>
                                         {[1, 2].map((j) => (
-                                            <div key={j} className="flex items-center justify-between p-4 border-t border-border">
+                                            <div
+                                                key={j}
+                                                className="flex items-center justify-between p-4 border-t border-border"
+                                            >
                                                 <div className="flex items-center gap-3">
                                                     <Skeleton className="h-4 w-4" />
                                                     <Skeleton className="h-4 w-32" />
@@ -384,15 +481,23 @@ export default function Calendars() {
                                 No calendars connected
                             </h3>
                             <p className="text-muted-foreground max-w-md mb-6">
-                                Connect your Google or Microsoft calendar accounts to view and manage your calendars,
+                                Connect your Google or Microsoft calendar
+                                accounts to view and manage your calendars,
                                 enable auto-join, and sync your meetings.
                             </p>
                             <div className="flex gap-3">
-                                <Button onClick={() => handleAddAccount("google")}>
+                                <Button
+                                    onClick={() => handleAddAccount("google")}
+                                >
                                     <GoogleIcon className="h-4 w-4 mr-2" />
                                     Connect Google
                                 </Button>
-                                <Button variant="outline" onClick={() => handleAddAccount("microsoft")}>
+                                <Button
+                                    variant="outline"
+                                    onClick={() =>
+                                        handleAddAccount("microsoft")
+                                    }
+                                >
                                     <MicrosoftIcon className="h-4 w-4 mr-2" />
                                     Connect Microsoft
                                 </Button>
@@ -400,12 +505,21 @@ export default function Calendars() {
                         </div>
                     ) : (
                         <div className="space-y-8">
-                            {getAccountsForPlatform("google").length > 0 && 
-                                renderPlatformGroup("google", "Google Calendar", GoogleIcon)}
-                            {getAccountsForPlatform("google").length > 0 && 
-                                getAccountsForPlatform("microsoft").length > 0 && <Separator />}
-                            {getAccountsForPlatform("microsoft").length > 0 && 
-                                renderPlatformGroup("microsoft", "Microsoft Outlook", MicrosoftIcon)}
+                            {getAccountsForPlatform("google").length > 0 &&
+                                renderPlatformGroup(
+                                    "google",
+                                    "Google Calendar",
+                                    GoogleIcon
+                                )}
+                            {getAccountsForPlatform("google").length > 0 &&
+                                getAccountsForPlatform("microsoft").length >
+                                    0 && <Separator />}
+                            {getAccountsForPlatform("microsoft").length > 0 &&
+                                renderPlatformGroup(
+                                    "microsoft",
+                                    "Microsoft Outlook",
+                                    MicrosoftIcon
+                                )}
                         </div>
                     )}
                 </CardContent>
@@ -428,8 +542,8 @@ export default function Calendars() {
                                 ({calendarToDisconnect?.email})?
                             </span>
                             <span className="block mt-2">
-                                Syncing will stop and upcoming events from this calendar will be removed
-                                from your account.
+                                Syncing will stop and upcoming events from this
+                                calendar will be removed from your account.
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -462,8 +576,9 @@ export default function Calendars() {
                                 ?
                             </span>
                             <span className="block mt-2">
-                                All calendars associated with this account will be disconnected and 
-                                their events will be removed from your account.
+                                All calendars associated with this account will
+                                be disconnected and their events will be removed
+                                from your account.
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
