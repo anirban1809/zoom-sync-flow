@@ -400,9 +400,12 @@ export default function Calendars() {
                         </div>
                     ) : (
                         <div className="space-y-8">
-                            {renderPlatformGroup("google", "Google Calendar", GoogleIcon)}
-                            <Separator />
-                            {renderPlatformGroup("microsoft", "Microsoft Outlook", MicrosoftIcon)}
+                            {getAccountsForPlatform("google").length > 0 && 
+                                renderPlatformGroup("google", "Google Calendar", GoogleIcon)}
+                            {getAccountsForPlatform("google").length > 0 && 
+                                getAccountsForPlatform("microsoft").length > 0 && <Separator />}
+                            {getAccountsForPlatform("microsoft").length > 0 && 
+                                renderPlatformGroup("microsoft", "Microsoft Outlook", MicrosoftIcon)}
                         </div>
                     )}
                 </CardContent>
