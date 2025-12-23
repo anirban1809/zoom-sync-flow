@@ -307,23 +307,7 @@ export default function Calendars() {
                     </Button>
                 </div>
 
-                {accounts.length === 0 ? (
-                    <div className="border border-dashed border-border rounded-lg p-6 text-center">
-                        <div className="rounded-full bg-muted p-3 w-fit mx-auto mb-3">
-                            <Icon className="h-6 w-6 opacity-50" />
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3">
-                            No {platformName} accounts connected
-                        </p>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleAddAccount(platform)}
-                        >
-                            Connect {platformName}
-                        </Button>
-                    </div>
-                ) : (
+                {accounts.length > 0 && (
                     <div className="space-y-3">
                         {accounts.map(renderAccountSection)}
                     </div>
