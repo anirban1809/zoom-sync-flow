@@ -5,6 +5,9 @@ import {
     RefreshCw,
     Check,
     Loader2,
+    MoreHorizontal,
+    Trash2,
+    User,
 } from "lucide-react";
 import ConnectCalendarModal from "@/components/ConnectCalendarModal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +24,12 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { apiFetch } from "@/lib/api/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -49,51 +58,59 @@ interface CalendarData {
     name: string;
     email: string;
     provider: "google" | "microsoft";
+    accountId: string;
     status: "CONNECTED" | "SYNCING" | "NOT_CONNECTED";
     auto_join: boolean;
     owner?: string;
 }
 
-interface PlatformConnection {
-    connected: boolean;
-    email?: string;
-    lastSync?: string;
+interface ConnectedAccount {
+    id: string;
+    email: string;
+    provider: "google" | "microsoft";
+    lastSync: string;
 }
 
 // Mock data for demonstration
-const mockPlatformConnections: Record<string, PlatformConnection> = {
-    google: { connected: true, email: "user@gmail.com", lastSync: "5 minutes ago" },
-    microsoft: { connected: false },
-};
+const mockConnectedAccounts: ConnectedAccount[] = [
+    { id: "g1", email: "personal@gmail.com", provider: "google", lastSync: "5 minutes ago" },
+    { id: "g2", email: "work@company.com", provider: "google", lastSync: "10 minutes ago" },
+    { id: "m1", email: "user@outlook.com", provider: "microsoft", lastSync: "2 minutes ago" },
+];
 
 const mockConnectedCalendars: CalendarData[] = [
-    { id: "1", name: "Work Calendar", email: "user@gmail.com", provider: "google", status: "CONNECTED", auto_join: true },
-    { id: "2", name: "Personal", email: "user@gmail.com", provider: "google", status: "SYNCING", auto_join: false },
+    { id: "1", name: "Personal Calendar", email: "personal@gmail.com", provider: "google", accountId: "g1", status: "CONNECTED", auto_join: true },
+    { id: "2", name: "Work Calendar", email: "work@company.com", provider: "google", accountId: "g2", status: "SYNCING", auto_join: false },
+    { id: "3", name: "Outlook Calendar", email: "user@outlook.com", provider: "microsoft", accountId: "m1", status: "CONNECTED", auto_join: true },
 ];
 
 const mockAvailableCalendars: CalendarData[] = [
-    { id: "3", name: "Team Events", email: "team@gmail.com", provider: "google", status: "NOT_CONNECTED", auto_join: false },
-    { id: "4", name: "Holidays", email: "user@gmail.com", provider: "google", status: "NOT_CONNECTED", auto_join: false },
+    { id: "4", name: "Holidays", email: "personal@gmail.com", provider: "google", accountId: "g1", status: "NOT_CONNECTED", auto_join: false },
+    { id: "5", name: "Team Events", email: "work@company.com", provider: "google", accountId: "g2", status: "NOT_CONNECTED", auto_join: false },
+    { id: "6", name: "Shared Calendar", email: "user@outlook.com", provider: "microsoft", accountId: "m1", status: "NOT_CONNECTED", auto_join: false },
 ];
 
 export default function Calendars() {
     const [connectModalOpen, setConnectModalOpen] = useState(false);
     const [calendarToDisconnect, setCalendarToDisconnect] = useState<CalendarData | null>(null);
+    const [accountToRemove, setAccountToRemove] = useState<ConnectedAccount | null>(null);
     const [loading, setLoading] = useState(true);
-    const [platformConnections, setPlatformConnections] = useState<Record<string, PlatformConnection>>({
-        google: { connected: false },
-        microsoft: { connected: false },
-    });
+    const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([]);
     const [connectedCalendars, setConnectedCalendars] = useState<CalendarData[]>([]);
     const [availableCalendars, setAvailableCalendars] = useState<CalendarData[]>([]);
 
-    const handleDisconnect = () => {
+    const handleDisconnectCalendar = () => {
         console.log("Disconnecting calendar:", calendarToDisconnect?.name);
         setCalendarToDisconnect(null);
     };
 
-    const handleConnectPlatform = (platform: "google" | "microsoft") => {
-        console.log("Connecting platform:", platform);
+    const handleRemoveAccount = () => {
+        console.log("Removing account:", accountToRemove?.email);
+        setAccountToRemove(null);
+    };
+
+    const handleAddAccount = (provider: "google" | "microsoft") => {
+        console.log("Adding account for:", provider);
         setConnectModalOpen(true);
     };
 
@@ -109,13 +126,13 @@ export default function Calendars() {
                 const result = await response.json();
                 console.log(result);
                 // For now, use mock data
-                setPlatformConnections(mockPlatformConnections);
+                setConnectedAccounts(mockConnectedAccounts);
                 setConnectedCalendars(mockConnectedCalendars);
                 setAvailableCalendars(mockAvailableCalendars);
             } catch (error) {
                 console.error("Failed to fetch calendars:", error);
                 // Use mock data on error
-                setPlatformConnections(mockPlatformConnections);
+                setConnectedAccounts(mockConnectedAccounts);
                 setConnectedCalendars(mockConnectedCalendars);
                 setAvailableCalendars(mockAvailableCalendars);
             }
@@ -123,214 +140,195 @@ export default function Calendars() {
         })();
     }, []);
 
-    const getConnectedCalendarsForPlatform = (platform: string) =>
-        connectedCalendars.filter((c) => c.provider === platform);
+    const getAccountsForPlatform = (platform: "google" | "microsoft") =>
+        connectedAccounts.filter((a) => a.provider === platform);
 
-    const getAvailableCalendarsForPlatform = (platform: string) =>
-        availableCalendars.filter((c) => c.provider === platform);
+    const getCalendarsForAccount = (accountId: string) =>
+        connectedCalendars.filter((c) => c.accountId === accountId);
 
-    const renderPlatformSection = (
+    const getAvailableCalendarsForAccount = (accountId: string) =>
+        availableCalendars.filter((c) => c.accountId === accountId);
+
+    const hasAnyAccounts = connectedAccounts.length > 0;
+
+    const renderAccountSection = (account: ConnectedAccount) => {
+        const calendars = getCalendarsForAccount(account.id);
+        const available = getAvailableCalendarsForAccount(account.id);
+        const Icon = account.provider === "google" ? GoogleIcon : MicrosoftIcon;
+
+        return (
+            <div key={account.id} className="border border-border rounded-lg">
+                {/* Account Header */}
+                <div className="flex items-center justify-between p-4 bg-muted/30">
+                    <div className="flex items-center gap-3">
+                        <Icon className="h-5 w-5" />
+                        <div>
+                            <p className="font-medium">{account.email}</p>
+                            <p className="text-xs text-muted-foreground">
+                                Last synced {account.lastSync}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm">
+                            <RefreshCw className="h-4 w-4" />
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    onClick={() => setAccountToRemove(account)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Remove Account
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+
+                {/* Calendars */}
+                <div className="divide-y divide-border">
+                    {calendars.length === 0 && available.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-muted-foreground">
+                            No calendars found for this account
+                        </div>
+                    ) : (
+                        <>
+                            {/* Connected Calendars */}
+                            {calendars.map((calendar) => (
+                                <div
+                                    key={calendar.id}
+                                    className="flex items-center justify-between p-4"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <CalendarIcon className="h-4 w-4 text-primary" />
+                                        <div>
+                                            <p className="text-sm font-medium">{calendar.name}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <Badge
+                                            variant="outline"
+                                            className={
+                                                calendar.status === "CONNECTED"
+                                                    ? "bg-green-500/10 text-green-600 border-green-500/20"
+                                                    : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
+                                            }
+                                        >
+                                            {calendar.status === "SYNCING" ? (
+                                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                            ) : (
+                                                <Check className="h-3 w-3 mr-1" />
+                                            )}
+                                            {calendar.status === "SYNCING" ? "Syncing" : "Connected"}
+                                        </Badge>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Auto-Join</span>
+                                            <Switch
+                                                checked={calendar.auto_join}
+                                                onCheckedChange={() => {}}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            onClick={() => setCalendarToDisconnect(calendar)}
+                                        >
+                                            Disconnect
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Available Calendars */}
+                            {available.map((calendar) => (
+                                <div
+                                    key={calendar.id}
+                                    className="flex items-center justify-between p-4 opacity-60"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                        <div>
+                                            <p className="text-sm font-medium">{calendar.name}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-xs text-muted-foreground">
+                                            Not connected
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleConnectCalendar(calendar)}
+                                        >
+                                            Connect
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    const renderPlatformGroup = (
         platform: "google" | "microsoft",
         platformName: string,
         Icon: React.ComponentType<{ className?: string }>
     ) => {
-        const connection = platformConnections[platform];
-        const connected = getConnectedCalendarsForPlatform(platform);
-        const available = getAvailableCalendarsForPlatform(platform);
+        const accounts = getAccountsForPlatform(platform);
 
         return (
-            <Card key={platform}>
-                {/* Platform Header */}
-                <div className="flex items-center justify-between p-6 border-b border-border">
-                    <div className="flex items-center gap-3">
-                        <Icon className="h-8 w-8" />
-                        <span className="text-lg font-semibold">{platformName}</span>
+            <div key={platform} className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Icon className="h-5 w-5" />
+                        <h3 className="font-semibold">{platformName}</h3>
+                        <Badge variant="secondary" className="text-xs">
+                            {accounts.length} {accounts.length === 1 ? "account" : "accounts"}
+                        </Badge>
                     </div>
-                    <div className="flex items-center gap-4">
-                        {connection.connected ? (
-                            <>
-                                <div className="text-right">
-                                    <p className="text-sm font-medium">{connection.email}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        Last synced {connection.lastSync}
-                                    </p>
-                                </div>
-                                <Button variant="outline" size="sm">
-                                    <RefreshCw className="h-4 w-4 mr-2" />
-                                    Reconnect
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <span className="text-sm text-muted-foreground">Not connected</span>
-                                <Button onClick={() => handleConnectPlatform(platform)}>
-                                    Connect {platformName}
-                                </Button>
-                            </>
-                        )}
-                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAddAccount(platform)}
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Account
+                    </Button>
                 </div>
 
-                {/* Platform Content */}
-                <CardContent className="p-6">
-                    {loading ? (
-                        <div className="space-y-6">
-                            <div className="space-y-3">
-                                <Skeleton className="h-5 w-40" />
-                                {[1, 2].map((i) => (
-                                    <div key={i} className="flex items-center justify-between py-3">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className="h-5 w-5 rounded" />
-                                            <div className="space-y-1">
-                                                <Skeleton className="h-4 w-32" />
-                                                <Skeleton className="h-3 w-40" />
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <Skeleton className="h-5 w-20 rounded-full" />
-                                            <Skeleton className="h-5 w-10 rounded-full" />
-                                            <Skeleton className="h-8 w-20" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                {accounts.length === 0 ? (
+                    <div className="border border-dashed border-border rounded-lg p-6 text-center">
+                        <div className="rounded-full bg-muted p-3 w-fit mx-auto mb-3">
+                            <Icon className="h-6 w-6 opacity-50" />
                         </div>
-                    ) : !connection.connected ? (
-                        <div className="flex flex-col items-center justify-center py-16 text-center">
-                            <div className="rounded-full bg-muted p-6 mb-6">
-                                <Icon className="h-12 w-12 opacity-50" />
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">
-                                {platformName} is not connected
-                            </h3>
-                            <p className="text-muted-foreground max-w-md mb-6">
-                                Connect your {platformName} account to view and manage your calendars,
-                                enable auto-join, and sync your meetings.
-                            </p>
-                            <Button size="lg" onClick={() => handleConnectPlatform(platform)}>
-                                Connect {platformName}
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="space-y-8">
-                            {/* Connected Calendars Section */}
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <h3 className="text-base font-semibold">Connected Calendars</h3>
-                                    <Badge variant="secondary" className="text-xs">
-                                        {connected.length}
-                                    </Badge>
-                                </div>
-
-                                {connected.length === 0 ? (
-                                    <div className="bg-muted/50 rounded-lg p-4 text-center">
-                                        <p className="text-sm text-muted-foreground">
-                                            No calendars connected
-                                        </p>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                            Select calendars from the available list below to start syncing
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="border border-border rounded-lg divide-y divide-border">
-                                        {connected.map((calendar) => (
-                                            <div
-                                                key={calendar.id}
-                                                className="flex items-center justify-between p-4"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <CalendarIcon className="h-5 w-5 text-primary" />
-                                                    <div>
-                                                        <p className="font-medium">{calendar.name}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {calendar.email}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-6">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className={
-                                                            calendar.status === "CONNECTED"
-                                                                ? "bg-green-500/10 text-green-600 border-green-500/20"
-                                                                : "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
-                                                        }
-                                                    >
-                                                        {calendar.status === "SYNCING" ? (
-                                                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                                        ) : (
-                                                            <Check className="h-3 w-3 mr-1" />
-                                                        )}
-                                                        {calendar.status === "SYNCING" ? "Syncing" : "Connected"}
-                                                    </Badge>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm text-muted-foreground">Auto-Join</span>
-                                                        <Switch
-                                                            checked={calendar.auto_join}
-                                                            onCheckedChange={() => {}}
-                                                        />
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                        onClick={() => setCalendarToDisconnect(calendar)}
-                                                    >
-                                                        Disconnect
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Available Calendars Section */}
-                            {available.length > 0 && (
-                                <div>
-                                    <div className="mb-4">
-                                        <h3 className="text-base font-semibold">Available Calendars</h3>
-                                        <p className="text-sm text-muted-foreground mt-1">
-                                            These calendars are not currently syncing with your account
-                                        </p>
-                                    </div>
-
-                                    <div className="border border-border rounded-lg divide-y divide-border">
-                                        {available.map((calendar) => (
-                                            <div
-                                                key={calendar.id}
-                                                className="flex items-center justify-between p-4 opacity-70"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <CalendarIcon className="h-5 w-5 text-muted-foreground" />
-                                                    <div>
-                                                        <p className="font-medium">{calendar.name}</p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {calendar.email}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-6">
-                                                    <span className="text-sm text-muted-foreground">
-                                                        Not connected
-                                                    </span>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleConnectCalendar(calendar)}
-                                                    >
-                                                        Connect
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                        <p className="text-sm text-muted-foreground mb-3">
+                            No {platformName} accounts connected
+                        </p>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddAccount(platform)}
+                        >
+                            Connect {platformName}
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {accounts.map(renderAccountSection)}
+                    </div>
+                )}
+            </div>
         );
     };
 
@@ -355,13 +353,78 @@ export default function Calendars() {
                 </Button>
             </div>
 
-            {/* Platform Sections */}
-            <div className="space-y-6">
-                {renderPlatformSection("google", "Google Calendar", GoogleIcon)}
-                {renderPlatformSection("microsoft", "Microsoft Outlook", MicrosoftIcon)}
-            </div>
+            {/* Main Content Card */}
+            <Card>
+                <CardContent className="p-6">
+                    {loading ? (
+                        <div className="space-y-6">
+                            {[1, 2].map((i) => (
+                                <div key={i} className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-5 w-5" />
+                                        <Skeleton className="h-5 w-32" />
+                                    </div>
+                                    <div className="border border-border rounded-lg">
+                                        <div className="p-4 bg-muted/30">
+                                            <div className="flex items-center gap-3">
+                                                <Skeleton className="h-5 w-5" />
+                                                <div className="space-y-1">
+                                                    <Skeleton className="h-4 w-40" />
+                                                    <Skeleton className="h-3 w-24" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {[1, 2].map((j) => (
+                                            <div key={j} className="flex items-center justify-between p-4 border-t border-border">
+                                                <div className="flex items-center gap-3">
+                                                    <Skeleton className="h-4 w-4" />
+                                                    <Skeleton className="h-4 w-32" />
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <Skeleton className="h-5 w-20 rounded-full" />
+                                                    <Skeleton className="h-5 w-10 rounded-full" />
+                                                    <Skeleton className="h-8 w-20" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : !hasAnyAccounts ? (
+                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                            <div className="rounded-full bg-muted p-6 mb-6">
+                                <CalendarIcon className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2">
+                                No calendars connected
+                            </h3>
+                            <p className="text-muted-foreground max-w-md mb-6">
+                                Connect your Google or Microsoft calendar accounts to view and manage your calendars,
+                                enable auto-join, and sync your meetings.
+                            </p>
+                            <div className="flex gap-3">
+                                <Button onClick={() => handleAddAccount("google")}>
+                                    <GoogleIcon className="h-4 w-4 mr-2" />
+                                    Connect Google
+                                </Button>
+                                <Button variant="outline" onClick={() => handleAddAccount("microsoft")}>
+                                    <MicrosoftIcon className="h-4 w-4 mr-2" />
+                                    Connect Microsoft
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-8">
+                            {renderPlatformGroup("google", "Google Calendar", GoogleIcon)}
+                            <Separator />
+                            {renderPlatformGroup("microsoft", "Microsoft Outlook", MicrosoftIcon)}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
 
-            {/* Disconnect Confirmation Dialog */}
+            {/* Disconnect Calendar Dialog */}
             <AlertDialog
                 open={!!calendarToDisconnect}
                 onOpenChange={(open) => !open && setCalendarToDisconnect(null)}
@@ -386,10 +449,44 @@ export default function Calendars() {
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={handleDisconnect}
+                            onClick={handleDisconnectCalendar}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             Disconnect
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Remove Account Dialog */}
+            <AlertDialog
+                open={!!accountToRemove}
+                onOpenChange={(open) => !open && setAccountToRemove(null)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remove Account</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-2">
+                            <span>
+                                Are you sure you want to remove{" "}
+                                <span className="font-medium text-foreground">
+                                    {accountToRemove?.email}
+                                </span>
+                                ?
+                            </span>
+                            <span className="block mt-2">
+                                All calendars associated with this account will be disconnected and 
+                                their events will be removed from your account.
+                            </span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleRemoveAccount}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Remove Account
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
