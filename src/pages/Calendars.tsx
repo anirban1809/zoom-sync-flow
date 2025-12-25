@@ -83,7 +83,7 @@ interface ConnectedAccount {
     lastSync: string;
 }
 
-// Mock data for demonstration
+// Mock data for demonstration//
 const mockConnectedAccounts: ConnectedAccount[] = [
     {
         id: "g1",
