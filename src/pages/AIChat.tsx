@@ -294,7 +294,9 @@ export default function AIChat() {
             </div>
 
             {/* Composer - Sticky at bottom */}
-            <div className="sticky bottom-0  pt-4 pl-4 pr-4 mt-auto">
+            <div className="sticky bottom-0 pt-4 pl-4 pr-4 mt-auto bg-background relative">
+                {/* Top fade effect */}
+                <div className="absolute -top-12 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none" />
                 <div className="max-w-3xl mx-auto w-full space-y-3">
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm">
