@@ -1,9 +1,7 @@
-import { CreateMeetingModal } from "@/components/CreateMeetingModal";
-import { MeetingCard } from "@/components/MeetingCard";
-import { TaskRow } from "@/components/TaskRow";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Card,
     CardContent,
@@ -11,558 +9,513 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { apiFetch } from "@/lib/api/api";
-import { mockMeetings, mockTasks } from "@/lib/mockData";
-import { cn } from "@/lib/utils";
-import { Meeting, Task } from "@/types";
-import { format } from "date-fns";
-import { Calendar, ChevronRight, Clock, User, Video } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const statusColors = {
-    todo: "bg-muted text-muted-foreground",
-    "in-progress": "bg-info/10 text-info border-info/20",
-    done: "bg-success/10 text-success border-success/20",
-    cancelled: "bg-muted text-muted-foreground",
-} as const;
-
-const getGreeting = () => {
-    const hour = new Date().getHours();
-
-    if (hour < 12) {
-        return {
-            greeting: "Good morning",
-            caption: "Here's what's happening today",
-        };
-    } else if (hour < 16) {
-        return {
-            greeting: "Good afternoon",
-            caption: "Let's keep the momentum going.",
-        };
-    } else {
-        return {
-            greeting: "Good evening",
-            caption: "Time to wrap up the day's goals.",
-        };
-    }
+    Send,
+    Paperclip,
+    Plus,
+    Calendar,
+    Clock,
+    Copy,
+    FileText,
+    Play,
+    CheckSquare,
+    ChevronDown,
+    ChevronRight,
+    Download,
+    Save,
+} from "lucide-react";
+type Message = {
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    sources?: Source[];
+    suggestedFollowUps?: string[];
 };
+type Source = {
+    type: "meeting" | "transcript" | "task" | "account";
+    title: string;
+    metadata: string;
+    snippet: string;
+    timestamp?: string;
+    confidence: string;
+};
+export default function AIChat() {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState("");
+    const [scopeChips, setScopeChips] = useState<string[]>([]);
+    const [expandedSources, setExpandedSources] = useState<
+        Record<string, boolean>
+    >({});
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const upcomingMeetings = [
+        {
+            id: "1",
+            title: "Weekly Team Sync",
+            time: "Today, 2:00 PM",
+            participants: ["John", "Sarah", "Mike"],
+        },
+        {
+            id: "2",
+            title: "Client Review - Acme Corp",
+            time: "Tomorrow, 10:00 AM",
+            participants: ["Lisa", "Tom"],
+        },
+        {
+            id: "3",
+            title: "Product Planning",
+            time: "Dec 26, 3:00 PM",
+            participants: ["Emma", "David", "Chris"],
+        },
+    ];
+    const recordedMeetings = [
+        {
+            id: "4",
+            title: "Q4 Strategy Discussion",
+            date: "Dec 20, 2024",
+            duration: "45 min",
+        },
+        {
+            id: "5",
+            title: "Design Review Session",
+            date: "Dec 18, 2024",
+            duration: "32 min",
+        },
+        {
+            id: "6",
+            title: "Sprint Retrospective",
+            date: "Dec 15, 2024",
+            duration: "28 min",
+        },
+    ];
+    const handleSend = () => {
+        if (!input.trim()) return;
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            role: "user",
+            content: input,
+        };
 
-export default function Home() {
-    const navigate = useNavigate();
-    const [userInfo, setUserInfo] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [createMeetingOpen, setCreateMeetingOpen] = useState(false);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-    const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(
-        null
-    );
-    const todaysMeetings = mockMeetings.slice(0, 3);
-    const { greeting, caption } = getGreeting();
-
-    const fetchUserInfo = async () => {
-        try {
-            const res = await apiFetch("/me");
-            setUserInfo(await res.json());
-        } catch (error) {
-            console.error("Failed to fetch user info:", error);
-        } finally {
-            setLoading(false);
+        // Mock assistant response
+        const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content:
+                "Based on your meetings and transcripts, here's what I found...",
+            sources: [
+                {
+                    type: "meeting",
+                    title: "Q3 Review with Acme Corp",
+                    metadata: "Oct 3, 2025 • John Smith • Acme Corp",
+                    snippet:
+                        "We discussed the pricing model and agreed to a 15% discount for annual contracts...",
+                    timestamp: "12:34",
+                    confidence: "High confidence",
+                },
+                {
+                    type: "transcript",
+                    title: "Product Strategy Session",
+                    metadata: "Oct 1, 2025 • Sarah Johnson",
+                    snippet:
+                        "The team decided to prioritize feature X for Q4 delivery...",
+                    timestamp: "08:15",
+                    confidence: "Medium confidence",
+                },
+            ],
+            suggestedFollowUps: [
+                "What were the key decisions?",
+                "Show me related action items",
+                "Who attended these meetings?",
+            ],
+        };
+        setMessages([...messages, userMessage, assistantMessage]);
+        setInput("");
+    };
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
         }
     };
-
+    const toggleSourceExpansion = (messageId: string) => {
+        setExpandedSources((prev) => ({
+            ...prev,
+            [messageId]: !prev[messageId],
+        }));
+    };
+    const addScope = (scope: string) => {
+        setScopeChips([...scopeChips, scope]);
+    };
+    const removeScope = (scope: string) => {
+        setScopeChips(scopeChips.filter((s) => s !== scope));
+    };
     useEffect(() => {
-        // Check for selected workspace in sessionStorage
-        const storedWorkspace = sessionStorage.getItem("selected_workspace_id");
-        if (storedWorkspace) {
-            // Workspace already selected, fetch user info
-            fetchUserInfo();
-        } else {
-            // No workspace selected, redirect to workspace selection
-            navigate("/workspace-selection");
-        }
-    }, [navigate]);
-
-    const upcomingTasks = mockTasks
-        .filter((t) => t.status !== "done")
-        .slice(0, 5);
-
-    if (loading) {
-        return (
-            <div className="p-8 max-w-7xl mx-auto space-y-6">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                        <Skeleton className="h-9 w-64" />
-                        <Skeleton className="h-5 w-48" />
-                    </div>
-                    <Skeleton className="h-10 w-40" />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card>
-                        <CardHeader>
-                            <Skeleton className="h-6 w-40" />
-                            <Skeleton className="h-4 w-48 mt-2" />
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            {[1, 2, 3].map((i) => (
-                                <div
-                                    key={i}
-                                    className="space-y-2 p-4 border rounded-lg"
-                                >
-                                    <Skeleton className="h-5 w-3/4" />
-                                    <Skeleton className="h-4 w-1/2" />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <Skeleton className="h-6 w-32" />
-                            <Skeleton className="h-4 w-40 mt-2" />
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center gap-3 p-3 border rounded-lg"
-                                >
-                                    <Skeleton className="h-4 w-4 rounded" />
-                                    <Skeleton className="h-4 flex-1" />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <Card>
-                    <CardHeader>
-                        <Skeleton className="h-6 w-40" />
-                        <Skeleton className="h-4 w-36 mt-2" />
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {[1, 2, 3].map((i) => (
-                            <div
-                                key={i}
-                                className="space-y-2 p-4 border rounded-lg"
-                            >
-                                <Skeleton className="h-5 w-2/3" />
-                                <Skeleton className="h-4 w-1/3" />
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
-
+        // Focus input on mount
+        textareaRef.current?.focus();
+    }, []);
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">
-                        {greeting}, {userInfo?.first_name || 'there'}
-                    </h1>
-                    <p className="text-muted-foreground mt-1">{caption}</p>
-                </div>
-                <div className="flex gap-2">
+        <div className="pt-8 pl-8 pr-8 flex flex-col h-full relative">
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                    Good Morning, Anirban
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                    Ask about your meetings, transcripts, and action items.
+                </p>
+            </div>
+
+            {/* Context Bar */}
+            <div className="flex-shrink-0 pb-4 pt-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                    {scopeChips.map((chip) => (
+                        <Badge key={chip} variant="secondary" className="gap-1">
+                            {chip}
+                            <button
+                                className="ml-1"
+                                onClick={() => removeScope(chip)}
+                            >
+                                ×
+                            </button>
+                        </Badge>
+                    ))}
                     <Button
-                        size="lg"
                         variant="outline"
-                        className="gap-2"
-                        onClick={() => setCreateMeetingOpen(true)}
+                        size="sm"
+                        onClick={() => addScope("Last 7 days")}
                     >
-                        <Calendar className="h-5 w-5" />
-                        Create Meeting
+                        <Plus className="mr-1 h-3 w-3" />
+                        Add scope
+                    </Button>
+                    <Button variant="outline" size="sm">
+                        <Calendar className="mr-1 h-3 w-3" />
+                        Attach meetings
                     </Button>
                 </div>
             </div>
 
-            <CreateMeetingModal
-                open={createMeetingOpen}
-                onOpenChange={setCreateMeetingOpen}
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Today's Meetings</CardTitle>
-                            <CardDescription>
-                                Scheduled for {format(new Date(), "MMMM d, yyyy")}
-                            </CardDescription>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="gap-1 text-muted-foreground hover:text-foreground"
-                            onClick={() => navigate("/calendars")}
-                        >
-                            View all
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {todaysMeetings.length > 0 ? (
-                            todaysMeetings.map((meeting) => (
-                                <MeetingCard
-                                    key={meeting.id}
-                                    meeting={meeting}
-                                    onClick={() => setSelectedMeeting(meeting)}
-                                />
-                            ))
-                        ) : (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <p className="mb-2">
-                                    No meetings scheduled for today
-                                </p>
-                                <Button variant="outline" size="sm">
-                                    Connect Calendar
-                                </Button>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Action Items</CardTitle>
-                        <CardDescription>Your pending tasks</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        {upcomingTasks.length > 0 ? (
-                            upcomingTasks.map((task) => (
-                                <div
-                                    key={task.id}
-                                    onClick={() => setSelectedTask(task)}
-                                    className="cursor-pointer"
-                                >
-                                    <TaskRow task={task} />
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <p>No pending tasks</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Recent Meetings</CardTitle>
-                    <CardDescription>From the past 7 days</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    {mockMeetings.length > 0 ? (
-                        mockMeetings
-                            .slice(0, 3)
-                            .map((meeting) => (
-                                <MeetingCard
-                                    key={meeting.id}
-                                    meeting={meeting}
-                                    showActions={false}
-                                />
-                            ))
-                    ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <p>No recent meetings</p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* Meeting Details Modal */}
-            <Dialog
-                open={!!selectedMeeting}
-                onOpenChange={() => setSelectedMeeting(null)}
-            >
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                    {selectedMeeting && (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle className="text-xl">
-                                    {selectedMeeting.title}
-                                </DialogTitle>
-                            </DialogHeader>
-
-                            <div className="mt-6 space-y-6">
-                                {/* Time and Status */}
-                                <div className="flex flex-wrap gap-2">
-                                    <Badge variant="outline">
-                                        <Clock className="h-3 w-3 mr-1" />
-                                        {format(
-                                            selectedMeeting.start,
-                                            "MMM d, yyyy h:mm a"
-                                        )}{" "}
-                                        -{" "}
-                                        {format(selectedMeeting.end, "h:mm a")}
-                                    </Badge>
-                                    <Badge
-                                        variant="outline"
-                                        className="capitalize"
-                                    >
-                                        {selectedMeeting.status}
-                                    </Badge>
-                                    <Badge
-                                        variant="outline"
-                                        className="capitalize"
-                                    >
-                                        {selectedMeeting.provider}
-                                    </Badge>
-                                </div>
-
-                                {/* Participants */}
-                                <div>
-                                    <h4 className="font-semibold text-sm mb-3">
-                                        Participants (
-                                        {selectedMeeting.participants.length})
-                                    </h4>
-                                    <div className="space-y-2">
-                                        {selectedMeeting.participants.map(
-                                            (participant) => (
-                                                <div
-                                                    key={participant.id}
-                                                    className="flex items-center gap-3"
-                                                >
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarFallback className="text-xs">
-                                                            {participant.name
-                                                                .split(" ")
-                                                                .map(
-                                                                    (n) => n[0]
-                                                                )
-                                                                .join("")}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex-1">
-                                                        <p className="text-sm font-medium">
-                                                            {participant.name}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {participant.role}
-                                                        </p>
+            {/* Conversation Area */}
+            <div className="flex-1 overflow-y-auto pb-[280px]">
+                {messages.length === 0 ? (
+                    <div className="max-w-3xl mx-auto space-y-8 py-6 px-8 pb-32">
+                        {/* Upcoming Meetings */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-medium">
+                                Upcoming Meetings
+                            </h2>
+                            <div className="grid gap-3">
+                                {upcomingMeetings.map((meeting) => (
+                                    <Card key={meeting.id}>
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <p className="font-medium text-sm">
+                                                        {meeting.title}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>
+                                                            {meeting.time}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Tags */}
-                                {selectedMeeting.tags.length > 0 && (
-                                    <div>
-                                        <h4 className="font-semibold text-sm mb-2">
-                                            Tags
-                                        </h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedMeeting.tags.map((tag) => (
-                                                <Badge
-                                                    key={tag}
-                                                    variant="secondary"
-                                                >
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Actions */}
-                                <div className="flex gap-2 pt-4 border-t">
-                                    <Button className="flex-1">
-                                        Join Meeting
-                                    </Button>
-                                    <Button variant="outline">
-                                        View Details
-                                    </Button>
-                                </div>
+                                                <div className="flex -space-x-2">
+                                                    {meeting.participants
+                                                        .slice(0, 3)
+                                                        .map(
+                                                            (
+                                                                participant,
+                                                                idx
+                                                            ) => (
+                                                                <div
+                                                                    key={idx}
+                                                                    className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background"
+                                                                >
+                                                                    {participant.charAt(
+                                                                        0
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </div>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
+                        </div>
 
-            {/* Task Details Modal */}
-            <Dialog
-                open={!!selectedTask}
-                onOpenChange={() => setSelectedTask(null)}
-            >
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                    {selectedTask && (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle className="text-xl">
-                                    {selectedTask.title}
-                                </DialogTitle>
-                            </DialogHeader>
-
-                            <div className="mt-6 space-y-6">
-                                {/* Status chips */}
-                                <div className="flex flex-wrap gap-2">
-                                    <Badge
-                                        variant="outline"
-                                        className={cn(
-                                            "border",
-                                            statusColors[selectedTask.status]
-                                        )}
+                        {/* Recorded Meetings */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-medium">
+                                Recently Recorded
+                            </h2>
+                            <div className="grid gap-3">
+                                {recordedMeetings.map((meeting) => (
+                                    <Card key={meeting.id}>
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <p className="font-medium text-sm">
+                                                        {meeting.title}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <Calendar className="h-3 w-3" />
+                                                        <span>
+                                                            {meeting.date}
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span>
+                                                            {meeting.duration}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                >
+                                                    <Play className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="max-w-3xl mx-auto space-y-6 py-6">
+                        {messages.map((message) => (
+                            <div key={message.id} className="space-y-3">
+                                <div
+                                    className={`flex ${
+                                        message.role === "user"
+                                            ? "justify-end"
+                                            : "justify-start"
+                                    }`}
+                                >
+                                    <Card
+                                        className={`max-w-[80%] ${
+                                            message.role === "user"
+                                                ? "bg-primary text-primary-foreground"
+                                                : ""
+                                        }`}
                                     >
-                                        {selectedTask.status}
-                                    </Badge>
-                                    {selectedTask.due && (
-                                        <Badge variant="outline">
-                                            <Calendar className="h-3 w-3 mr-1" />
-                                            {format(
-                                                selectedTask.due,
-                                                "MMM d, yyyy"
-                                            )}
-                                        </Badge>
-                                    )}
-                                    {selectedTask.ownerName && (
-                                        <Badge variant="outline">
-                                            <User className="h-3 w-3 mr-1" />
-                                            {selectedTask.ownerName}
-                                        </Badge>
-                                    )}
+                                        <CardContent className="p-4">
+                                            <p className="text-sm whitespace-pre-wrap">
+                                                {message.content}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
-                                {/* Meeting origin card */}
-                                {selectedTask.meetingId && (
-                                    <div className="rounded-lg border p-4 bg-muted/30">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <Video className="h-4 w-4 text-muted-foreground" />
-                                            <h4 className="font-semibold text-sm">
-                                                Origin Meeting
-                                            </h4>
-                                        </div>
-                                        <p className="font-medium mb-1">
-                                            {
-                                                mockMeetings.find(
-                                                    (m) =>
-                                                        m.id ===
-                                                        selectedTask.meetingId
-                                                )?.title
-                                            }
-                                        </p>
-                                        <p className="text-sm text-muted-foreground mb-2">
-                                            {mockMeetings.find(
-                                                (m) =>
-                                                    m.id ===
-                                                    selectedTask.meetingId
-                                            )?.start
-                                                ? format(
-                                                      mockMeetings.find(
-                                                          (m) =>
-                                                              m.id ===
-                                                              selectedTask.meetingId
-                                                      )!.start,
-                                                      "MMM d, yyyy h:mm a"
-                                                  )
-                                                : ""}
-                                        </p>
-                                        <Button
-                                            variant="link"
-                                            className="mt-2 p-0 h-auto text-xs text-primary"
-                                        >
-                                            View meeting →
-                                        </Button>
-                                    </div>
-                                )}
+                                {message.role === "assistant" &&
+                                    message.sources && (
+                                        <Card>
+                                            <CardHeader
+                                                className="cursor-pointer"
+                                                onClick={() =>
+                                                    toggleSourceExpansion(
+                                                        message.id
+                                                    )
+                                                }
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="text-sm">
+                                                        Sources (
+                                                        {message.sources.length}
+                                                        )
+                                                    </CardTitle>
+                                                    {expandedSources[
+                                                        message.id
+                                                    ] ? (
+                                                        <ChevronDown className="h-4 w-4" />
+                                                    ) : (
+                                                        <ChevronRight className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </CardHeader>
+                                            {expandedSources[message.id] && (
+                                                <CardContent className="space-y-3">
+                                                    {message.sources.map(
+                                                        (source, idx) => (
+                                                            <div
+                                                                key={idx}
+                                                                className="space-y-2"
+                                                            >
+                                                                <div className="flex items-start justify-between">
+                                                                    <div className="space-y-1">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Badge variant="outline">
+                                                                                {
+                                                                                    source.type
+                                                                                }
+                                                                            </Badge>
+                                                                            <span className="font-medium text-sm">
+                                                                                {
+                                                                                    source.title
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="text-xs text-muted-foreground">
+                                                                            {
+                                                                                source.metadata
+                                                                            }
+                                                                        </p>
+                                                                    </div>
+                                                                    <Badge
+                                                                        variant="secondary"
+                                                                        className="text-xs"
+                                                                    >
+                                                                        {
+                                                                            source.confidence
+                                                                        }
+                                                                    </Badge>
+                                                                </div>
+                                                                <p className="text-sm bg-muted p-2 rounded">
+                                                                    "
+                                                                    {
+                                                                        source.snippet
+                                                                    }
+                                                                    "
+                                                                </p>
+                                                                <div className="flex gap-2 flex-wrap">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                    >
+                                                                        <Play className="mr-1 h-3 w-3" />
+                                                                        Play
+                                                                        from{" "}
+                                                                        {
+                                                                            source.timestamp
+                                                                        }
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                    >
+                                                                        <FileText className="mr-1 h-3 w-3" />
+                                                                        Open
+                                                                        transcript
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                    >
+                                                                        <Save className="mr-1 h-3 w-3" />
+                                                                        Save
+                                                                        snippet
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                    >
+                                                                        <CheckSquare className="mr-1 h-3 w-3" />
+                                                                        Create
+                                                                        task
+                                                                    </Button>
+                                                                </div>
+                                                                {idx <
+                                                                    message
+                                                                        .sources
+                                                                        .length -
+                                                                        1 && (
+                                                                    <Separator className="my-3" />
+                                                                )}
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </CardContent>
+                                            )}
+                                        </Card>
+                                    )}
 
-                                {/* External Links */}
-                                {selectedTask.externalLinks.length > 0 && (
-                                    <div>
-                                        <h4 className="font-semibold text-sm mb-2">
-                                            External Links
-                                        </h4>
-                                        <div className="space-y-2">
-                                            {selectedTask.externalLinks.map(
-                                                (link) => (
-                                                    <a
-                                                        key={link.id}
-                                                        href={link.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                {message.role === "assistant" &&
+                                    message.suggestedFollowUps && (
+                                        <div className="flex gap-2 flex-wrap">
+                                            {message.suggestedFollowUps.map(
+                                                (followUp) => (
+                                                    <Badge
+                                                        key={followUp}
+                                                        variant="outline"
+                                                        className="cursor-pointer hover:bg-accent"
+                                                        onClick={() =>
+                                                            setInput(followUp)
+                                                        }
                                                     >
-                                                        {link.provider}:{" "}
-                                                        {link.id}
-                                                    </a>
+                                                        {followUp}
+                                                    </Badge>
                                                 )
                                             )}
                                         </div>
+                                    )}
+
+                                {message.role === "assistant" && (
+                                    <div className="flex gap-2">
+                                        <Button variant="ghost" size="sm">
+                                            <Copy className="mr-1 h-3 w-3" />
+                                            Copy
+                                        </Button>
+                                        <Button variant="ghost" size="sm">
+                                            <Download className="mr-1 h-3 w-3" />
+                                            Export
+                                        </Button>
+                                        <Button variant="ghost" size="sm">
+                                            <Save className="mr-1 h-3 w-3" />
+                                            Save to notes
+                                        </Button>
                                     </div>
                                 )}
-
-                                {/* Comments */}
-                                <div>
-                                    <h4 className="font-semibold text-sm mb-2">
-                                        Comments
-                                    </h4>
-                                    <div className="space-y-3">
-                                        <div className="flex gap-3">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="text-xs">
-                                                    YO
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1">
-                                                <Textarea
-                                                    placeholder="Add a comment… (use @mentions)"
-                                                    className="min-h-[80px]"
-                                                />
-                                                <Button
-                                                    size="sm"
-                                                    className="mt-2"
-                                                >
-                                                    Comment
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Activity */}
-                                <div>
-                                    <Tabs
-                                        defaultValue="activity"
-                                        className="w-full"
-                                    >
-                                        <TabsList>
-                                            <TabsTrigger value="activity">
-                                                Activity
-                                            </TabsTrigger>
-                                            <TabsTrigger value="related">
-                                                Related
-                                            </TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                    <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                                        <p>
-                                            Created{" "}
-                                            {format(
-                                                selectedTask.createdAt,
-                                                "MMM d, yyyy"
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
                             </div>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Composer - Sticky at bottom */}
+            <div className="sticky bottom-0 pt-4 pl-4 pr-4 mt-auto bg-background w-full">
+                {/* Top fade effect */}
+                <div className="absolute w-full -top-12 left-0 right-0 h-12 bg-gradient-to-t from-background pointer-events-none" />
+                <div className="max-w-3xl mx-auto w-full space-y-3">
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                            <Calendar className="mr-1 h-3 w-3" />
+                            Mention meeting
+                        </Button>
+                        <Button variant="outline" size="sm">
+                            <Clock className="mr-1 h-3 w-3" />
+                            Insert timestamp
+                        </Button>
+                        <Button variant="outline" size="sm">
+                            <Paperclip className="mr-1 h-3 w-3" />
+                            Attach
+                        </Button>
+                    </div>
+                    <div className="flex gap-2">
+                        <Textarea
+                            ref={textareaRef}
+                            placeholder="Ask a question or type / for shortcuts..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="min-h-[60px] resize-none"
+                        />
+                        <Button onClick={handleSend} disabled={!input.trim()}>
+                            <Send className="h-4 w-4" />
+                        </Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
+                            Enter to send, Shift+Enter for new line
+                        </p>
+                        <Button variant="link" size="sm" className="text-xs">
+                            Prompt tips
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
