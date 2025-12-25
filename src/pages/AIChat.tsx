@@ -2,171 +2,135 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-    Send,
-    Paperclip,
-    Plus,
-    Calendar,
-    Clock,
-    Copy,
-    FileText,
-    Play,
-    CheckSquare,
-    ChevronDown,
-    ChevronRight,
-    Download,
-    Save,
-} from "lucide-react";
-
+import { Send, Paperclip, Plus, Calendar, Clock, Copy, FileText, Play, CheckSquare, ChevronDown, ChevronRight, Download, Save } from "lucide-react";
 type Message = {
-    id: string;
-    role: "user" | "assistant";
-    content: string;
-    sources?: Source[];
-    suggestedFollowUps?: string[];
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sources?: Source[];
+  suggestedFollowUps?: string[];
 };
-
 type Source = {
-    type: "meeting" | "transcript" | "task" | "account";
-    title: string;
-    metadata: string;
-    snippet: string;
-    timestamp?: string;
-    confidence: string;
+  type: "meeting" | "transcript" | "task" | "account";
+  title: string;
+  metadata: string;
+  snippet: string;
+  timestamp?: string;
+  confidence: string;
 };
-
 export default function AIChat() {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
-    const [scopeChips, setScopeChips] = useState<string[]>([]);
-    const [expandedSources, setExpandedSources] = useState<
-        Record<string, boolean>
-    >({});
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    const upcomingMeetings = [
-        { id: "1", title: "Weekly Team Sync", time: "Today, 2:00 PM", participants: ["John", "Sarah", "Mike"] },
-        { id: "2", title: "Client Review - Acme Corp", time: "Tomorrow, 10:00 AM", participants: ["Lisa", "Tom"] },
-        { id: "3", title: "Product Planning", time: "Dec 26, 3:00 PM", participants: ["Emma", "David", "Chris"] },
-    ];
-
-    const recordedMeetings = [
-        { id: "4", title: "Q4 Strategy Discussion", date: "Dec 20, 2024", duration: "45 min" },
-        { id: "5", title: "Design Review Session", date: "Dec 18, 2024", duration: "32 min" },
-        { id: "6", title: "Sprint Retrospective", date: "Dec 15, 2024", duration: "28 min" },
-    ];
-
-    const handleSend = () => {
-        if (!input.trim()) return;
-
-        const userMessage: Message = {
-            id: Date.now().toString(),
-            role: "user",
-            content: input,
-        };
-
-        // Mock assistant response
-        const assistantMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            role: "assistant",
-            content:
-                "Based on your meetings and transcripts, here's what I found...",
-            sources: [
-                {
-                    type: "meeting",
-                    title: "Q3 Review with Acme Corp",
-                    metadata: "Oct 3, 2025 • John Smith • Acme Corp",
-                    snippet:
-                        "We discussed the pricing model and agreed to a 15% discount for annual contracts...",
-                    timestamp: "12:34",
-                    confidence: "High confidence",
-                },
-                {
-                    type: "transcript",
-                    title: "Product Strategy Session",
-                    metadata: "Oct 1, 2025 • Sarah Johnson",
-                    snippet:
-                        "The team decided to prioritize feature X for Q4 delivery...",
-                    timestamp: "08:15",
-                    confidence: "Medium confidence",
-                },
-            ],
-            suggestedFollowUps: [
-                "What were the key decisions?",
-                "Show me related action items",
-                "Who attended these meetings?",
-            ],
-        };
-
-        setMessages([...messages, userMessage, assistantMessage]);
-        setInput("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [scopeChips, setScopeChips] = useState<string[]>([]);
+  const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const upcomingMeetings = [{
+    id: "1",
+    title: "Weekly Team Sync",
+    time: "Today, 2:00 PM",
+    participants: ["John", "Sarah", "Mike"]
+  }, {
+    id: "2",
+    title: "Client Review - Acme Corp",
+    time: "Tomorrow, 10:00 AM",
+    participants: ["Lisa", "Tom"]
+  }, {
+    id: "3",
+    title: "Product Planning",
+    time: "Dec 26, 3:00 PM",
+    participants: ["Emma", "David", "Chris"]
+  }];
+  const recordedMeetings = [{
+    id: "4",
+    title: "Q4 Strategy Discussion",
+    date: "Dec 20, 2024",
+    duration: "45 min"
+  }, {
+    id: "5",
+    title: "Design Review Session",
+    date: "Dec 18, 2024",
+    duration: "32 min"
+  }, {
+    id: "6",
+    title: "Sprint Retrospective",
+    date: "Dec 15, 2024",
+    duration: "28 min"
+  }];
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
+    // Mock assistant response
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: "Based on your meetings and transcripts, here's what I found...",
+      sources: [{
+        type: "meeting",
+        title: "Q3 Review with Acme Corp",
+        metadata: "Oct 3, 2025 • John Smith • Acme Corp",
+        snippet: "We discussed the pricing model and agreed to a 15% discount for annual contracts...",
+        timestamp: "12:34",
+        confidence: "High confidence"
+      }, {
+        type: "transcript",
+        title: "Product Strategy Session",
+        metadata: "Oct 1, 2025 • Sarah Johnson",
+        snippet: "The team decided to prioritize feature X for Q4 delivery...",
+        timestamp: "08:15",
+        confidence: "Medium confidence"
+      }],
+      suggestedFollowUps: ["What were the key decisions?", "Show me related action items", "Who attended these meetings?"]
     };
-
-    const toggleSourceExpansion = (messageId: string) => {
-        setExpandedSources((prev) => ({
-            ...prev,
-            [messageId]: !prev[messageId],
-        }));
-    };
-
-    const addScope = (scope: string) => {
-        setScopeChips([...scopeChips, scope]);
-    };
-
-    const removeScope = (scope: string) => {
-        setScopeChips(scopeChips.filter((s) => s !== scope));
-    };
-
-    useEffect(() => {
-        // Focus input on mount
-        textareaRef.current?.focus();
-    }, []);
-
-    return (
-        <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto flex flex-col h-full relative">
+    setMessages([...messages, userMessage, assistantMessage]);
+    setInput("");
+  };
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+  const toggleSourceExpansion = (messageId: string) => {
+    setExpandedSources(prev => ({
+      ...prev,
+      [messageId]: !prev[messageId]
+    }));
+  };
+  const addScope = (scope: string) => {
+    setScopeChips([...scopeChips, scope]);
+  };
+  const removeScope = (scope: string) => {
+    setScopeChips(scopeChips.filter(s => s !== scope));
+  };
+  useEffect(() => {
+    // Focus input on mount
+    textareaRef.current?.focus();
+  }, []);
+  return <div className="pt-8 pl-8 pr-8 max-w-7xl mx-auto flex flex-col h-full relative">
             {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Chat</h1>
-                <p className="text-muted-foreground mt-2">
-                    Ask about your meetings, transcripts, and action items.
-                </p>
+                <p className="text-muted-foreground mt-2">Ask about your meetings, transcripts, and action items.</p>
             </div>
 
             {/* Context Bar */}
             <div className="flex-shrink-0 pb-4 pt-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                    {scopeChips.map((chip) => (
-                        <Badge key={chip} variant="secondary" className="gap-1">
+                    {scopeChips.map(chip => <Badge key={chip} variant="secondary" className="gap-1">
                             {chip}
-                            <button
-                                className="ml-1"
-                                onClick={() => removeScope(chip)}
-                            >
+                            <button className="ml-1" onClick={() => removeScope(chip)}>
                                 ×
                             </button>
-                        </Badge>
-                    ))}
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addScope("Last 7 days")}
-                    >
+                        </Badge>)}
+                    <Button variant="outline" size="sm" onClick={() => addScope("Last 7 days")}>
                         <Plus className="mr-1 h-3 w-3" />
                         Add scope
                     </Button>
@@ -179,14 +143,12 @@ export default function AIChat() {
 
             {/* Conversation Area */}
             <div className="flex-1 overflow-y-auto pb-[280px]">
-                {messages.length === 0 ? (
-                    <div className="max-w-3xl mx-auto space-y-8 py-6 px-8 pb-32">
+                {messages.length === 0 ? <div className="max-w-3xl mx-auto space-y-8 py-6 px-8 pb-32">
                         {/* Upcoming Meetings */}
                         <div className="space-y-4">
                             <h2 className="text-lg font-medium">Upcoming Meetings</h2>
                             <div className="grid gap-3">
-                                {upcomingMeetings.map((meeting) => (
-                                    <Card key={meeting.id}>
+                                {upcomingMeetings.map(meeting => <Card key={meeting.id}>
                                         <CardContent className="p-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="space-y-1">
@@ -197,19 +159,13 @@ export default function AIChat() {
                                                     </div>
                                                 </div>
                                                 <div className="flex -space-x-2">
-                                                    {meeting.participants.slice(0, 3).map((participant, idx) => (
-                                                        <div
-                                                            key={idx}
-                                                            className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background"
-                                                        >
+                                                    {meeting.participants.slice(0, 3).map((participant, idx) => <div key={idx} className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background">
                                                             {participant.charAt(0)}
-                                                        </div>
-                                                    ))}
+                                                        </div>)}
                                                 </div>
                                             </div>
                                         </CardContent>
-                                    </Card>
-                                ))}
+                                    </Card>)}
                             </div>
                         </div>
 
@@ -217,8 +173,7 @@ export default function AIChat() {
                         <div className="space-y-4">
                             <h2 className="text-lg font-medium">Recently Recorded</h2>
                             <div className="grid gap-3">
-                                {recordedMeetings.map((meeting) => (
-                                    <Card key={meeting.id}>
+                                {recordedMeetings.map(meeting => <Card key={meeting.id}>
                                         <CardContent className="p-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="space-y-1">
@@ -235,29 +190,13 @@ export default function AIChat() {
                                                 </Button>
                                             </div>
                                         </CardContent>
-                                    </Card>
-                                ))}
+                                    </Card>)}
                             </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="max-w-3xl mx-auto space-y-6 py-6">
-                        {messages.map((message) => (
-                            <div key={message.id} className="space-y-3">
-                                <div
-                                    className={`flex ${
-                                        message.role === "user"
-                                            ? "justify-end"
-                                            : "justify-start"
-                                    }`}
-                                >
-                                    <Card
-                                        className={`max-w-[80%] ${
-                                            message.role === "user"
-                                                ? "bg-primary text-primary-foreground"
-                                                : ""
-                                        }`}
-                                    >
+                    </div> : <div className="max-w-3xl mx-auto space-y-6 py-6">
+                        {messages.map(message => <div key={message.id} className="space-y-3">
+                                <div className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                                    <Card className={`max-w-[80%] ${message.role === "user" ? "bg-primary text-primary-foreground" : ""}`}>
                                         <CardContent className="p-4">
                                             <p className="text-sm whitespace-pre-wrap">
                                                 {message.content}
@@ -266,150 +205,77 @@ export default function AIChat() {
                                     </Card>
                                 </div>
 
-                                {message.role === "assistant" &&
-                                    message.sources && (
-                                        <Card>
-                                            <CardHeader
-                                                className="cursor-pointer"
-                                                onClick={() =>
-                                                    toggleSourceExpansion(
-                                                        message.id
-                                                    )
-                                                }
-                                            >
+                                {message.role === "assistant" && message.sources && <Card>
+                                            <CardHeader className="cursor-pointer" onClick={() => toggleSourceExpansion(message.id)}>
                                                 <div className="flex items-center justify-between">
                                                     <CardTitle className="text-sm">
                                                         Sources (
                                                         {message.sources.length}
                                                         )
                                                     </CardTitle>
-                                                    {expandedSources[
-                                                        message.id
-                                                    ] ? (
-                                                        <ChevronDown className="h-4 w-4" />
-                                                    ) : (
-                                                        <ChevronRight className="h-4 w-4" />
-                                                    )}
+                                                    {expandedSources[message.id] ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                                 </div>
                                             </CardHeader>
-                                            {expandedSources[message.id] && (
-                                                <CardContent className="space-y-3">
-                                                    {message.sources.map(
-                                                        (source, idx) => (
-                                                            <div
-                                                                key={idx}
-                                                                className="space-y-2"
-                                                            >
+                                            {expandedSources[message.id] && <CardContent className="space-y-3">
+                                                    {message.sources.map((source, idx) => <div key={idx} className="space-y-2">
                                                                 <div className="flex items-start justify-between">
                                                                     <div className="space-y-1">
                                                                         <div className="flex items-center gap-2">
                                                                             <Badge variant="outline">
-                                                                                {
-                                                                                    source.type
-                                                                                }
+                                                                                {source.type}
                                                                             </Badge>
                                                                             <span className="font-medium text-sm">
-                                                                                {
-                                                                                    source.title
-                                                                                }
+                                                                                {source.title}
                                                                             </span>
                                                                         </div>
                                                                         <p className="text-xs text-muted-foreground">
-                                                                            {
-                                                                                source.metadata
-                                                                            }
+                                                                            {source.metadata}
                                                                         </p>
                                                                     </div>
-                                                                    <Badge
-                                                                        variant="secondary"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        {
-                                                                            source.confidence
-                                                                        }
+                                                                    <Badge variant="secondary" className="text-xs">
+                                                                        {source.confidence}
                                                                     </Badge>
                                                                 </div>
                                                                 <p className="text-sm bg-muted p-2 rounded">
                                                                     "
-                                                                    {
-                                                                        source.snippet
-                                                                    }
+                                                                    {source.snippet}
                                                                     "
                                                                 </p>
                                                                 <div className="flex gap-2 flex-wrap">
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                    >
+                                                                    <Button variant="ghost" size="sm">
                                                                         <Play className="mr-1 h-3 w-3" />
                                                                         Play
                                                                         from{" "}
-                                                                        {
-                                                                            source.timestamp
-                                                                        }
+                                                                        {source.timestamp}
                                                                     </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                    >
+                                                                    <Button variant="ghost" size="sm">
                                                                         <FileText className="mr-1 h-3 w-3" />
                                                                         Open
                                                                         transcript
                                                                     </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                    >
+                                                                    <Button variant="ghost" size="sm">
                                                                         <Save className="mr-1 h-3 w-3" />
                                                                         Save
                                                                         snippet
                                                                     </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                    >
+                                                                    <Button variant="ghost" size="sm">
                                                                         <CheckSquare className="mr-1 h-3 w-3" />
                                                                         Create
                                                                         task
                                                                     </Button>
                                                                 </div>
-                                                                {idx <
-                                                                    message
-                                                                        .sources
-                                                                        .length -
-                                                                        1 && (
-                                                                    <Separator className="my-3" />
-                                                                )}
-                                                            </div>
-                                                        )
-                                                    )}
-                                                </CardContent>
-                                            )}
-                                        </Card>
-                                    )}
+                                                                {idx < message.sources.length - 1 && <Separator className="my-3" />}
+                                                            </div>)}
+                                                </CardContent>}
+                                        </Card>}
 
-                                {message.role === "assistant" &&
-                                    message.suggestedFollowUps && (
-                                        <div className="flex gap-2 flex-wrap">
-                                            {message.suggestedFollowUps.map(
-                                                (followUp) => (
-                                                    <Badge
-                                                        key={followUp}
-                                                        variant="outline"
-                                                        className="cursor-pointer hover:bg-accent"
-                                                        onClick={() =>
-                                                            setInput(followUp)
-                                                        }
-                                                    >
+                                {message.role === "assistant" && message.suggestedFollowUps && <div className="flex gap-2 flex-wrap">
+                                            {message.suggestedFollowUps.map(followUp => <Badge key={followUp} variant="outline" className="cursor-pointer hover:bg-accent" onClick={() => setInput(followUp)}>
                                                         {followUp}
-                                                    </Badge>
-                                                )
-                                            )}
-                                        </div>
-                                    )}
+                                                    </Badge>)}
+                                        </div>}
 
-                                {message.role === "assistant" && (
-                                    <div className="flex gap-2">
+                                {message.role === "assistant" && <div className="flex gap-2">
                                         <Button variant="ghost" size="sm">
                                             <Copy className="mr-1 h-3 w-3" />
                                             Copy
@@ -422,12 +288,9 @@ export default function AIChat() {
                                             <Save className="mr-1 h-3 w-3" />
                                             Save to notes
                                         </Button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                    </div>}
+                            </div>)}
+                    </div>}
             </div>
 
             {/* Composer - Sticky at bottom */}
@@ -448,14 +311,7 @@ export default function AIChat() {
                         </Button>
                     </div>
                     <div className="flex gap-2">
-                        <Textarea
-                            ref={textareaRef}
-                            placeholder="Ask a question or type / for shortcuts..."
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            className="min-h-[60px] resize-none"
-                        />
+                        <Textarea ref={textareaRef} placeholder="Ask a question or type / for shortcuts..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} className="min-h-[60px] resize-none" />
                         <Button onClick={handleSend} disabled={!input.trim()}>
                             <Send className="h-4 w-4" />
                         </Button>
@@ -470,6 +326,5 @@ export default function AIChat() {
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        </div>;
 }
