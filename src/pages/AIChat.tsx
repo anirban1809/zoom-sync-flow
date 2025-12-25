@@ -53,12 +53,16 @@ export default function AIChat() {
     >({});
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const starterPrompts = [
-        "Summarize last week's customer meetings",
-        "List open action items due this week",
-        "Find decisions about pricing for Acme",
-        "Show all mentions of 'renewal' with timestamps",
-        "Who hasn't had a meeting with Acme in 30 days?",
+    const upcomingMeetings = [
+        { id: "1", title: "Weekly Team Sync", time: "Today, 2:00 PM", participants: ["John", "Sarah", "Mike"] },
+        { id: "2", title: "Client Review - Acme Corp", time: "Tomorrow, 10:00 AM", participants: ["Lisa", "Tom"] },
+        { id: "3", title: "Product Planning", time: "Dec 26, 3:00 PM", participants: ["Emma", "David", "Chris"] },
+    ];
+
+    const recordedMeetings = [
+        { id: "4", title: "Q4 Strategy Discussion", date: "Dec 20, 2024", duration: "45 min" },
+        { id: "5", title: "Design Review Session", date: "Dec 18, 2024", duration: "32 min" },
+        { id: "6", title: "Sprint Retrospective", date: "Dec 15, 2024", duration: "28 min" },
     ];
 
     const handleSend = () => {
@@ -176,28 +180,64 @@ export default function AIChat() {
             {/* Conversation Area */}
             <div className="flex-1 overflow-y-auto pb-[280px]">
                 {messages.length === 0 ? (
-                    <div className="max-w-3xl mx-auto space-y-6 py-6">
-                        <div className="text-center space-y-2 mb-8">
-                            <h2 className="text-lg font-medium">
-                                Get started with AI Chat
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
-                                Try one of these prompts or ask your own
-                                question
-                            </p>
+                    <div className="max-w-3xl mx-auto space-y-8 py-6 px-8 pb-32">
+                        {/* Upcoming Meetings */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-medium">Upcoming Meetings</h2>
+                            <div className="grid gap-3">
+                                {upcomingMeetings.map((meeting) => (
+                                    <Card key={meeting.id}>
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <p className="font-medium text-sm">{meeting.title}</p>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>{meeting.time}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex -space-x-2">
+                                                    {meeting.participants.slice(0, 3).map((participant, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium border-2 border-background"
+                                                        >
+                                                            {participant.charAt(0)}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                        <div className="grid gap-3">
-                            {starterPrompts.map((prompt) => (
-                                <Card
-                                    key={prompt}
-                                    className="cursor-pointer hover:bg-accent transition-colors"
-                                    onClick={() => setInput(prompt)}
-                                >
-                                    <CardContent className="p-4">
-                                        <p className="text-sm">{prompt}</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
+
+                        {/* Recorded Meetings */}
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-medium">Recently Recorded</h2>
+                            <div className="grid gap-3">
+                                {recordedMeetings.map((meeting) => (
+                                    <Card key={meeting.id}>
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <p className="font-medium text-sm">{meeting.title}</p>
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <Calendar className="h-3 w-3" />
+                                                        <span>{meeting.date}</span>
+                                                        <span>•</span>
+                                                        <span>{meeting.duration}</span>
+                                                    </div>
+                                                </div>
+                                                <Button variant="ghost" size="sm">
+                                                    <Play className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 ) : (
