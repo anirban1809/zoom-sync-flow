@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -202,9 +203,17 @@ export default function Home() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Upcoming Meetings */}
                             <div className="space-y-4">
-                                <h2 className="text-lg font-medium">
-                                    Upcoming Meetings
-                                </h2>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-medium">
+                                        Upcoming Meetings
+                                    </h2>
+                                    <Link
+                                        to="/meetings?tab=upcoming"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        View all
+                                    </Link>
+                                </div>
                                 <div className="grid gap-3">
                                     {upcomingMeetings.map((meeting) => (
                                         <Card key={meeting.id}>
@@ -249,9 +258,17 @@ export default function Home() {
 
                             {/* Recorded Meetings */}
                             <div className="space-y-4">
-                                <h2 className="text-lg font-medium">
-                                    Recently Recorded
-                                </h2>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-medium">
+                                        Recently Recorded
+                                    </h2>
+                                    <Link
+                                        to="/meetings?tab=recorded"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        View all
+                                    </Link>
+                                </div>
                                 <div className="grid gap-3">
                                     {recordedMeetings.map((meeting) => (
                                         <Card key={meeting.id}>
