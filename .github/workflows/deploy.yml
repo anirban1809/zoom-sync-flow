@@ -78,7 +78,6 @@ jobs:
               run: |
                   cd cdk && cdk bootstrap \
                     aws://779844646698/${AWS_REGION} \
-                    --qualifier ${APP_ENV}
 
             - name: Deploy CDK stack
               run: |
