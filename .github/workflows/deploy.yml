@@ -74,10 +74,10 @@ jobs:
               run: |
                   cd cdk && npx cdk ls || { echo "❌ No stacks detected — check bin/app.ts or APP_ENV"; exit 1; }
 
-            - name: Bootstrap CDK environment
-              run: |
-                  cd cdk && cdk bootstrap \
-                    aws://779844646698/${AWS_REGION} \
+            # - name: Bootstrap CDK environment
+            #   run: |
+            #       cd cdk && cdk bootstrap \
+            #         aws://779844646698/${AWS_REGION} \
 
             - name: Deploy CDK stack
               run: |
