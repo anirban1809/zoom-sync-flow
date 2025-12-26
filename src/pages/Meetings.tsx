@@ -33,7 +33,7 @@ import {
 import { mockMeetings } from "@/lib/mockData";
 import { Meeting } from "@/types";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const providerColors = {
     zoom: "bg-blue-500",
@@ -43,6 +43,8 @@ const providerColors = {
 
 export default function Meetings() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const defaultTab = searchParams.get("tab") || "upcoming";
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(
         null
@@ -87,7 +89,7 @@ export default function Meetings() {
                 </div>
             </div>
 
-            <Tabs defaultValue="upcoming" className="w-full">
+            <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="mb-4">
                     <TabsTrigger value="upcoming" className="gap-2">
                         <Calendar className="h-4 w-4" />
