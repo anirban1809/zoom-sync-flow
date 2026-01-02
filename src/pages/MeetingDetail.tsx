@@ -311,358 +311,377 @@ export default function MeetingDetail() {
                 </div>
             </div>
 
-            {meeting.status === "completed" && (meeting.recordingUrl || meeting.audioUrl) && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                            {meeting.recordingUrl ? (
-                                <>
-                                    <Video className="h-4 w-4" />
-                                    Video Recording
-                                </>
-                            ) : (
-                                <>
-                                    <Mic className="h-4 w-4" />
-                                    Audio Recording
-                                </>
-                            )}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {meeting.recordingUrl ? (
-                            <MediaPlayer
-                                ref={mediaPlayerRef}
-                                src={meeting.recordingUrl}
-                                type="video"
-                                onTimeUpdate={handleMediaTimeUpdate}
-                            />
-                        ) : meeting.audioUrl ? (
-                            <div className="bg-muted/30 rounded-lg p-6 border border-border">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <Mic className="h-8 w-8 text-primary" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-foreground">Audio Only</h3>
-                                        <p className="text-sm text-muted-foreground">
-                                            Video was not recorded for this meeting
-                                        </p>
-                                    </div>
-                                </div>
-                                <MediaPlayer
-                                    ref={mediaPlayerRef}
-                                    src={meeting.audioUrl}
-                                    type="audio"
-                                    onTimeUpdate={handleMediaTimeUpdate}
-                                />
-                            </div>
-                        ) : null}
-                    </CardContent>
-                </Card>
-            )}
-
-            {summary && (
+            {meeting.status === "completed" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
-                    {/* AI Summary Card */}
-                    <Card className="flex flex-col h-full">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <CardTitle>AI Summary</CardTitle>
-                                    <CardDescription>
-                                        Generated with{" "}
-                                        {Math.round(summary.confidence * 100)}%
-                                        confidence
-                                    </CardDescription>
-                                </div>
-                                <Badge
-                                    variant={
-                                        summary.sentiment === "positive"
-                                            ? "default"
-                                            : summary.sentiment === "negative"
-                                            ? "destructive"
-                                            : "secondary"
-                                    }
-                                >
-                                    {summary.sentiment}
-                                </Badge>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-6 flex-1 overflow-hidden">
-                            <ScrollArea className="h-full pr-4">
-                                <div className="space-y-6">
-                                    {summary.bullets.length > 0 && (
-                                        <div className="space-y-3">
-                                            <h3 className="font-semibold flex items-center gap-2">
-                                                <MessageSquare className="h-4 w-4" />
-                                                Key Points
-                                            </h3>
-                                            <ul className="space-y-3">
-                                                {summary.bullets.map(
-                                                    (bullet, i) => (
-                                                        <li
-                                                            key={i}
-                                                            className="flex gap-3"
-                                                        >
-                                                            <span className="text-muted-foreground mt-0.5">
-                                                                •
-                                                            </span>
-                                                            <div className="flex-1">
-                                                                <p className="text-sm">
-                                                                    {
-                                                                        bullet.text
-                                                                    }
-                                                                </p>
-                                                                {bullet.evidence
-                                                                    .length >
-                                                                    0 && (
-                                                                    <button
-                                                                        className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
-                                                                        onClick={() =>
-                                                                            handleViewEvidence(
-                                                                                bullet
-                                                                                    .evidence[0]
-                                                                                    .transcriptSegmentId
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                        evidence
-                                                                        (
-                                                                        {
-                                                                            bullet
-                                                                                .evidence
-                                                                                .length
-                                                                        }
-                                                                        )
-                                                                        <ExternalLink className="h-3 w-3" />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </li>
-                                                    )
-                                                )}
-                                            </ul>
+                    {/* Left Column: Media Player + AI Summary */}
+                    <div className="flex flex-col gap-6">
+                        {/* Media Player */}
+                        {(meeting.recordingUrl || meeting.audioUrl) && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base flex items-center gap-2">
+                                        {meeting.recordingUrl ? (
+                                            <>
+                                                <Video className="h-4 w-4" />
+                                                Video Recording
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Mic className="h-4 w-4" />
+                                                Audio Recording
+                                            </>
+                                        )}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {meeting.recordingUrl ? (
+                                        <MediaPlayer
+                                            ref={mediaPlayerRef}
+                                            src={meeting.recordingUrl}
+                                            type="video"
+                                            onTimeUpdate={handleMediaTimeUpdate}
+                                        />
+                                    ) : meeting.audioUrl ? (
+                                        <div className="bg-muted/30 rounded-lg p-6 border border-border">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <Mic className="h-8 w-8 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-foreground">Audio Only</h3>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Video was not recorded for this meeting
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <MediaPlayer
+                                                ref={mediaPlayerRef}
+                                                src={meeting.audioUrl}
+                                                type="audio"
+                                                onTimeUpdate={handleMediaTimeUpdate}
+                                            />
                                         </div>
-                                    )}
+                                    ) : null}
+                                </CardContent>
+                            </Card>
+                        )}
 
-                                    {summary.decisions.length > 0 && (
-                                        <>
+                        {/* AI Summary */}
+                        {summary ? (
+                            <Card className="flex flex-col flex-1">
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <CardTitle>AI Summary</CardTitle>
+                                            <CardDescription>
+                                                Generated with{" "}
+                                                {Math.round(summary.confidence * 100)}%
+                                                confidence
+                                            </CardDescription>
+                                        </div>
+                                        <Badge
+                                            variant={
+                                                summary.sentiment === "positive"
+                                                    ? "default"
+                                                    : summary.sentiment === "negative"
+                                                    ? "destructive"
+                                                    : "secondary"
+                                            }
+                                        >
+                                            {summary.sentiment}
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-6 flex-1 overflow-hidden">
+                                    <ScrollArea className="h-full pr-4">
+                                        <div className="space-y-6">
+                                            {summary.bullets.length > 0 && (
+                                                <div className="space-y-3">
+                                                    <h3 className="font-semibold flex items-center gap-2">
+                                                        <MessageSquare className="h-4 w-4" />
+                                                        Key Points
+                                                    </h3>
+                                                    <ul className="space-y-3">
+                                                        {summary.bullets.map(
+                                                            (bullet, i) => (
+                                                                <li
+                                                                    key={i}
+                                                                    className="flex gap-3"
+                                                                >
+                                                                    <span className="text-muted-foreground mt-0.5">
+                                                                        •
+                                                                    </span>
+                                                                    <div className="flex-1">
+                                                                        <p className="text-sm">
+                                                                            {
+                                                                                bullet.text
+                                                                            }
+                                                                        </p>
+                                                                        {bullet.evidence
+                                                                            .length >
+                                                                            0 && (
+                                                                            <button
+                                                                                className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                                                                onClick={() =>
+                                                                                    handleViewEvidence(
+                                                                                        bullet
+                                                                                            .evidence[0]
+                                                                                            .transcriptSegmentId
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                View
+                                                                                evidence
+                                                                                (
+                                                                                {
+                                                                                    bullet
+                                                                                        .evidence
+                                                                                        .length
+                                                                                }
+                                                                                )
+                                                                                <ExternalLink className="h-3 w-3" />
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                </li>
+                                                            )
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {summary.decisions.length > 0 && (
+                                                <>
+                                                    <Separator />
+                                                    <div className="space-y-3">
+                                                        <h3 className="font-semibold flex items-center gap-2">
+                                                            <CheckCircle2 className="h-4 w-4" />
+                                                            Decisions
+                                                        </h3>
+                                                        <ul className="space-y-3">
+                                                            {summary.decisions.map(
+                                                                (decision, i) => (
+                                                                    <li
+                                                                        key={i}
+                                                                        className="rounded-lg border bg-success/5 p-3"
+                                                                    >
+                                                                        <p className="text-sm font-medium">
+                                                                            {
+                                                                                decision.text
+                                                                            }
+                                                                        </p>
+                                                                        {decision.owner && (
+                                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                                Owner:{" "}
+                                                                                {
+                                                                                    decision.owner
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                        {decision
+                                                                            .evidence
+                                                                            .length >
+                                                                            0 && (
+                                                                            <button
+                                                                                className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                                                                onClick={() =>
+                                                                                    handleViewEvidence(
+                                                                                        decision
+                                                                                            .evidence[0]
+                                                                                            .transcriptSegmentId
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                View
+                                                                                evidence
+                                                                                (
+                                                                                {
+                                                                                    decision
+                                                                                        .evidence
+                                                                                        .length
+                                                                                }
+                                                                                )
+                                                                                <ExternalLink className="h-3 w-3" />
+                                                                            </button>
+                                                                        )}
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {summary.risks.length > 0 && (
+                                                <>
+                                                    <Separator />
+                                                    <div className="space-y-3">
+                                                        <h3 className="font-semibold flex items-center gap-2">
+                                                            <AlertTriangle className="h-4 w-4" />
+                                                            Risks
+                                                        </h3>
+                                                        <ul className="space-y-3">
+                                                            {summary.risks.map(
+                                                                (risk, i) => (
+                                                                    <li
+                                                                        key={i}
+                                                                        className="rounded-lg border bg-warning/5 p-3"
+                                                                    >
+                                                                        <div className="flex items-start justify-between gap-2">
+                                                                            <p className="text-sm font-medium flex-1">
+                                                                                {
+                                                                                    risk.text
+                                                                                }
+                                                                            </p>
+                                                                            <Badge variant="outline">
+                                                                                {
+                                                                                    risk.severity
+                                                                                }
+                                                                            </Badge>
+                                                                        </div>
+                                                                        {risk.evidence
+                                                                            .length >
+                                                                            0 && (
+                                                                            <button
+                                                                                className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                                                                onClick={() =>
+                                                                                    handleViewEvidence(
+                                                                                        risk
+                                                                                            .evidence[0]
+                                                                                            .transcriptSegmentId
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                View
+                                                                                evidence
+                                                                                (
+                                                                                {
+                                                                                    risk
+                                                                                        .evidence
+                                                                                        .length
+                                                                                }
+                                                                                )
+                                                                                <ExternalLink className="h-3 w-3" />
+                                                                            </button>
+                                                                        )}
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {summary.questions.length > 0 && (
+                                                <>
+                                                    <Separator />
+                                                    <div className="space-y-3">
+                                                        <h3 className="font-semibold flex items-center gap-2">
+                                                            <HelpCircle className="h-4 w-4" />
+                                                            Open Questions
+                                                        </h3>
+                                                        <ul className="space-y-3">
+                                                            {summary.questions.map(
+                                                                (question, i) => (
+                                                                    <li
+                                                                        key={i}
+                                                                        className="rounded-lg border bg-info/5 p-3"
+                                                                    >
+                                                                        <p className="text-sm font-medium">
+                                                                            {
+                                                                                question.text
+                                                                            }
+                                                                        </p>
+                                                                        {question.askedBy && (
+                                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                                Asked
+                                                                                by:{" "}
+                                                                                {
+                                                                                    question.askedBy
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                        {question
+                                                                            .evidence
+                                                                            .length >
+                                                                            0 && (
+                                                                            <button
+                                                                                className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
+                                                                                onClick={() =>
+                                                                                    handleViewEvidence(
+                                                                                        question
+                                                                                            .evidence[0]
+                                                                                            .transcriptSegmentId
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                View
+                                                                                evidence
+                                                                                (
+                                                                                {
+                                                                                    question
+                                                                                        .evidence
+                                                                                        .length
+                                                                                }
+                                                                                )
+                                                                                <ExternalLink className="h-3 w-3" />
+                                                                            </button>
+                                                                        )}
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {/* Action Items Section */}
                                             <Separator />
                                             <div className="space-y-3">
                                                 <h3 className="font-semibold flex items-center gap-2">
                                                     <CheckCircle2 className="h-4 w-4" />
-                                                    Decisions
+                                                    Action Items ({tasks.length})
                                                 </h3>
-                                                <ul className="space-y-3">
-                                                    {summary.decisions.map(
-                                                        (decision, i) => (
-                                                            <li
-                                                                key={i}
-                                                                className="rounded-lg border bg-success/5 p-3"
-                                                            >
-                                                                <p className="text-sm font-medium">
-                                                                    {
-                                                                        decision.text
-                                                                    }
-                                                                </p>
-                                                                {decision.owner && (
-                                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                                        Owner:{" "}
-                                                                        {
-                                                                            decision.owner
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                                {decision
-                                                                    .evidence
-                                                                    .length >
-                                                                    0 && (
-                                                                    <button
-                                                                        className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
-                                                                        onClick={() =>
-                                                                            handleViewEvidence(
-                                                                                decision
-                                                                                    .evidence[0]
-                                                                                    .transcriptSegmentId
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                        evidence
-                                                                        (
-                                                                        {
-                                                                            decision
-                                                                                .evidence
-                                                                                .length
-                                                                        }
-                                                                        )
-                                                                        <ExternalLink className="h-3 w-3" />
-                                                                    </button>
-                                                                )}
-                                                            </li>
-                                                        )
+                                                <div className="space-y-2">
+                                                    {tasks.length > 0 ? (
+                                                        tasks.map((task) => (
+                                                            <TaskRow
+                                                                key={task.id}
+                                                                task={task}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-4 text-muted-foreground text-sm">
+                                                            <p>
+                                                                No action items have
+                                                                been created for this
+                                                                meeting yet
+                                                            </p>
+                                                        </div>
                                                     )}
-                                                </ul>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {summary.risks.length > 0 && (
-                                        <>
-                                            <Separator />
-                                            <div className="space-y-3">
-                                                <h3 className="font-semibold flex items-center gap-2">
-                                                    <AlertTriangle className="h-4 w-4" />
-                                                    Risks
-                                                </h3>
-                                                <ul className="space-y-3">
-                                                    {summary.risks.map(
-                                                        (risk, i) => (
-                                                            <li
-                                                                key={i}
-                                                                className="rounded-lg border bg-warning/5 p-3"
-                                                            >
-                                                                <div className="flex items-start justify-between gap-2">
-                                                                    <p className="text-sm font-medium flex-1">
-                                                                        {
-                                                                            risk.text
-                                                                        }
-                                                                    </p>
-                                                                    <Badge variant="outline">
-                                                                        {
-                                                                            risk.severity
-                                                                        }
-                                                                    </Badge>
-                                                                </div>
-                                                                {risk.evidence
-                                                                    .length >
-                                                                    0 && (
-                                                                    <button
-                                                                        className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
-                                                                        onClick={() =>
-                                                                            handleViewEvidence(
-                                                                                risk
-                                                                                    .evidence[0]
-                                                                                    .transcriptSegmentId
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                        evidence
-                                                                        (
-                                                                        {
-                                                                            risk
-                                                                                .evidence
-                                                                                .length
-                                                                        }
-                                                                        )
-                                                                        <ExternalLink className="h-3 w-3" />
-                                                                    </button>
-                                                                )}
-                                                            </li>
-                                                        )
-                                                    )}
-                                                </ul>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {summary.questions.length > 0 && (
-                                        <>
-                                            <Separator />
-                                            <div className="space-y-3">
-                                                <h3 className="font-semibold flex items-center gap-2">
-                                                    <HelpCircle className="h-4 w-4" />
-                                                    Open Questions
-                                                </h3>
-                                                <ul className="space-y-3">
-                                                    {summary.questions.map(
-                                                        (question, i) => (
-                                                            <li
-                                                                key={i}
-                                                                className="rounded-lg border bg-info/5 p-3"
-                                                            >
-                                                                <p className="text-sm font-medium">
-                                                                    {
-                                                                        question.text
-                                                                    }
-                                                                </p>
-                                                                {question.askedBy && (
-                                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                                        Asked
-                                                                        by:{" "}
-                                                                        {
-                                                                            question.askedBy
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                                {question
-                                                                    .evidence
-                                                                    .length >
-                                                                    0 && (
-                                                                    <button
-                                                                        className="text-xs text-primary hover:underline mt-1 flex items-center gap-1"
-                                                                        onClick={() =>
-                                                                            handleViewEvidence(
-                                                                                question
-                                                                                    .evidence[0]
-                                                                                    .transcriptSegmentId
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                        evidence
-                                                                        (
-                                                                        {
-                                                                            question
-                                                                                .evidence
-                                                                                .length
-                                                                        }
-                                                                        )
-                                                                        <ExternalLink className="h-3 w-3" />
-                                                                    </button>
-                                                                )}
-                                                            </li>
-                                                        )
-                                                    )}
-                                                </ul>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {/* Action Items Section */}
-                                    <Separator />
-                                    <div className="space-y-3">
-                                        <h3 className="font-semibold flex items-center gap-2">
-                                            <CheckCircle2 className="h-4 w-4" />
-                                            Action Items ({tasks.length})
-                                        </h3>
-                                        <div className="space-y-2">
-                                            {tasks.length > 0 ? (
-                                                tasks.map((task) => (
-                                                    <TaskRow
-                                                        key={task.id}
-                                                        task={task}
-                                                    />
-                                                ))
-                                            ) : (
-                                                <div className="text-center py-4 text-muted-foreground text-sm">
-                                                    <p>
-                                                        No action items have
-                                                        been created for this
-                                                        meeting yet
-                                                    </p>
                                                 </div>
-                                            )}
+                                            </div>
+                                        </div>
+                                    </ScrollArea>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card>
+                                <CardContent className="py-12">
+                                    <div className="text-center text-muted-foreground">
+                                        <p className="mb-3">
+                                            AI summary is being generated...
+                                        </p>
+                                        <div className="h-2 w-48 mx-auto bg-muted rounded-full overflow-hidden">
+                                            <div className="h-full w-2/3 bg-primary animate-pulse" />
                                         </div>
                                     </div>
-                                </div>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
 
-                    {/* Transcript Card */}
+                    {/* Right Column: Transcript */}
                     <Card className="flex flex-col h-full relative">
                         <CardHeader>
                             <CardTitle>Transcript</CardTitle>
@@ -774,20 +793,6 @@ export default function MeetingDetail() {
                 </div>
             )}
 
-            {!summary && meeting.status === "completed" && (
-                <Card>
-                    <CardContent className="py-12">
-                        <div className="text-center text-muted-foreground">
-                            <p className="mb-3">
-                                AI summary is being generated...
-                            </p>
-                            <div className="h-2 w-48 mx-auto bg-muted rounded-full overflow-hidden">
-                                <div className="h-full w-2/3 bg-primary animate-pulse" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             {/* Share Modal */}
             <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
