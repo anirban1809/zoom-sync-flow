@@ -142,7 +142,7 @@ const mockAvailableCalendars: CalendarData[] = [
         email: "personal@gmail.com",
         provider: "google",
         accountId: "g1",
-        status: "NOT_CONNECTED",
+        status: "CONNECTED",
         auto_join: false,
     },
     {

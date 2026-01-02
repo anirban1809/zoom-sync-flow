@@ -76,19 +76,41 @@ export default function ConnectCalendarModal({
     >(null);
     const [selectedCalendars, setSelectedCalendars] = useState<string[]>([]);
     const [isLoadingCalendars, setIsLoadingCalendars] = useState(false);
+    const workspaceId = sessionStorage.getItem("selected_workspace_id");
+
+    const fetchCalendars = async (provider: "google" | "microsoft") => {
+        setIsLoadingCalendars(true);
+
+        const res = await apiFetch(
+            `/${provider}/calendars?workspaceId=${workspaceId}`
+        );
+
+        const result = await res.json();
+        console.log(result);
+
+        if (!result.ok) {
+            throw new Error("Failed to fetch calendars");
+        }
+
+        setIsLoadingCalendars(false);
+    };
 
     const login = useGoogleLogin({
         flow: "auth-code", // this is the “offline” style flow
         scope: "openid email profile https://www.googleapis.com/auth/calendar.readonly",
         onSuccess: async (codeResponse) => {
-            const res = await apiFetch("/connect/google", {
-                method: "POST",
-                body: JSON.stringify(codeResponse),
-            });
+            const res = await apiFetch(
+                `/connect/google?workspaceId=${workspaceId}`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(codeResponse),
+                }
+            );
 
             const result = await res.json();
 
             if (result.ok) {
+                await fetchCalendars("google");
             }
         },
         onError: (err) => {
