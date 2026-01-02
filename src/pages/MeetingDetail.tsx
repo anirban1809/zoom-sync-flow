@@ -118,6 +118,36 @@ export default function MeetingDetail() {
         [transcript]
     );
 
+    // Auto-scroll transcript when active segment changes
+    useEffect(() => {
+        if (activeSegmentId && transcriptRefs.current[activeSegmentId] && transcriptScrollRef.current) {
+            const element = transcriptRefs.current[activeSegmentId];
+            const scrollContainer = transcriptScrollRef.current;
+            
+            if (element && scrollContainer) {
+                const elementRect = element.getBoundingClientRect();
+                const containerRect = scrollContainer.getBoundingClientRect();
+                
+                // Check if element is outside the middle third of the container
+                const containerMiddleTop = containerRect.top + containerRect.height / 3;
+                const containerMiddleBottom = containerRect.top + (containerRect.height * 2) / 3;
+                
+                if (elementRect.top < containerMiddleTop || elementRect.bottom > containerMiddleBottom) {
+                    // Scroll element to center of container
+                    const elementTop = element.offsetTop;
+                    const elementHeight = element.offsetHeight;
+                    const containerHeight = scrollContainer.clientHeight;
+                    const scrollTop = elementTop - (containerHeight / 2) + (elementHeight / 2);
+                    
+                    scrollContainer.scrollTo({
+                        top: scrollTop,
+                        behavior: "smooth"
+                    });
+                }
+            }
+        }
+    }, [activeSegmentId]);
+
     // Handle media time updates
     const handleMediaTimeUpdate = useCallback(
         (time: number) => {
@@ -693,10 +723,7 @@ export default function MeetingDetail() {
                         <CardContent className="flex-1 overflow-hidden relative">
                             {transcript ? (
                                 <>
-                                    <ScrollArea
-                                        className="h-full pr-4"
-                                        ref={transcriptScrollRef}
-                                    >
+                                    <ScrollArea className="h-full pr-4" viewportRef={transcriptScrollRef}>
                                         <div className="space-y-2">
                                         {transcript.segments.map((segment) => {
                                             const isActive =
